@@ -1,123 +1,199 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>TripMate AI</title>
+    <title>Roamer AI</title>
 
-    <link rel="stylesheet" href="/static/style.css">
-</head>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
 
-<body>
-
+  <body>
     <div class="page-bg">
-        <div class="gradient-circle circle-1"></div>
-        <div class="gradient-circle circle-2"></div>
-        <div class="gradient-circle circle-3"></div>
+      <div class="gradient-circle circle-1"></div>
+      <div class="gradient-circle circle-2"></div>
+      <div class="gradient-circle circle-3"></div>
     </div>
 
     <main class="app-container">
+      <div id="accountBar" class="account-bar hidden">
+        <span id="accountEmail"></span>
+        <button class="copy-btn" onclick="logout()">Log out</button>
+      </div>
 
-        <section class="hero-section">
-            <div class="badge">
-                ✈️ TripMate AI — A Multi-Agent Travel Planner with LangGraph
-            </div>
+      <section class="hero-section">
+        <div class="badge">
+          ✈️ Roamer AI — A Multi-Agent Travel Planner with LangGraph
+        </div>
 
-            <h1>
-                Plan Your Perfect Trip with AI
-            </h1>
+        <h1>Plan Your Perfect Trip with AI</h1>
 
+        <p>
+          Search flights, discover hotels, and generate a complete travel
+          itinerary using a multi-agent LangGraph system.
+        </p>
+      </section>
+
+      <section id="authCard" class="planner-card auth-card hidden">
+        <div class="card-header">
+          <div>
+            <h2>Log in to plan your trips</h2>
             <p>
-                Search flights, discover hotels, and generate a complete travel itinerary using a multi-agent LangGraph system.
+              Your plans are saved to your account so you can come back and
+              revise them.
             </p>
-        </section>
+          </div>
+        </div>
 
-        <section class="planner-card">
+        <form
+          class="auth-form"
+          onsubmit="
+            event.preventDefault();
+            submitAuth('login');
+          "
+        >
+          <input
+            id="authEmail"
+            type="email"
+            placeholder="Email"
+            autocomplete="email"
+            required
+          />
+          <input
+            id="authPassword"
+            type="password"
+            placeholder="Password (at least 8 characters)"
+            autocomplete="current-password"
+            required
+          />
 
-            <div class="card-header">
-                <div>
-                    <h2 id="inputTitle">Where do you want to go?</h2>
-                    <p id="inputHint">
-                        Example: Plan a complete 7 days Japan trip from Bangladesh under 2 lakhs.
-                    </p>
-                </div>
+          <div class="auth-actions">
+            <button type="submit" id="loginBtn" class="auth-primary">
+              Log in
+            </button>
+            <button
+              type="button"
+              id="registerBtn"
+              class="copy-btn"
+              onclick="submitAuth('register')"
+            >
+              Create account
+            </button>
+          </div>
+        </form>
+      </section>
 
-                <div class="status-pill">
-                    <span class="status-dot"></span>
-                    Online
-                </div>
-            </div>
+      <section id="plannerCard" class="planner-card hidden">
+        <div class="card-header">
+          <div>
+            <h2 id="inputTitle">Where do you want to go?</h2>
+            <p id="inputHint">
+              Example: Plan a complete 7 days Japan trip from Bangladesh under 2
+              lakhs.
+            </p>
+          </div>
 
-            <div class="input-area">
-                <textarea
-                    id="userInput"
-                    placeholder="Plan a complete 7 days Japan trip including flights, hotels and sightseeing under 2 lakhs..."
-                ></textarea>
+          <div class="status-pill">
+            <span class="status-dot"></span>
+            Online
+          </div>
+        </div>
 
-                <button id="sendBtn" onclick="sendMessage()">
-                    <span id="btnText">Generate Plan</span>
-                    <span id="btnLoader" class="loader hidden"></span>
-                </button>
-            </div>
+        <div class="input-area">
+          <textarea
+            id="userInput"
+            placeholder="Plan a complete 7 days Japan trip including flights, hotels and sightseeing under 2 lakhs..."
+          ></textarea>
 
-            <div id="quickPrompts" class="quick-prompts">
-                <button onclick="setPrompt('Plan a complete 7 days Japan trip from Bangladesh including flights, hotels and sightseeing under 2 lakhs.')">
-                    Japan Trip
-                </button>
+          <button id="sendBtn" onclick="sendMessage()">
+            <span id="btnText">Generate Plan</span>
+            <span id="btnLoader" class="loader hidden"></span>
+          </button>
+        </div>
 
-                <button onclick="setPrompt('Plan a 5 days Dubai trip from Dhaka with flights, hotels and sightseeing.')">
-                    Dubai Trip
-                </button>
+        <div id="quickPrompts" class="quick-prompts">
+          <button
+            onclick="
+              setPrompt(
+                'Plan a complete 7 days Japan trip from Bangladesh including flights, hotels and sightseeing under 2 lakhs.',
+              )
+            "
+          >
+            Japan Trip
+          </button>
 
-                <button onclick="setPrompt('Plan a 7 days Thailand trip from Bangladesh with budget hotels and sightseeing.')">
-                    Thailand Trip
-                </button>
+          <button
+            onclick="
+              setPrompt(
+                'Plan a 5 days Dubai trip from Dhaka with flights, hotels and sightseeing.',
+              )
+            "
+          >
+            Dubai Trip
+          </button>
 
-                <button onclick="setPrompt('Give me all country flight info.')">
-                    Global Flights
-                </button>
-            </div>
+          <button
+            onclick="
+              setPrompt(
+                'Plan a 7 days Thailand trip from Bangladesh with budget hotels and sightseeing.',
+              )
+            "
+          >
+            Thailand Trip
+          </button>
 
-        </section>
+          <button onclick="setPrompt('Give me all country flight info.')">
+            Global Flights
+          </button>
+        </div>
+      </section>
 
-        <section id="resultSection" class="result-section hidden">
+      <section id="tripsSection" class="planner-card trips-card hidden">
+        <div class="card-header">
+          <div>
+            <h2>My Trips</h2>
+            <p>Open an earlier plan to view or revise it.</p>
+          </div>
+        </div>
 
-            <div class="result-header">
-                <div>
-                    <h2>Your AI Travel Plan</h2>
-                    <p id="threadInfo">Thread ID: -</p>
-                </div>
+        <ul id="tripsList" class="trips-list"></ul>
+        <p id="tripsEmpty" class="trips-empty hidden">
+          No trips yet. Your plans will appear here.
+        </p>
+      </section>
 
-                <div class="result-actions">
-                    <button class="copy-btn" onclick="copyResult()">
-                        Copy
-                    </button>
+      <section id="resultSection" class="result-section hidden">
+        <div class="result-header">
+          <div>
+            <h2>Your AI Travel Plan</h2>
+            <p id="threadInfo">Thread ID: -</p>
+          </div>
 
-                    <button class="download-btn" onclick="downloadPDF()">
-                        Download PDF
-                    </button>
+          <div class="result-actions">
+            <button class="copy-btn" onclick="copyResult()">Copy</button>
 
-                    <button class="copy-btn" onclick="newTrip()">
-                        New Trip
-                    </button>
-                </div>
-            </div>
+            <button class="download-btn" onclick="downloadPDF()">
+              Download PDF
+            </button>
 
-            <div id="pdfContent" class="pdf-content">
-                <h1 class="pdf-title">AI Travel Plan</h1>
-                <div id="resultBox" class="result-box"></div>
-            </div>
+            <button class="copy-btn" onclick="newTrip()">New Trip</button>
+          </div>
+        </div>
 
-        </section>
+        <div id="pdfContent" class="pdf-content">
+          <h1 class="pdf-title">AI Travel Plan</h1>
+          <div id="resultBox" class="result-box"></div>
+        </div>
+      </section>
 
-        <section id="errorBox" class="error-box hidden"></section>
-
+      <section id="errorBox" class="error-box hidden"></section>
     </main>
 
     <footer>
-        Built with FastAPI, LangGraph, Ollama/Groq, PostgreSQL, Tavily and SerpApi Google Flights
+      Built with FastAPI, LangGraph, Ollama/Groq, PostgreSQL, Tavily and SerpApi
+      Google Flights
     </footer>
 
     <!-- Markdown Renderer -->
@@ -128,6 +204,5 @@
 
     <!-- Your Custom JS -->
     <script src="/static/script.js"></script>
-
-</body>
+  </body>
 </html>

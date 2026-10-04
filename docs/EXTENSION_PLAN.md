@@ -1,21 +1,11 @@
-# TripMate AI — Extension Plan
+# Roamer AI — Extension Plan
 
-Goal: turn TripMate into a resume project for **Agentic AI System** roles.
 
-## Known weakness to fix
-
-The current "multi-agent" graph is a fixed chain of four steps:
-`flight_agent → hotel_agent → itinerary_agent → final_agent`.
-
-- `hotel_agent` makes no LLM call (`flight_agent` now does — see below).
-- ~~No node makes a decision~~ → `router_agent` now routes feedback (see below). The planning path itself is still a fixed chain.
-- `llm_calls` counts the hotel tool step too, so it reports 4 when only 3 are real LLM calls.
+Goal: extend Roamer AI to include user auth, plan revision, RAG, MCP, and more functionalities.
 
 ---
 
 ## Stack and API changes
-
-All services now run on free tiers.
 
 | Area         | Before                                                                   | Now                                                          | Why                                                      |
 | ------------ | ------------------------------------------------------------------------ | ------------------------------------------------------------ | -------------------------------------------------------- |
@@ -32,8 +22,17 @@ All services now run on free tiers.
 - [x] Enable pgvector: run `CREATE EXTENSION IF NOT EXISTS vector;` on the Render database
 - [x] Replace the single shared `psycopg` connection with `psycopg_pool` + `AsyncPostgresSaver`, and make `run_travel_agent` async (verified: `/health` answers in 10 ms while a plan is generating)
 - [x] Add a `users` table and simple JWT auth in FastAPI so each user has their own trips and threads
-- [ ] Scope every user-data query by `user_id` in the app (no Supabase RLS here)
-- [ ] Check the free-tier limits in the Render dashboard (1 GB storage; free databases expire after a set period). Keep the RAG data small enough to fit
+- [x] Scope every user-data query by `user_id` in the app (no Supabase RLS here)
+
+How it's built:
+
+- `backend/app/db.py`: one connection pool shared by the checkpointer and the app; creates `users` and `trips` at startup. `trips` links each graph thread to its owner
+- `backend/app/auth.py`: Argon2 password hashes (`pwdlib`), 7-day HS256 JWTs (`pyjwt`), and a `get_current_user` dependency
+- `backend/app/trips.py`: trip queries, all filtered by `user_id`
+- Endpoints: `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me`, `GET /api/trips`; `/api/travel` routes require login
+- Someone else's thread, or a made-up thread id, returns the same 404 as a missing one; only the server creates thread ids
+- Frontend: login/register form, token sent on every request, My Trips list, Log out
+- Tested with two accounts: user B gets 404 for user A's plan and feedback, and sees an empty trip list
 
 ## Phase 2 — RAG implementation
 

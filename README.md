@@ -1,4 +1,4 @@
-# ✈️ TripMate AI — A Multi-Agent Travel Planner with LangGraph
+# ✈️ Roamer AI — A Multi-Agent Travel Planner with LangGraph
 
 An open-source AI travel planner that turns a natural-language trip request into a practical travel plan with flight suggestions, hotel ideas, and a day-by-day itinerary. The project uses a multi-agent workflow built with LangGraph, LangChain, and FastAPI.
 
@@ -20,8 +20,10 @@ all coordinated through a LangGraph workflow.
 - 🧠 Multi-agent orchestration with LangGraph
 - 📝 Structured travel itinerary generation
 - 🌐 FastAPI backend with a simple web interface
+- 💬 Give feedback on a plan and the agents revise it
+- 🔐 User accounts (JWT); each user only sees their own trips
 - 💾 Conversation state persistence using PostgreSQL
-- ⚡ LLM-powered responses with Groq
+- ⚡ Local LLM with Ollama (free), or hosted with Groq
 
 ## Tech Stack
 
@@ -78,6 +80,10 @@ FLIGHT_CURRENCY=AUD
 TAVILY_API_KEY=your_tavily_api_key
 DEFAULT_ORIGIN_IATA=DAC
 
+# Signs login tokens. Use a long random string, e.g. the output of:
+# python -c "import secrets; print(secrets.token_urlsafe(48))"
+JWT_SECRET=your_long_random_secret
+
 # LLM provider: "ollama" (local, free) or "groq" (hosted, needs GROQ_API_KEY)
 LLM_PROVIDER=ollama
 OLLAMA_MODEL=qwen3:8b
@@ -113,14 +119,26 @@ To run one request in the terminal instead: `python -m scripts.run_agent` (also 
 ## API Endpoints
 
 - GET /health - Health check
-- POST /api/travel - Submit a travel request
+- POST /api/auth/register - Create an account, returns a token
+- POST /api/auth/login - Log in, returns a token
+- GET /api/auth/me - The logged-in user
+- GET /api/trips - Your saved trips
+- POST /api/travel - Submit a travel request, or feedback on an existing trip (`thread_id`)
+- GET /api/travel/{thread_id} - Get the latest plan for one of your trips
 
-Example request:
+All `/api/trips` and `/api/travel` routes need an `Authorization: Bearer <token>` header.
+
+Example requests:
 
 ```bash
+TOKEN=$(curl -s -X POST http://127.0.0.1:8000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"you@example.com","password":"your-password"}' | python -c "import sys,json; print(json.load(sys.stdin)['token'])")
+
 curl -X POST http://127.0.0.1:8000/api/travel \
   -H "Content-Type: application/json" \
-  -d '{"message":"Plan a 3-day trip to Tokyo with a budget of $1200"}'
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"message":"Plan a 3-day trip to Tokyo from Melbourne leaving 2026-11-20"}'
 ```
 
 ## How the Workflow Works
