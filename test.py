@@ -1,20 +1,33 @@
+import asyncio
+
 from tools.tavily_tool import tavily_search
-from tools.flight_tool import search_flights
-from backend import run_travel_agent
+from tools.google_flights_tool import search_google_flights
+from backend import run_travel_agent, open_travel_graph
+from db import open_db, close_db
 
 # res = tavily_search("Best hotels in India")
 # print(res)
 
 
-# res = search_flights("Plan a 7 days Nepal trip from Bangladesh")
+# res = search_google_flights("MEL", "NRT", "2026-11-10", "2026-11-13")
 # print(res)
 
-user_input = input("Enter travel request: ")
 
-response = run_travel_agent(
-    user_input=user_input,
-    thread_id="test_user"
-)
+async def main():
+    user_input = input("Enter travel request: ")
 
-print("\nFINAL RESPONSE:\n")
-print(response["answer"])
+    await open_db()
+    try:
+        await open_travel_graph()
+        response = await run_travel_agent(
+            user_input=user_input,
+            thread_id="test_user"
+        )
+    finally:
+        await close_db()
+
+    print("\nFINAL RESPONSE:\n")
+    print(response["answer"])
+
+
+asyncio.run(main())

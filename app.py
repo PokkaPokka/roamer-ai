@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from pathlib import Path
 import traceback
 import uvicorn
@@ -8,14 +9,25 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
-from backend import run_travel_agent
+from backend import run_travel_agent, get_trip_plan, open_travel_graph
+from db import open_db, close_db
 
 BASE_DIR = Path(__file__).resolve().parent
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await open_db()
+    await open_travel_graph()
+    yield
+    await close_db()
+
 
 app = FastAPI(
     title="TripMate AI",
     description="LangGraph Multi-Agent Travel Planner with FastAPI Frontend",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 
@@ -61,7 +73,7 @@ async def travel_planner(request_data: TravelRequest):
                 }
             )
 
-        result = run_travel_agent(
+        result = await run_travel_agent(
             user_input=user_message,
             thread_id=request_data.thread_id
         )
@@ -71,6 +83,7 @@ async def travel_planner(request_data: TravelRequest):
                 "success": True,
                 "thread_id": result["thread_id"],
                 "answer": result["answer"],
+                "route": result["route"],
                 "flight_results": result["flight_results"],
                 "hotel_results": result["hotel_results"],
                 "itinerary": result["itinerary"],
@@ -90,6 +103,19 @@ async def travel_planner(request_data: TravelRequest):
             }
         )
 
+
+
+@app.get("/api/travel/{thread_id}")
+async def get_travel_plan(thread_id: str):
+    answer = await get_trip_plan(thread_id)
+
+    if not answer:
+        return JSONResponse(
+            status_code=404,
+            content={"success": False, "error": "No plan found for this thread."}
+        )
+
+    return {"success": True, "thread_id": thread_id, "answer": answer}
 
 
 @app.get("/health")

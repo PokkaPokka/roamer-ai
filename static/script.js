@@ -35,7 +35,70 @@ function hideError() {
     errorBox.textContent = "";
 }
 
-function showResult(answer, threadId) {
+const NEW_TRIP_TEXT = {
+    title: "Where do you want to go?",
+    hint: "Example: Plan a 3 day trip from Melbourne to Tokyo leaving 20 November.",
+    placeholder: "Plan a 3 day trip from Melbourne to Tokyo including flights, hotels and sightseeing...",
+    button: "Generate Plan"
+};
+
+const FEEDBACK_TEXT = {
+    title: "Want to change anything?",
+    hint: "Tell the planner what to change, e.g. \"make it 5 days\" or \"add more food spots on day 2\".",
+    placeholder: "Your feedback on the plan...",
+    button: "Revise Plan"
+};
+
+const ROUTE_LABELS = {
+    plan: "New plan",
+    new_search: "Updated with new flight and hotel searches",
+    revise: "Revised from your feedback"
+};
+
+function setMode(hasPlan) {
+    const text = hasPlan ? FEEDBACK_TEXT : NEW_TRIP_TEXT;
+
+    document.getElementById("inputTitle").textContent = text.title;
+    document.getElementById("inputHint").textContent = text.hint;
+    document.getElementById("userInput").placeholder = text.placeholder;
+    document.getElementById("btnText").textContent = text.button;
+    document.getElementById("quickPrompts").classList.toggle("hidden", hasPlan);
+}
+
+function newTrip() {
+    currentThreadId = null;
+    latestAnswerMarkdown = "";
+    localStorage.removeItem("travel_thread_id");
+
+    document.getElementById("resultSection").classList.add("hidden");
+    document.getElementById("userInput").value = "";
+    hideError();
+    setMode(false);
+}
+
+async function restorePlan() {
+    if (!currentThreadId) {
+        setMode(false);
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/travel/${encodeURIComponent(currentThreadId)}`);
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            showResult(data.answer, currentThreadId);
+            setMode(true);
+            return;
+        }
+    } catch (error) {
+        // Fall through and start a new trip.
+    }
+
+    newTrip();
+}
+
+function showResult(answer, threadId, route) {
     latestAnswerMarkdown = answer;
 
     const resultSection = document.getElementById("resultSection");
@@ -48,7 +111,8 @@ function showResult(answer, threadId) {
         resultBox.innerText = answer;
     }
 
-    threadInfo.textContent = `Thread ID: ${threadId}`;
+    const routeLabel = ROUTE_LABELS[route] ? `${ROUTE_LABELS[route]} · ` : "";
+    threadInfo.textContent = `${routeLabel}Thread ID: ${threadId}`;
 
     resultSection.classList.remove("hidden");
 
@@ -92,7 +156,9 @@ async function sendMessage() {
         currentThreadId = data.thread_id;
         localStorage.setItem("travel_thread_id", currentThreadId);
 
-        showResult(data.answer, data.thread_id);
+        showResult(data.answer, data.thread_id, data.route);
+        input.value = "";
+        setMode(true);
 
     } catch (error) {
         showError(error.message);
@@ -181,3 +247,4 @@ document.addEventListener("keydown", function(event) {
         sendMessage();
     }
 });
+restorePlan();

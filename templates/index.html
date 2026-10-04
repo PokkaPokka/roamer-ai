@@ -38,8 +38,8 @@
 
             <div class="card-header">
                 <div>
-                    <h2>Where do you want to go?</h2>
-                    <p>
+                    <h2 id="inputTitle">Where do you want to go?</h2>
+                    <p id="inputHint">
                         Example: Plan a complete 7 days Japan trip from Bangladesh under 2 lakhs.
                     </p>
                 </div>
@@ -62,7 +62,7 @@
                 </button>
             </div>
 
-            <div class="quick-prompts">
+            <div id="quickPrompts" class="quick-prompts">
                 <button onclick="setPrompt('Plan a complete 7 days Japan trip from Bangladesh including flights, hotels and sightseeing under 2 lakhs.')">
                     Japan Trip
                 </button>
@@ -98,6 +98,10 @@
                     <button class="download-btn" onclick="downloadPDF()">
                         Download PDF
                     </button>
+
+                    <button class="copy-btn" onclick="newTrip()">
+                        New Trip
+                    </button>
                 </div>
             </div>
 
@@ -113,7 +117,7 @@
     </main>
 
     <footer>
-        Built with FastAPI, LangGraph, Groq, PostgreSQL, Tavily and AviationStack
+        Built with FastAPI, LangGraph, Ollama/Groq, PostgreSQL, Tavily and SerpApi Google Flights
     </footer>
 
     <!-- Markdown Renderer -->
