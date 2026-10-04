@@ -9,10 +9,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
-from backend import run_travel_agent, get_trip_plan, open_travel_graph
-from db import open_db, close_db
+from app.graph import run_travel_agent, get_trip_plan, open_travel_graph
+from app.db import open_db, close_db
 
-BASE_DIR = Path(__file__).resolve().parent
+# The frontend lives in <repo>/frontend; FastAPI serves it.
+FRONTEND_DIR = Path(__file__).resolve().parents[2] / "frontend"
 
 
 @asynccontextmanager
@@ -33,13 +34,13 @@ app = FastAPI(
 
 app.mount(
     "/static",
-    StaticFiles(directory=str(BASE_DIR / "static")),
+    StaticFiles(directory=str(FRONTEND_DIR / "static")),
     name="static"
 )
 
 
 templates = Jinja2Templates(
-    directory=str(BASE_DIR / "templates")
+    directory=str(FRONTEND_DIR / "templates")
 )
 
 
@@ -134,7 +135,7 @@ async def favicon():
 
 if __name__ == "__main__":
     uvicorn.run(
-        "app:app",
+        "app.main:app",
         host="127.0.0.1",
         port=8000,
         reload=True

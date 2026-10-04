@@ -24,10 +24,10 @@ from langchain_core.messages import (
 )
 from langchain_groq import ChatGroq
 from langchain_ollama import ChatOllama
-from tools.tavily_tool import tavily_search
-from tools.flight_tool import resolve_location_to_iata, parse_route, DEFAULT_ORIGIN_IATA
-from tools.google_flights_tool import search_google_flights
-from db import get_pool
+from app.tools.tavily_tool import tavily_search
+from app.tools.flight_tool import resolve_location_to_iata, parse_route, DEFAULT_ORIGIN_IATA
+from app.tools.google_flights_tool import search_google_flights
+from app.db import get_pool
 
 
 # =========================

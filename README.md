@@ -39,12 +39,20 @@ all coordinated through a LangGraph workflow.
 
 ```text
 .
-├── app.py                # FastAPI app entry point
-├── backend.py            # LangGraph travel workflow
-├── requirements.txt      # Python dependencies
-├── static/               # Static frontend assets
-├── templates/            # HTML templates
-└── tools/                # Flight and web search integrations
+├── backend/
+│   ├── app/
+│   │   ├── main.py       # FastAPI app entry point and routes
+│   │   ├── graph.py      # LangGraph travel workflow
+│   │   ├── db.py         # PostgreSQL pool and app tables
+│   │   └── tools/        # Flight and web search integrations
+│   ├── scripts/
+│   │   └── run_agent.py  # Run one request from the terminal
+│   └── requirements.txt  # Python dependencies
+├── frontend/
+│   ├── templates/        # HTML templates
+│   └── static/           # JavaScript and CSS
+├── docs/                 # Extension plan and diagrams
+└── Dockerfile
 ```
 
 ## Prerequisites
@@ -82,15 +90,16 @@ For local development, install [Ollama](https://ollama.com), then run `ollama pu
 ```bash
 python -m venv .venv
 source .venv/bin/activate   # On Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+pip install -r backend/requirements.txt
 ```
 
 ## Running the App
 
-Start the FastAPI server:
+Start the FastAPI server from the `backend` folder:
 
 ```bash
-python app.py
+cd backend
+python -m app.main
 ```
 
 Then open your browser at:
@@ -98,6 +107,8 @@ Then open your browser at:
 ```text
 http://127.0.0.1:8000/
 ```
+
+To run one request in the terminal instead: `python -m scripts.run_agent` (also from `backend`).
 
 ## API Endpoints
 

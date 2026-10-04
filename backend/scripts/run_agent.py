@@ -1,9 +1,9 @@
 import asyncio
 
-from tools.tavily_tool import tavily_search
-from tools.google_flights_tool import search_google_flights
-from backend import run_travel_agent, open_travel_graph
-from db import open_db, close_db
+from app.tools.tavily_tool import tavily_search
+from app.tools.google_flights_tool import search_google_flights
+from app.graph import run_travel_agent, open_travel_graph
+from app.db import open_db, close_db
 
 # res = tavily_search("Best hotels in India")
 # print(res)

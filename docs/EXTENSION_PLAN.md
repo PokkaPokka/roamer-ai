@@ -31,7 +31,7 @@ All services now run on free tiers.
 
 - [x] Enable pgvector: run `CREATE EXTENSION IF NOT EXISTS vector;` on the Render database
 - [x] Replace the single shared `psycopg` connection with `psycopg_pool` + `AsyncPostgresSaver`, and make `run_travel_agent` async (verified: `/health` answers in 10 ms while a plan is generating)
-- [ ] Add a `users` table and simple JWT auth in FastAPI so each user has their own trips and threads
+- [x] Add a `users` table and simple JWT auth in FastAPI so each user has their own trips and threads
 - [ ] Scope every user-data query by `user_id` in the app (no Supabase RLS here)
 - [ ] Check the free-tier limits in the Render dashboard (1 GB storage; free databases expire after a set period). Keep the RAG data small enough to fit
 
