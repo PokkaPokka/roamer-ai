@@ -15,7 +15,7 @@ all coordinated through a LangGraph workflow.
 
 ## Features
 
-- ✈️ Flight research using AviationStack
+- ✈️ Real flight fares from Google Flights (via SerpApi), with LLM extraction of trip details
 - 🏨 Hotel suggestions using Tavily search
 - 🧠 Multi-agent orchestration with LangGraph
 - 📝 Structured travel itinerary generation
@@ -33,7 +33,7 @@ all coordinated through a LangGraph workflow.
 - Groq LLMs
 - PostgreSQL
 - Tavily API
-- AviationStack API
+- SerpApi (Google Flights)
 
 ## Project Structure
 
@@ -56,7 +56,7 @@ Before running the project locally, make sure you have:
 - API keys for:
   - Groq
   - Tavily
-  - AviationStack
+  - SerpApi (free plan: 250 searches/month)
 
 ## Environment Variables
 
@@ -65,10 +65,17 @@ Create a .env file in the project root with the following variables:
 ```env
 DATABASE_URL=postgresql://user:password@localhost:5432/travel_db
 GROQ_API_KEY=your_groq_api_key
-AVIATIONSTACK_API_KEY=your_aviationstack_api_key
+SERPAPI_API_KEY=your_serpapi_api_key
+FLIGHT_CURRENCY=AUD
 TAVILY_API_KEY=your_tavily_api_key
 DEFAULT_ORIGIN_IATA=DAC
+
+# LLM provider: "ollama" (local, free) or "groq" (hosted, needs GROQ_API_KEY)
+LLM_PROVIDER=ollama
+OLLAMA_MODEL=qwen3:8b
 ```
+
+For local development, install [Ollama](https://ollama.com), then run `ollama pull qwen3:8b`.
 
 ## Installation
 
