@@ -216,3 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Knowledge-base downloads (rebuilt by scripts/build_kb.py)
+backend/data/cache/

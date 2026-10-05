@@ -1,0 +1,4006 @@
+{
+  "generated": "2026-10-05",
+  "method": "Total en.wikivoyage page views over 12 months (2025-10 to 2026-09), from the monthly top-1000 lists, filtered to 'Category:City articles'",
+  "cities": [
+    {
+      "rank": 1,
+      "title": "London",
+      "country": "United Kingdom",
+      "page_views": 100060,
+      "source_url": "https://en.wikivoyage.org/wiki/London",
+      "wikidata": "Q84"
+    },
+    {
+      "rank": 2,
+      "title": "New York City",
+      "country": "United States",
+      "page_views": 91915,
+      "source_url": "https://en.wikivoyage.org/wiki/New_York_City",
+      "wikidata": "Q60"
+    },
+    {
+      "rank": 3,
+      "title": "Paris",
+      "country": "France",
+      "page_views": 87283,
+      "source_url": "https://en.wikivoyage.org/wiki/Paris",
+      "wikidata": "Q90"
+    },
+    {
+      "rank": 4,
+      "title": "Hong Kong",
+      "country": "People's Republic of China",
+      "page_views": 82852,
+      "source_url": "https://en.wikivoyage.org/wiki/Hong_Kong",
+      "wikidata": "Q8646"
+    },
+    {
+      "rank": 5,
+      "title": "Bangkok",
+      "country": "Thailand",
+      "page_views": 74941,
+      "source_url": "https://en.wikivoyage.org/wiki/Bangkok",
+      "wikidata": "Q1861"
+    },
+    {
+      "rank": 6,
+      "title": "Amsterdam",
+      "country": "Netherlands",
+      "page_views": 72496,
+      "source_url": "https://en.wikivoyage.org/wiki/Amsterdam",
+      "wikidata": "Q727"
+    },
+    {
+      "rank": 7,
+      "title": "Berlin",
+      "country": "Germany",
+      "page_views": 72191,
+      "source_url": "https://en.wikivoyage.org/wiki/Berlin",
+      "wikidata": "Q64"
+    },
+    {
+      "rank": 8,
+      "title": "Dublin",
+      "country": "Ireland",
+      "page_views": 68906,
+      "source_url": "https://en.wikivoyage.org/wiki/Dublin",
+      "wikidata": "Q1761"
+    },
+    {
+      "rank": 9,
+      "title": "Sydney",
+      "country": "Australia",
+      "page_views": 66686,
+      "source_url": "https://en.wikivoyage.org/wiki/Sydney",
+      "wikidata": "Q3130"
+    },
+    {
+      "rank": 10,
+      "title": "Chiang Mai",
+      "country": "Thailand",
+      "page_views": 65398,
+      "source_url": "https://en.wikivoyage.org/wiki/Chiang_Mai",
+      "wikidata": "Q52028"
+    },
+    {
+      "rank": 11,
+      "title": "Toronto",
+      "country": "Canada",
+      "page_views": 63381,
+      "source_url": "https://en.wikivoyage.org/wiki/Toronto",
+      "wikidata": "Q172"
+    },
+    {
+      "rank": 12,
+      "title": "Bengaluru",
+      "country": "India",
+      "page_views": 62675,
+      "source_url": "https://en.wikivoyage.org/wiki/Bengaluru",
+      "wikidata": "Q1355"
+    },
+    {
+      "rank": 13,
+      "title": "Tokyo",
+      "country": "Japan",
+      "page_views": 62366,
+      "source_url": "https://en.wikivoyage.org/wiki/Tokyo",
+      "wikidata": "Q7473516"
+    },
+    {
+      "rank": 14,
+      "title": "Venice",
+      "country": "Italy",
+      "page_views": 62099,
+      "source_url": "https://en.wikivoyage.org/wiki/Venice",
+      "wikidata": "Q641"
+    },
+    {
+      "rank": 15,
+      "title": "Ho Chi Minh City",
+      "country": "Vietnam",
+      "page_views": 60842,
+      "source_url": "https://en.wikivoyage.org/wiki/Ho_Chi_Minh_City",
+      "wikidata": "Q1854"
+    },
+    {
+      "rank": 16,
+      "title": "Barcelona",
+      "country": "Spain",
+      "page_views": 59087,
+      "source_url": "https://en.wikivoyage.org/wiki/Barcelona",
+      "wikidata": "Q1492"
+    },
+    {
+      "rank": 17,
+      "title": "Istanbul",
+      "country": "Turkey",
+      "page_views": 58254,
+      "source_url": "https://en.wikivoyage.org/wiki/Istanbul",
+      "wikidata": "Q406"
+    },
+    {
+      "rank": 18,
+      "title": "Glasgow",
+      "country": "United Kingdom",
+      "page_views": 57272,
+      "source_url": "https://en.wikivoyage.org/wiki/Glasgow",
+      "wikidata": "Q4093"
+    },
+    {
+      "rank": 19,
+      "title": "Mexico City",
+      "country": "Mexico",
+      "page_views": 56867,
+      "source_url": "https://en.wikivoyage.org/wiki/Mexico_City",
+      "wikidata": "Q1489"
+    },
+    {
+      "rank": 20,
+      "title": "Montreal",
+      "country": "Canada",
+      "page_views": 56847,
+      "source_url": "https://en.wikivoyage.org/wiki/Montreal",
+      "wikidata": "Q340"
+    },
+    {
+      "rank": 21,
+      "title": "Prague",
+      "country": "Czech Republic",
+      "page_views": 55994,
+      "source_url": "https://en.wikivoyage.org/wiki/Prague",
+      "wikidata": "Q1085"
+    },
+    {
+      "rank": 22,
+      "title": "Los Angeles",
+      "country": "United States",
+      "page_views": 55954,
+      "source_url": "https://en.wikivoyage.org/wiki/Los_Angeles",
+      "wikidata": "Q65"
+    },
+    {
+      "rank": 23,
+      "title": "Delhi",
+      "country": "India",
+      "page_views": 55445,
+      "source_url": "https://en.wikivoyage.org/wiki/Delhi",
+      "wikidata": "Q1353"
+    },
+    {
+      "rank": 24,
+      "title": "Vienna",
+      "country": "Austria",
+      "page_views": 55033,
+      "source_url": "https://en.wikivoyage.org/wiki/Vienna",
+      "wikidata": "Q1741"
+    },
+    {
+      "rank": 25,
+      "title": "Rome",
+      "country": "Italy",
+      "page_views": 54322,
+      "source_url": "https://en.wikivoyage.org/wiki/Rome",
+      "wikidata": "Q220"
+    },
+    {
+      "rank": 26,
+      "title": "Guangzhou",
+      "country": "People's Republic of China",
+      "page_views": 53755,
+      "source_url": "https://en.wikivoyage.org/wiki/Guangzhou",
+      "wikidata": "Q16572"
+    },
+    {
+      "rank": 27,
+      "title": "Lisbon",
+      "country": "Portugal",
+      "page_views": 52390,
+      "source_url": "https://en.wikivoyage.org/wiki/Lisbon",
+      "wikidata": "Q597"
+    },
+    {
+      "rank": 28,
+      "title": "Las Vegas",
+      "country": "United States",
+      "page_views": 52340,
+      "source_url": "https://en.wikivoyage.org/wiki/Las_Vegas",
+      "wikidata": "Q23768"
+    },
+    {
+      "rank": 29,
+      "title": "Dubai",
+      "country": "United Arab Emirates",
+      "page_views": 52329,
+      "source_url": "https://en.wikivoyage.org/wiki/Dubai",
+      "wikidata": "Q612"
+    },
+    {
+      "rank": 30,
+      "title": "Seattle",
+      "country": "United States",
+      "page_views": 52122,
+      "source_url": "https://en.wikivoyage.org/wiki/Seattle",
+      "wikidata": "Q5083"
+    },
+    {
+      "rank": 31,
+      "title": "Marrakech",
+      "country": "Morocco",
+      "page_views": 51718,
+      "source_url": "https://en.wikivoyage.org/wiki/Marrakech",
+      "wikidata": "Q101625"
+    },
+    {
+      "rank": 32,
+      "title": "Budapest",
+      "country": "Hungary",
+      "page_views": 51178,
+      "source_url": "https://en.wikivoyage.org/wiki/Budapest",
+      "wikidata": "Q1781"
+    },
+    {
+      "rank": 33,
+      "title": "Aarhus",
+      "country": "Denmark",
+      "page_views": 50726,
+      "source_url": "https://en.wikivoyage.org/wiki/Aarhus",
+      "wikidata": "Q25319"
+    },
+    {
+      "rank": 34,
+      "title": "Chicago",
+      "country": "United States",
+      "page_views": 49977,
+      "source_url": "https://en.wikivoyage.org/wiki/Chicago",
+      "wikidata": "Q1297"
+    },
+    {
+      "rank": 35,
+      "title": "Munich",
+      "country": "Germany",
+      "page_views": 49215,
+      "source_url": "https://en.wikivoyage.org/wiki/Munich",
+      "wikidata": "Q1726"
+    },
+    {
+      "rank": 36,
+      "title": "Moscow",
+      "country": "Russia",
+      "page_views": 48185,
+      "source_url": "https://en.wikivoyage.org/wiki/Moscow",
+      "wikidata": "Q649"
+    },
+    {
+      "rank": 37,
+      "title": "Hyderabad",
+      "country": "India",
+      "page_views": 46716,
+      "source_url": "https://en.wikivoyage.org/wiki/Hyderabad",
+      "wikidata": "Q1361"
+    },
+    {
+      "rank": 38,
+      "title": "Frankfurt",
+      "country": "Germany",
+      "page_views": 46446,
+      "source_url": "https://en.wikivoyage.org/wiki/Frankfurt",
+      "wikidata": "Q1794"
+    },
+    {
+      "rank": 39,
+      "title": "Buenos Aires",
+      "country": "Argentina",
+      "page_views": 46153,
+      "source_url": "https://en.wikivoyage.org/wiki/Buenos_Aires",
+      "wikidata": "Q1486"
+    },
+    {
+      "rank": 40,
+      "title": "Phnom Penh",
+      "country": "Cambodia",
+      "page_views": 46057,
+      "source_url": "https://en.wikivoyage.org/wiki/Phnom_Penh",
+      "wikidata": "Q1850"
+    },
+    {
+      "rank": 41,
+      "title": "Stockholm",
+      "country": "Sweden",
+      "page_views": 45285,
+      "source_url": "https://en.wikivoyage.org/wiki/Stockholm",
+      "wikidata": "Q1754"
+    },
+    {
+      "rank": 42,
+      "title": "Macau",
+      "country": "People's Republic of China",
+      "page_views": 44872,
+      "source_url": "https://en.wikivoyage.org/wiki/Macau",
+      "wikidata": "Q14773"
+    },
+    {
+      "rank": 43,
+      "title": "Madrid",
+      "country": "Spain",
+      "page_views": 44554,
+      "source_url": "https://en.wikivoyage.org/wiki/Madrid",
+      "wikidata": "Q2807"
+    },
+    {
+      "rank": 44,
+      "title": "Shanghai",
+      "country": "People's Republic of China",
+      "page_views": 44303,
+      "source_url": "https://en.wikivoyage.org/wiki/Shanghai",
+      "wikidata": "Q8686"
+    },
+    {
+      "rank": 45,
+      "title": "Beijing",
+      "country": "People's Republic of China",
+      "page_views": 44086,
+      "source_url": "https://en.wikivoyage.org/wiki/Beijing",
+      "wikidata": "Q956"
+    },
+    {
+      "rank": 46,
+      "title": "Manchester",
+      "country": "United Kingdom",
+      "page_views": 43447,
+      "source_url": "https://en.wikivoyage.org/wiki/Manchester",
+      "wikidata": "Q18125"
+    },
+    {
+      "rank": 47,
+      "title": "Hanoi",
+      "country": "Vietnam",
+      "page_views": 43184,
+      "source_url": "https://en.wikivoyage.org/wiki/Hanoi",
+      "wikidata": "Q1858"
+    },
+    {
+      "rank": 48,
+      "title": "Chennai",
+      "country": "India",
+      "page_views": 42940,
+      "source_url": "https://en.wikivoyage.org/wiki/Chennai",
+      "wikidata": "Q1352"
+    },
+    {
+      "rank": 49,
+      "title": "Kolkata",
+      "country": "India",
+      "page_views": 42917,
+      "source_url": "https://en.wikivoyage.org/wiki/Kolkata",
+      "wikidata": "Q1348"
+    },
+    {
+      "rank": 50,
+      "title": "Kuala Lumpur",
+      "country": "Malaysia",
+      "page_views": 42866,
+      "source_url": "https://en.wikivoyage.org/wiki/Kuala_Lumpur",
+      "wikidata": "Q1865"
+    },
+    {
+      "rank": 51,
+      "title": "Taipei",
+      "country": "Taiwan",
+      "page_views": 42847,
+      "source_url": "https://en.wikivoyage.org/wiki/Taipei",
+      "wikidata": "Q1867"
+    },
+    {
+      "rank": 52,
+      "title": "Vancouver",
+      "country": "Canada",
+      "page_views": 42638,
+      "source_url": "https://en.wikivoyage.org/wiki/Vancouver",
+      "wikidata": "Q24639"
+    },
+    {
+      "rank": 53,
+      "title": "Florence",
+      "country": "Italy",
+      "page_views": 42583,
+      "source_url": "https://en.wikivoyage.org/wiki/Florence",
+      "wikidata": "Q2044"
+    },
+    {
+      "rank": 54,
+      "title": "Athens",
+      "country": "Greece",
+      "page_views": 42312,
+      "source_url": "https://en.wikivoyage.org/wiki/Athens",
+      "wikidata": "Q1524"
+    },
+    {
+      "rank": 55,
+      "title": "Brussels",
+      "country": "Belgium",
+      "page_views": 42139,
+      "source_url": "https://en.wikivoyage.org/wiki/Brussels",
+      "wikidata": "Q239"
+    },
+    {
+      "rank": 56,
+      "title": "Helsinki",
+      "country": "Finland",
+      "page_views": 41958,
+      "source_url": "https://en.wikivoyage.org/wiki/Helsinki",
+      "wikidata": "Q1757"
+    },
+    {
+      "rank": 57,
+      "title": "Brisbane",
+      "country": "Australia",
+      "page_views": 41717,
+      "source_url": "https://en.wikivoyage.org/wiki/Brisbane",
+      "wikidata": "Q34932"
+    },
+    {
+      "rank": 58,
+      "title": "Siem Reap",
+      "country": "Cambodia",
+      "page_views": 41587,
+      "source_url": "https://en.wikivoyage.org/wiki/Siem_Reap",
+      "wikidata": "Q11711"
+    },
+    {
+      "rank": 59,
+      "title": "Rio de Janeiro",
+      "country": "Brazil",
+      "page_views": 41309,
+      "source_url": "https://en.wikivoyage.org/wiki/Rio_de_Janeiro",
+      "wikidata": "Q8678"
+    },
+    {
+      "rank": 60,
+      "title": "Milan",
+      "country": "Italy",
+      "page_views": 41224,
+      "source_url": "https://en.wikivoyage.org/wiki/Milan",
+      "wikidata": "Q490"
+    },
+    {
+      "rank": 61,
+      "title": "Boston",
+      "country": "United States",
+      "page_views": 41194,
+      "source_url": "https://en.wikivoyage.org/wiki/Boston",
+      "wikidata": "Q100"
+    },
+    {
+      "rank": 62,
+      "title": "Melbourne",
+      "country": "Australia",
+      "page_views": 40861,
+      "source_url": "https://en.wikivoyage.org/wiki/Melbourne",
+      "wikidata": "Q3141"
+    },
+    {
+      "rank": 63,
+      "title": "Cebu City",
+      "country": "Philippines",
+      "page_views": 40399,
+      "source_url": "https://en.wikivoyage.org/wiki/Cebu_City",
+      "wikidata": "Q1467"
+    },
+    {
+      "rank": 64,
+      "title": "Seoul",
+      "country": "South Korea",
+      "page_views": 39979,
+      "source_url": "https://en.wikivoyage.org/wiki/Seoul",
+      "wikidata": "Q8684"
+    },
+    {
+      "rank": 65,
+      "title": "Jakarta",
+      "country": "Indonesia",
+      "page_views": 38948,
+      "source_url": "https://en.wikivoyage.org/wiki/Jakarta",
+      "wikidata": "Q3630"
+    },
+    {
+      "rank": 66,
+      "title": "Mumbai",
+      "country": "India",
+      "page_views": 37842,
+      "source_url": "https://en.wikivoyage.org/wiki/Mumbai",
+      "wikidata": "Q1156"
+    },
+    {
+      "rank": 67,
+      "title": "Jaipur",
+      "country": "India",
+      "page_views": 37097,
+      "source_url": "https://en.wikivoyage.org/wiki/Jaipur",
+      "wikidata": "Q66485"
+    },
+    {
+      "rank": 68,
+      "title": "Warsaw",
+      "country": "Poland",
+      "page_views": 36788,
+      "source_url": "https://en.wikivoyage.org/wiki/Warsaw",
+      "wikidata": "Q270"
+    },
+    {
+      "rank": 69,
+      "title": "Washington, D.C.",
+      "country": "United States",
+      "page_views": 36680,
+      "source_url": "https://en.wikivoyage.org/wiki/Washington,_D.C.",
+      "wikidata": "Q61"
+    },
+    {
+      "rank": 70,
+      "title": "Johor Bahru",
+      "country": "Malaysia",
+      "page_views": 36108,
+      "source_url": "https://en.wikivoyage.org/wiki/Johor_Bahru",
+      "wikidata": "Q231318"
+    },
+    {
+      "rank": 71,
+      "title": "Osaka",
+      "country": "Japan",
+      "page_views": 35740,
+      "source_url": "https://en.wikivoyage.org/wiki/Osaka",
+      "wikidata": "Q35765"
+    },
+    {
+      "rank": 72,
+      "title": "Belgrade",
+      "country": "Serbia",
+      "page_views": 35473,
+      "source_url": "https://en.wikivoyage.org/wiki/Belgrade",
+      "wikidata": "Q3711"
+    },
+    {
+      "rank": 73,
+      "title": "San Francisco",
+      "country": "United States",
+      "page_views": 35394,
+      "source_url": "https://en.wikivoyage.org/wiki/San_Francisco",
+      "wikidata": "Q62"
+    },
+    {
+      "rank": 74,
+      "title": "Tallinn",
+      "country": "Estonia",
+      "page_views": 35377,
+      "source_url": "https://en.wikivoyage.org/wiki/Tallinn",
+      "wikidata": "Q1770"
+    },
+    {
+      "rank": 75,
+      "title": "Addis Ababa",
+      "country": "Ethiopia",
+      "page_views": 34876,
+      "source_url": "https://en.wikivoyage.org/wiki/Addis_Ababa",
+      "wikidata": "Q3624"
+    },
+    {
+      "rank": 76,
+      "title": "Hamburg",
+      "country": "Germany",
+      "page_views": 34643,
+      "source_url": "https://en.wikivoyage.org/wiki/Hamburg",
+      "wikidata": "Q1055"
+    },
+    {
+      "rank": 77,
+      "title": "Manila",
+      "country": "Philippines",
+      "page_views": 34628,
+      "source_url": "https://en.wikivoyage.org/wiki/Manila",
+      "wikidata": "Q1461"
+    },
+    {
+      "rank": 78,
+      "title": "Perth",
+      "country": "Australia",
+      "page_views": 34588,
+      "source_url": "https://en.wikivoyage.org/wiki/Perth",
+      "wikidata": "Q3183"
+    },
+    {
+      "rank": 79,
+      "title": "Almaty",
+      "country": "Kazakhstan",
+      "page_views": 34569,
+      "source_url": "https://en.wikivoyage.org/wiki/Almaty",
+      "wikidata": "Q35493"
+    },
+    {
+      "rank": 80,
+      "title": "Cologne",
+      "country": "Germany",
+      "page_views": 34529,
+      "source_url": "https://en.wikivoyage.org/wiki/Cologne",
+      "wikidata": "Q365"
+    },
+    {
+      "rank": 81,
+      "title": "Sofia",
+      "country": "Bulgaria",
+      "page_views": 34377,
+      "source_url": "https://en.wikivoyage.org/wiki/Sofia",
+      "wikidata": "Q472"
+    },
+    {
+      "rank": 82,
+      "title": "Ulaanbaatar",
+      "country": "Mongolia",
+      "page_views": 34196,
+      "source_url": "https://en.wikivoyage.org/wiki/Ulaanbaatar",
+      "wikidata": "Q23430"
+    },
+    {
+      "rank": 83,
+      "title": "Naples",
+      "country": "Italy",
+      "page_views": 33873,
+      "source_url": "https://en.wikivoyage.org/wiki/Naples",
+      "wikidata": "Q2634"
+    },
+    {
+      "rank": 84,
+      "title": "Bogotá",
+      "country": "Colombia",
+      "page_views": 33764,
+      "source_url": "https://en.wikivoyage.org/wiki/Bogotá",
+      "wikidata": "Q2841"
+    },
+    {
+      "rank": 85,
+      "title": "Cape Town",
+      "country": "South Africa",
+      "page_views": 33762,
+      "source_url": "https://en.wikivoyage.org/wiki/Cape_Town",
+      "wikidata": "Q5465"
+    },
+    {
+      "rank": 86,
+      "title": "Kyiv",
+      "country": "Ukraine",
+      "page_views": 33743,
+      "source_url": "https://en.wikivoyage.org/wiki/Kyiv",
+      "wikidata": "Q1899"
+    },
+    {
+      "rank": 87,
+      "title": "Ottawa",
+      "country": "Canada",
+      "page_views": 33710,
+      "source_url": "https://en.wikivoyage.org/wiki/Ottawa",
+      "wikidata": "Q1930"
+    },
+    {
+      "rank": 88,
+      "title": "Copenhagen",
+      "country": "Denmark",
+      "page_views": 33478,
+      "source_url": "https://en.wikivoyage.org/wiki/Copenhagen",
+      "wikidata": "Q1748"
+    },
+    {
+      "rank": 89,
+      "title": "Tirana",
+      "country": "Albania",
+      "page_views": 33452,
+      "source_url": "https://en.wikivoyage.org/wiki/Tirana",
+      "wikidata": "Q19689"
+    },
+    {
+      "rank": 90,
+      "title": "Bratislava",
+      "country": "Slovakia",
+      "page_views": 33271,
+      "source_url": "https://en.wikivoyage.org/wiki/Bratislava",
+      "wikidata": "Q1780"
+    },
+    {
+      "rank": 91,
+      "title": "Jerusalem",
+      "country": "Israel",
+      "page_views": 33064,
+      "source_url": "https://en.wikivoyage.org/wiki/Jerusalem",
+      "wikidata": "Q1218"
+    },
+    {
+      "rank": 92,
+      "title": "Vilnius",
+      "country": "Lithuania",
+      "page_views": 33002,
+      "source_url": "https://en.wikivoyage.org/wiki/Vilnius",
+      "wikidata": "Q216"
+    },
+    {
+      "rank": 93,
+      "title": "Agra",
+      "country": "India",
+      "page_views": 32978,
+      "source_url": "https://en.wikivoyage.org/wiki/Agra",
+      "wikidata": "Q42941"
+    },
+    {
+      "rank": 94,
+      "title": "Bucharest",
+      "country": "Romania",
+      "page_views": 32935,
+      "source_url": "https://en.wikivoyage.org/wiki/Bucharest",
+      "wikidata": "Q19660"
+    },
+    {
+      "rank": 95,
+      "title": "Orlando",
+      "country": "United States",
+      "page_views": 32788,
+      "source_url": "https://en.wikivoyage.org/wiki/Orlando",
+      "wikidata": "Q49233"
+    },
+    {
+      "rank": 96,
+      "title": "Ljubljana",
+      "country": "Slovenia",
+      "page_views": 32756,
+      "source_url": "https://en.wikivoyage.org/wiki/Ljubljana",
+      "wikidata": "Q437"
+    },
+    {
+      "rank": 97,
+      "title": "Shenzhen",
+      "country": "People's Republic of China",
+      "page_views": 32724,
+      "source_url": "https://en.wikivoyage.org/wiki/Shenzhen",
+      "wikidata": "Q15174"
+    },
+    {
+      "rank": 98,
+      "title": "Ubud",
+      "country": "Indonesia",
+      "page_views": 32716,
+      "source_url": "https://en.wikivoyage.org/wiki/Ubud",
+      "wikidata": "Q210654"
+    },
+    {
+      "rank": 99,
+      "title": "Tbilisi",
+      "country": "Georgia",
+      "page_views": 32651,
+      "source_url": "https://en.wikivoyage.org/wiki/Tbilisi",
+      "wikidata": "Q994"
+    },
+    {
+      "rank": 100,
+      "title": "Kraków",
+      "country": "Poland",
+      "page_views": 32640,
+      "source_url": "https://en.wikivoyage.org/wiki/Kraków",
+      "wikidata": "Q31487"
+    },
+    {
+      "rank": 101,
+      "title": "Oslo",
+      "country": "Norway",
+      "page_views": 32638,
+      "source_url": "https://en.wikivoyage.org/wiki/Oslo",
+      "wikidata": "Q585"
+    },
+    {
+      "rank": 102,
+      "title": "Pattaya",
+      "country": "Thailand",
+      "page_views": 32364,
+      "source_url": "https://en.wikivoyage.org/wiki/Pattaya",
+      "wikidata": "Q170919"
+    },
+    {
+      "rank": 103,
+      "title": "Valencia",
+      "country": "Spain",
+      "page_views": 32350,
+      "source_url": "https://en.wikivoyage.org/wiki/Valencia",
+      "wikidata": "Q8818"
+    },
+    {
+      "rank": 104,
+      "title": "Abu Dhabi",
+      "country": "United Arab Emirates",
+      "page_views": 32304,
+      "source_url": "https://en.wikivoyage.org/wiki/Abu_Dhabi",
+      "wikidata": "Q1519"
+    },
+    {
+      "rank": 105,
+      "title": "Cancún",
+      "country": "Mexico",
+      "page_views": 32238,
+      "source_url": "https://en.wikivoyage.org/wiki/Cancún",
+      "wikidata": "Q8969"
+    },
+    {
+      "rank": 106,
+      "title": "Chengdu",
+      "country": "People's Republic of China",
+      "page_views": 32198,
+      "source_url": "https://en.wikivoyage.org/wiki/Chengdu",
+      "wikidata": "Q30002"
+    },
+    {
+      "rank": 107,
+      "title": "Liverpool",
+      "country": "United Kingdom",
+      "page_views": 31720,
+      "source_url": "https://en.wikivoyage.org/wiki/Liverpool",
+      "wikidata": "Q24826"
+    },
+    {
+      "rank": 108,
+      "title": "Walt Disney World",
+      "country": "United States",
+      "page_views": 31468,
+      "source_url": "https://en.wikivoyage.org/wiki/Walt_Disney_World",
+      "wikidata": "Q206859"
+    },
+    {
+      "rank": 109,
+      "title": "Birmingham",
+      "country": "United Kingdom",
+      "page_views": 31440,
+      "source_url": "https://en.wikivoyage.org/wiki/Birmingham",
+      "wikidata": "Q2256"
+    },
+    {
+      "rank": 110,
+      "title": "Cairo",
+      "country": "Egypt",
+      "page_views": 31391,
+      "source_url": "https://en.wikivoyage.org/wiki/Cairo",
+      "wikidata": "Q85"
+    },
+    {
+      "rank": 111,
+      "title": "Karachi",
+      "country": "Pakistan",
+      "page_views": 31127,
+      "source_url": "https://en.wikivoyage.org/wiki/Karachi",
+      "wikidata": "Q8660"
+    },
+    {
+      "rank": 112,
+      "title": "Turku",
+      "country": "Finland",
+      "page_views": 30944,
+      "source_url": "https://en.wikivoyage.org/wiki/Turku",
+      "wikidata": "Q38511"
+    },
+    {
+      "rank": 113,
+      "title": "Yerevan",
+      "country": "Armenia",
+      "page_views": 30702,
+      "source_url": "https://en.wikivoyage.org/wiki/Yerevan",
+      "wikidata": "Q1953"
+    },
+    {
+      "rank": 114,
+      "title": "Yangon",
+      "country": "Myanmar",
+      "page_views": 30680,
+      "source_url": "https://en.wikivoyage.org/wiki/Yangon",
+      "wikidata": "Q37995"
+    },
+    {
+      "rank": 115,
+      "title": "Canberra",
+      "country": "Australia",
+      "page_views": 30611,
+      "source_url": "https://en.wikivoyage.org/wiki/Canberra",
+      "wikidata": "Q3114"
+    },
+    {
+      "rank": 116,
+      "title": "Houston",
+      "country": "United States",
+      "page_views": 30554,
+      "source_url": "https://en.wikivoyage.org/wiki/Houston",
+      "wikidata": "Q16555"
+    },
+    {
+      "rank": 117,
+      "title": "Dallas",
+      "country": "United States",
+      "page_views": 30397,
+      "source_url": "https://en.wikivoyage.org/wiki/Dallas",
+      "wikidata": "Q16557"
+    },
+    {
+      "rank": 118,
+      "title": "Adelaide",
+      "country": "Australia",
+      "page_views": 30327,
+      "source_url": "https://en.wikivoyage.org/wiki/Adelaide",
+      "wikidata": "Q5112"
+    },
+    {
+      "rank": 119,
+      "title": "Yogyakarta",
+      "country": "Indonesia",
+      "page_views": 29677,
+      "source_url": "https://en.wikivoyage.org/wiki/Yogyakarta",
+      "wikidata": "Q7568"
+    },
+    {
+      "rank": 120,
+      "title": "Portland (Oregon)",
+      "country": "United States",
+      "page_views": 29274,
+      "source_url": "https://en.wikivoyage.org/wiki/Portland_(Oregon)",
+      "wikidata": "Q6106"
+    },
+    {
+      "rank": 121,
+      "title": "Tashkent",
+      "country": "Uzbekistan",
+      "page_views": 29115,
+      "source_url": "https://en.wikivoyage.org/wiki/Tashkent",
+      "wikidata": "Q269"
+    },
+    {
+      "rank": 122,
+      "title": "Johannesburg",
+      "country": "South Africa",
+      "page_views": 28875,
+      "source_url": "https://en.wikivoyage.org/wiki/Johannesburg",
+      "wikidata": "Q34647"
+    },
+    {
+      "rank": 123,
+      "title": "Edinburgh",
+      "country": "United Kingdom",
+      "page_views": 28856,
+      "source_url": "https://en.wikivoyage.org/wiki/Edinburgh",
+      "wikidata": "Q23436"
+    },
+    {
+      "rank": 124,
+      "title": "Hoi An",
+      "country": "Vietnam",
+      "page_views": 28852,
+      "source_url": "https://en.wikivoyage.org/wiki/Hoi_An",
+      "wikidata": "Q36160"
+    },
+    {
+      "rank": 125,
+      "title": "Nice",
+      "country": "France",
+      "page_views": 28714,
+      "source_url": "https://en.wikivoyage.org/wiki/Nice",
+      "wikidata": "Q33959"
+    },
+    {
+      "rank": 126,
+      "title": "Winnipeg",
+      "country": "Canada",
+      "page_views": 28584,
+      "source_url": "https://en.wikivoyage.org/wiki/Winnipeg",
+      "wikidata": "Q2135"
+    },
+    {
+      "rank": 127,
+      "title": "Saint Petersburg",
+      "country": "Russia",
+      "page_views": 28505,
+      "source_url": "https://en.wikivoyage.org/wiki/Saint_Petersburg",
+      "wikidata": "Q656"
+    },
+    {
+      "rank": 128,
+      "title": "Doha",
+      "country": "Qatar",
+      "page_views": 27905,
+      "source_url": "https://en.wikivoyage.org/wiki/Doha",
+      "wikidata": "Q3861"
+    },
+    {
+      "rank": 129,
+      "title": "Bergen",
+      "country": "Norway",
+      "page_views": 27627,
+      "source_url": "https://en.wikivoyage.org/wiki/Bergen",
+      "wikidata": "Q26793"
+    },
+    {
+      "rank": 130,
+      "title": "Nuremberg",
+      "country": "Germany",
+      "page_views": 27567,
+      "source_url": "https://en.wikivoyage.org/wiki/Nuremberg",
+      "wikidata": "Q2090"
+    },
+    {
+      "rank": 131,
+      "title": "Tehran",
+      "country": "Iran",
+      "page_views": 27526,
+      "source_url": "https://en.wikivoyage.org/wiki/Tehran",
+      "wikidata": "Q3616"
+    },
+    {
+      "rank": 132,
+      "title": "San Diego",
+      "country": "United States",
+      "page_views": 27477,
+      "source_url": "https://en.wikivoyage.org/wiki/San_Diego",
+      "wikidata": "Q16552"
+    },
+    {
+      "rank": 133,
+      "title": "Sacramento",
+      "country": "United States",
+      "page_views": 27391,
+      "source_url": "https://en.wikivoyage.org/wiki/Sacramento",
+      "wikidata": "Q18013"
+    },
+    {
+      "rank": 134,
+      "title": "Dhaka",
+      "country": "Bangladesh",
+      "page_views": 27277,
+      "source_url": "https://en.wikivoyage.org/wiki/Dhaka",
+      "wikidata": "Q1354"
+    },
+    {
+      "rank": 135,
+      "title": "Vientiane",
+      "country": "Laos",
+      "page_views": 27176,
+      "source_url": "https://en.wikivoyage.org/wiki/Vientiane",
+      "wikidata": "Q9326"
+    },
+    {
+      "rank": 136,
+      "title": "Bristol",
+      "country": "United Kingdom",
+      "page_views": 27108,
+      "source_url": "https://en.wikivoyage.org/wiki/Bristol",
+      "wikidata": "Q23154"
+    },
+    {
+      "rank": 137,
+      "title": "Rotterdam",
+      "country": "Netherlands",
+      "page_views": 26999,
+      "source_url": "https://en.wikivoyage.org/wiki/Rotterdam",
+      "wikidata": "Q34370"
+    },
+    {
+      "rank": 138,
+      "title": "Luang Prabang",
+      "country": "Laos",
+      "page_views": 26998,
+      "source_url": "https://en.wikivoyage.org/wiki/Luang_Prabang",
+      "wikidata": "Q190165"
+    },
+    {
+      "rank": 139,
+      "title": "Chongqing",
+      "country": "People's Republic of China",
+      "page_views": 26688,
+      "source_url": "https://en.wikivoyage.org/wiki/Chongqing",
+      "wikidata": "Q15897817"
+    },
+    {
+      "rank": 140,
+      "title": "Bologna",
+      "country": "Italy",
+      "page_views": 26642,
+      "source_url": "https://en.wikivoyage.org/wiki/Bologna",
+      "wikidata": "Q1891"
+    },
+    {
+      "rank": 141,
+      "title": "Buffalo",
+      "country": "United States",
+      "page_views": 26551,
+      "source_url": "https://en.wikivoyage.org/wiki/Buffalo",
+      "wikidata": "Q40435"
+    },
+    {
+      "rank": 142,
+      "title": "Nairobi",
+      "country": "Kenya",
+      "page_views": 26202,
+      "source_url": "https://en.wikivoyage.org/wiki/Nairobi",
+      "wikidata": "Q3870"
+    },
+    {
+      "rank": 143,
+      "title": "Alexandria",
+      "country": "Egypt",
+      "page_views": 25936,
+      "source_url": "https://en.wikivoyage.org/wiki/Alexandria",
+      "wikidata": "Q87"
+    },
+    {
+      "rank": 144,
+      "title": "Philadelphia",
+      "country": "United States",
+      "page_views": 25860,
+      "source_url": "https://en.wikivoyage.org/wiki/Philadelphia",
+      "wikidata": "Q1345"
+    },
+    {
+      "rank": 145,
+      "title": "Tel Aviv",
+      "country": "Israel",
+      "page_views": 25365,
+      "source_url": "https://en.wikivoyage.org/wiki/Tel_Aviv",
+      "wikidata": "Q33935"
+    },
+    {
+      "rank": 146,
+      "title": "Manali",
+      "country": "India",
+      "page_views": 25266,
+      "source_url": "https://en.wikivoyage.org/wiki/Manali",
+      "wikidata": "Q83443"
+    },
+    {
+      "rank": 147,
+      "title": "Edmonton",
+      "country": "Canada",
+      "page_views": 25246,
+      "source_url": "https://en.wikivoyage.org/wiki/Edmonton",
+      "wikidata": "Q2096"
+    },
+    {
+      "rank": 148,
+      "title": "Indianapolis",
+      "country": "United States",
+      "page_views": 25188,
+      "source_url": "https://en.wikivoyage.org/wiki/Indianapolis",
+      "wikidata": "Q6346"
+    },
+    {
+      "rank": 149,
+      "title": "Rome/Vatican",
+      "country": "Vatican City",
+      "page_views": 25161,
+      "source_url": "https://en.wikivoyage.org/wiki/Rome/Vatican",
+      "wikidata": "Q237"
+    },
+    {
+      "rank": 150,
+      "title": "Leeds",
+      "country": "United Kingdom",
+      "page_views": 25076,
+      "source_url": "https://en.wikivoyage.org/wiki/Leeds",
+      "wikidata": "Q39121"
+    },
+    {
+      "rank": 151,
+      "title": "Quito",
+      "country": "Ecuador",
+      "page_views": 25027,
+      "source_url": "https://en.wikivoyage.org/wiki/Quito",
+      "wikidata": "Q2900"
+    },
+    {
+      "rank": 152,
+      "title": "Siliguri",
+      "country": "India",
+      "page_views": 25026,
+      "source_url": "https://en.wikivoyage.org/wiki/Siliguri",
+      "wikidata": "Q5087"
+    },
+    {
+      "rank": 153,
+      "title": "Dresden",
+      "country": "Germany",
+      "page_views": 25004,
+      "source_url": "https://en.wikivoyage.org/wiki/Dresden",
+      "wikidata": "Q1731"
+    },
+    {
+      "rank": 154,
+      "title": "Cambridge",
+      "country": "United Kingdom",
+      "page_views": 24955,
+      "source_url": "https://en.wikivoyage.org/wiki/Cambridge",
+      "wikidata": "Q350"
+    },
+    {
+      "rank": 155,
+      "title": "Asheville",
+      "country": "United States",
+      "page_views": 24945,
+      "source_url": "https://en.wikivoyage.org/wiki/Asheville",
+      "wikidata": "Q648501"
+    },
+    {
+      "rank": 156,
+      "title": "Tampere",
+      "country": "Finland",
+      "page_views": 24653,
+      "source_url": "https://en.wikivoyage.org/wiki/Tampere",
+      "wikidata": "Q40840"
+    },
+    {
+      "rank": 157,
+      "title": "São Paulo",
+      "country": "Brazil",
+      "page_views": 24623,
+      "source_url": "https://en.wikivoyage.org/wiki/São_Paulo",
+      "wikidata": "Q174"
+    },
+    {
+      "rank": 158,
+      "title": "Nusa Lembongan",
+      "country": "Indonesia",
+      "page_views": 24489,
+      "source_url": "https://en.wikivoyage.org/wiki/Nusa_Lembongan",
+      "wikidata": "Q1970352"
+    },
+    {
+      "rank": 159,
+      "title": "Gdańsk",
+      "country": "Poland",
+      "page_views": 24388,
+      "source_url": "https://en.wikivoyage.org/wiki/Gdańsk",
+      "wikidata": "Q1792"
+    },
+    {
+      "rank": 160,
+      "title": "Kyoto",
+      "country": "Japan",
+      "page_views": 24349,
+      "source_url": "https://en.wikivoyage.org/wiki/Kyoto",
+      "wikidata": "Q34600"
+    },
+    {
+      "rank": 161,
+      "title": "Sanya",
+      "country": "People's Republic of China",
+      "page_views": 24145,
+      "source_url": "https://en.wikivoyage.org/wiki/Sanya",
+      "wikidata": "Q319804"
+    },
+    {
+      "rank": 162,
+      "title": "Birmingham (Alabama)",
+      "country": "United States",
+      "page_views": 24144,
+      "source_url": "https://en.wikivoyage.org/wiki/Birmingham_(Alabama)",
+      "wikidata": "Q79867"
+    },
+    {
+      "rank": 163,
+      "title": "Düsseldorf",
+      "country": "Germany",
+      "page_views": 24064,
+      "source_url": "https://en.wikivoyage.org/wiki/Düsseldorf",
+      "wikidata": "Q1718"
+    },
+    {
+      "rank": 164,
+      "title": "Zagreb",
+      "country": "Croatia",
+      "page_views": 24028,
+      "source_url": "https://en.wikivoyage.org/wiki/Zagreb",
+      "wikidata": "Q1435"
+    },
+    {
+      "rank": 165,
+      "title": "York",
+      "country": "United Kingdom",
+      "page_views": 23930,
+      "source_url": "https://en.wikivoyage.org/wiki/York",
+      "wikidata": "Q42462"
+    },
+    {
+      "rank": 166,
+      "title": "George Town (Malaysia)",
+      "country": "Malaysia",
+      "page_views": 23810,
+      "source_url": "https://en.wikivoyage.org/wiki/George_Town_(Malaysia)",
+      "wikidata": "Q61092"
+    },
+    {
+      "rank": 167,
+      "title": "Wuhan",
+      "country": "People's Republic of China",
+      "page_views": 23588,
+      "source_url": "https://en.wikivoyage.org/wiki/Wuhan",
+      "wikidata": "Q11746"
+    },
+    {
+      "rank": 168,
+      "title": "Davao",
+      "country": "Philippines",
+      "page_views": 23534,
+      "source_url": "https://en.wikivoyage.org/wiki/Davao",
+      "wikidata": "Q1473"
+    },
+    {
+      "rank": 169,
+      "title": "Seville",
+      "country": "Spain",
+      "page_views": 23467,
+      "source_url": "https://en.wikivoyage.org/wiki/Seville",
+      "wikidata": "Q8717"
+    },
+    {
+      "rank": 170,
+      "title": "Leipzig",
+      "country": "Germany",
+      "page_views": 23197,
+      "source_url": "https://en.wikivoyage.org/wiki/Leipzig",
+      "wikidata": "Q2079"
+    },
+    {
+      "rank": 171,
+      "title": "Lima",
+      "country": "Peru",
+      "page_views": 23186,
+      "source_url": "https://en.wikivoyage.org/wiki/Lima",
+      "wikidata": "Q2868"
+    },
+    {
+      "rank": 172,
+      "title": "Kuching",
+      "country": "Malaysia",
+      "page_views": 23051,
+      "source_url": "https://en.wikivoyage.org/wiki/Kuching",
+      "wikidata": "Q220445"
+    },
+    {
+      "rank": 173,
+      "title": "Dubrovnik",
+      "country": "Croatia",
+      "page_views": 22944,
+      "source_url": "https://en.wikivoyage.org/wiki/Dubrovnik",
+      "wikidata": "Q1722"
+    },
+    {
+      "rank": 174,
+      "title": "Halifax",
+      "country": "Canada",
+      "page_views": 22779,
+      "source_url": "https://en.wikivoyage.org/wiki/Halifax",
+      "wikidata": "Q2141"
+    },
+    {
+      "rank": 175,
+      "title": "Detroit",
+      "country": "United States",
+      "page_views": 22667,
+      "source_url": "https://en.wikivoyage.org/wiki/Detroit",
+      "wikidata": "Q12439"
+    },
+    {
+      "rank": 176,
+      "title": "Turin",
+      "country": "Italy",
+      "page_views": 22538,
+      "source_url": "https://en.wikivoyage.org/wiki/Turin",
+      "wikidata": "Q495"
+    },
+    {
+      "rank": 177,
+      "title": "Hiroshima",
+      "country": "Japan",
+      "page_views": 22520,
+      "source_url": "https://en.wikivoyage.org/wiki/Hiroshima",
+      "wikidata": "Q34664"
+    },
+    {
+      "rank": 178,
+      "title": "Miami",
+      "country": "United States",
+      "page_views": 22458,
+      "source_url": "https://en.wikivoyage.org/wiki/Miami",
+      "wikidata": "Q8652"
+    },
+    {
+      "rank": 179,
+      "title": "Langkawi",
+      "country": "Malaysia",
+      "page_views": 22398,
+      "source_url": "https://en.wikivoyage.org/wiki/Langkawi",
+      "wikidata": "Q273303"
+    },
+    {
+      "rank": 180,
+      "title": "Lyon",
+      "country": "France",
+      "page_views": 22387,
+      "source_url": "https://en.wikivoyage.org/wiki/Lyon",
+      "wikidata": "Q456"
+    },
+    {
+      "rank": 181,
+      "title": "Málaga",
+      "country": "Spain",
+      "page_views": 22362,
+      "source_url": "https://en.wikivoyage.org/wiki/Málaga",
+      "wikidata": "Q8851"
+    },
+    {
+      "rank": 182,
+      "title": "Pristina",
+      "country": "Kosovo",
+      "page_views": 22230,
+      "source_url": "https://en.wikivoyage.org/wiki/Pristina",
+      "wikidata": "Q25270"
+    },
+    {
+      "rank": 183,
+      "title": "Ahmedabad",
+      "country": "India",
+      "page_views": 22193,
+      "source_url": "https://en.wikivoyage.org/wiki/Ahmedabad",
+      "wikidata": "Q1070"
+    },
+    {
+      "rank": 184,
+      "title": "Digha",
+      "country": "India",
+      "page_views": 22173,
+      "source_url": "https://en.wikivoyage.org/wiki/Digha",
+      "wikidata": "Q5275680"
+    },
+    {
+      "rank": 185,
+      "title": "Porto",
+      "country": "Portugal",
+      "page_views": 21942,
+      "source_url": "https://en.wikivoyage.org/wiki/Porto",
+      "wikidata": "Q36433"
+    },
+    {
+      "rank": 186,
+      "title": "Calgary",
+      "country": "Canada",
+      "page_views": 21879,
+      "source_url": "https://en.wikivoyage.org/wiki/Calgary",
+      "wikidata": "Q36312"
+    },
+    {
+      "rank": 187,
+      "title": "Minsk",
+      "country": "Belarus",
+      "page_views": 21868,
+      "source_url": "https://en.wikivoyage.org/wiki/Minsk",
+      "wikidata": "Q2280"
+    },
+    {
+      "rank": 188,
+      "title": "Disneyland",
+      "country": "United States",
+      "page_views": 21834,
+      "source_url": "https://en.wikivoyage.org/wiki/Disneyland",
+      "wikidata": "Q1229066"
+    },
+    {
+      "rank": 189,
+      "title": "Bilbao",
+      "country": "Spain",
+      "page_views": 21671,
+      "source_url": "https://en.wikivoyage.org/wiki/Bilbao",
+      "wikidata": "Q8692"
+    },
+    {
+      "rank": 190,
+      "title": "Qingdao",
+      "country": "People's Republic of China",
+      "page_views": 21525,
+      "source_url": "https://en.wikivoyage.org/wiki/Qingdao",
+      "wikidata": "Q170322"
+    },
+    {
+      "rank": 191,
+      "title": "Kabul",
+      "country": "Afghanistan",
+      "page_views": 21508,
+      "source_url": "https://en.wikivoyage.org/wiki/Kabul",
+      "wikidata": "Q5838"
+    },
+    {
+      "rank": 192,
+      "title": "Da Nang",
+      "country": "Vietnam",
+      "page_views": 21374,
+      "source_url": "https://en.wikivoyage.org/wiki/Da_Nang",
+      "wikidata": "Q25282"
+    },
+    {
+      "rank": 193,
+      "title": "Marseille",
+      "country": "France",
+      "page_views": 21339,
+      "source_url": "https://en.wikivoyage.org/wiki/Marseille",
+      "wikidata": "Q23482"
+    },
+    {
+      "rank": 194,
+      "title": "Kansas City",
+      "country": "United States",
+      "page_views": 21213,
+      "source_url": "https://en.wikivoyage.org/wiki/Kansas_City",
+      "wikidata": "Q41819"
+    },
+    {
+      "rank": 195,
+      "title": "Denver",
+      "country": "United States",
+      "page_views": 21127,
+      "source_url": "https://en.wikivoyage.org/wiki/Denver",
+      "wikidata": "Q16554"
+    },
+    {
+      "rank": 196,
+      "title": "Atlanta",
+      "country": "United States",
+      "page_views": 21109,
+      "source_url": "https://en.wikivoyage.org/wiki/Atlanta",
+      "wikidata": "Q23556"
+    },
+    {
+      "rank": 197,
+      "title": "Oakland",
+      "country": "United States",
+      "page_views": 21064,
+      "source_url": "https://en.wikivoyage.org/wiki/Oakland",
+      "wikidata": "Q17042"
+    },
+    {
+      "rank": 198,
+      "title": "Angeles",
+      "country": "Philippines",
+      "page_views": 21039,
+      "source_url": "https://en.wikivoyage.org/wiki/Angeles",
+      "wikidata": "Q55741"
+    },
+    {
+      "rank": 199,
+      "title": "Oaxaca (city)",
+      "country": "Mexico",
+      "page_views": 21009,
+      "source_url": "https://en.wikivoyage.org/wiki/Oaxaca_(city)",
+      "wikidata": "Q131429"
+    },
+    {
+      "rank": 200,
+      "title": "The Hague",
+      "country": "Netherlands",
+      "page_views": 20979,
+      "source_url": "https://en.wikivoyage.org/wiki/The_Hague",
+      "wikidata": "Q36600"
+    },
+    {
+      "rank": 201,
+      "title": "Auckland",
+      "country": "New Zealand",
+      "page_views": 20956,
+      "source_url": "https://en.wikivoyage.org/wiki/Auckland",
+      "wikidata": "Q37100"
+    },
+    {
+      "rank": 202,
+      "title": "Derby",
+      "country": "United Kingdom",
+      "page_views": 20922,
+      "source_url": "https://en.wikivoyage.org/wiki/Derby",
+      "wikidata": "Q43475"
+    },
+    {
+      "rank": 203,
+      "title": "Sarajevo",
+      "country": "Bosnia and Herzegovina",
+      "page_views": 20860,
+      "source_url": "https://en.wikivoyage.org/wiki/Sarajevo",
+      "wikidata": "Q11194"
+    },
+    {
+      "rank": 204,
+      "title": "Bruges",
+      "country": "Belgium",
+      "page_views": 20829,
+      "source_url": "https://en.wikivoyage.org/wiki/Bruges",
+      "wikidata": "Q12994"
+    },
+    {
+      "rank": 205,
+      "title": "Muscat",
+      "country": "Oman",
+      "page_views": 20724,
+      "source_url": "https://en.wikivoyage.org/wiki/Muscat",
+      "wikidata": "Q3826"
+    },
+    {
+      "rank": 206,
+      "title": "Christchurch",
+      "country": "New Zealand",
+      "page_views": 20690,
+      "source_url": "https://en.wikivoyage.org/wiki/Christchurch",
+      "wikidata": "Q79990"
+    },
+    {
+      "rank": 207,
+      "title": "Lahore",
+      "country": "Pakistan",
+      "page_views": 20663,
+      "source_url": "https://en.wikivoyage.org/wiki/Lahore",
+      "wikidata": "Q11739"
+    },
+    {
+      "rank": 208,
+      "title": "Poznań",
+      "country": "Poland",
+      "page_views": 20652,
+      "source_url": "https://en.wikivoyage.org/wiki/Poznań",
+      "wikidata": "Q268"
+    },
+    {
+      "rank": 209,
+      "title": "Gothenburg",
+      "country": "Sweden",
+      "page_views": 20569,
+      "source_url": "https://en.wikivoyage.org/wiki/Gothenburg",
+      "wikidata": "Q25287"
+    },
+    {
+      "rank": 210,
+      "title": "Kuta",
+      "country": "Indonesia",
+      "page_views": 20382,
+      "source_url": "https://en.wikivoyage.org/wiki/Kuta",
+      "wikidata": "Q994499"
+    },
+    {
+      "rank": 211,
+      "title": "Incheon",
+      "country": "South Korea",
+      "page_views": 20352,
+      "source_url": "https://en.wikivoyage.org/wiki/Incheon",
+      "wikidata": "Q20934"
+    },
+    {
+      "rank": 212,
+      "title": "Antwerp",
+      "country": "Belgium",
+      "page_views": 20257,
+      "source_url": "https://en.wikivoyage.org/wiki/Antwerp",
+      "wikidata": "Q12892"
+    },
+    {
+      "rank": 213,
+      "title": "Skopje",
+      "country": "North Macedonia",
+      "page_views": 20197,
+      "source_url": "https://en.wikivoyage.org/wiki/Skopje",
+      "wikidata": "Q384"
+    },
+    {
+      "rank": 214,
+      "title": "Zurich",
+      "country": "Switzerland",
+      "page_views": 20089,
+      "source_url": "https://en.wikivoyage.org/wiki/Zurich",
+      "wikidata": "Q72"
+    },
+    {
+      "rank": 215,
+      "title": "Ipoh",
+      "country": "Malaysia",
+      "page_views": 20064,
+      "source_url": "https://en.wikivoyage.org/wiki/Ipoh",
+      "wikidata": "Q271619"
+    },
+    {
+      "rank": 216,
+      "title": "New Orleans",
+      "country": "United States",
+      "page_views": 19806,
+      "source_url": "https://en.wikivoyage.org/wiki/New_Orleans",
+      "wikidata": "Q34404"
+    },
+    {
+      "rank": 217,
+      "title": "Cincinnati",
+      "country": "United States",
+      "page_views": 19688,
+      "source_url": "https://en.wikivoyage.org/wiki/Cincinnati",
+      "wikidata": "Q43196"
+    },
+    {
+      "rank": 218,
+      "title": "Boracay",
+      "country": "Philippines",
+      "page_views": 19658,
+      "source_url": "https://en.wikivoyage.org/wiki/Boracay",
+      "wikidata": "Q855235"
+    },
+    {
+      "rank": 219,
+      "title": "Kaohsiung",
+      "country": "Taiwan",
+      "page_views": 19570,
+      "source_url": "https://en.wikivoyage.org/wiki/Kaohsiung",
+      "wikidata": "Q181557"
+    },
+    {
+      "rank": 220,
+      "title": "Hamilton (Ontario)",
+      "country": "Canada",
+      "page_views": 19460,
+      "source_url": "https://en.wikivoyage.org/wiki/Hamilton_(Ontario)",
+      "wikidata": "Q133116"
+    },
+    {
+      "rank": 221,
+      "title": "Oxford",
+      "country": "United Kingdom",
+      "page_views": 19329,
+      "source_url": "https://en.wikivoyage.org/wiki/Oxford",
+      "wikidata": "Q34217"
+    },
+    {
+      "rank": 222,
+      "title": "Windsor (Ontario)",
+      "country": "Canada",
+      "page_views": 19314,
+      "source_url": "https://en.wikivoyage.org/wiki/Windsor_(Ontario)",
+      "wikidata": "Q182625"
+    },
+    {
+      "rank": 223,
+      "title": "Darjeeling",
+      "country": "India",
+      "page_views": 19220,
+      "source_url": "https://en.wikivoyage.org/wiki/Darjeeling",
+      "wikidata": "Q169997"
+    },
+    {
+      "rank": 224,
+      "title": "Fort Lauderdale",
+      "country": "United States",
+      "page_views": 19168,
+      "source_url": "https://en.wikivoyage.org/wiki/Fort_Lauderdale",
+      "wikidata": "Q165972"
+    },
+    {
+      "rank": 225,
+      "title": "Baku",
+      "country": "Azerbaijan",
+      "page_views": 19150,
+      "source_url": "https://en.wikivoyage.org/wiki/Baku",
+      "wikidata": "Q9248"
+    },
+    {
+      "rank": 226,
+      "title": "Salt Lake City",
+      "country": "United States",
+      "page_views": 18835,
+      "source_url": "https://en.wikivoyage.org/wiki/Salt_Lake_City",
+      "wikidata": "Q23337"
+    },
+    {
+      "rank": 227,
+      "title": "Victoria (British Columbia)",
+      "country": "Canada",
+      "page_views": 18780,
+      "source_url": "https://en.wikivoyage.org/wiki/Victoria_(British_Columbia)",
+      "wikidata": "Q2132"
+    },
+    {
+      "rank": 228,
+      "title": "Puerto Vallarta",
+      "country": "Mexico",
+      "page_views": 18648,
+      "source_url": "https://en.wikivoyage.org/wiki/Puerto_Vallarta",
+      "wikidata": "Q853258"
+    },
+    {
+      "rank": 229,
+      "title": "Suwon",
+      "country": "South Korea",
+      "page_views": 18633,
+      "source_url": "https://en.wikivoyage.org/wiki/Suwon",
+      "wikidata": "Q20714"
+    },
+    {
+      "rank": 230,
+      "title": "Geneva",
+      "country": "Switzerland",
+      "page_views": 18618,
+      "source_url": "https://en.wikivoyage.org/wiki/Geneva",
+      "wikidata": "Q71"
+    },
+    {
+      "rank": 231,
+      "title": "Kampala",
+      "country": "Uganda",
+      "page_views": 18617,
+      "source_url": "https://en.wikivoyage.org/wiki/Kampala",
+      "wikidata": "Q3894"
+    },
+    {
+      "rank": 232,
+      "title": "St. Louis",
+      "country": "United States",
+      "page_views": 18597,
+      "source_url": "https://en.wikivoyage.org/wiki/St._Louis",
+      "wikidata": "Q38022"
+    },
+    {
+      "rank": 233,
+      "title": "Amman",
+      "country": "Jordan",
+      "page_views": 18519,
+      "source_url": "https://en.wikivoyage.org/wiki/Amman",
+      "wikidata": "Q3805"
+    },
+    {
+      "rank": 234,
+      "title": "Bandung",
+      "country": "Indonesia",
+      "page_views": 18501,
+      "source_url": "https://en.wikivoyage.org/wiki/Bandung",
+      "wikidata": "Q10389"
+    },
+    {
+      "rank": 235,
+      "title": "Yangshuo",
+      "country": "People's Republic of China",
+      "page_views": 18388,
+      "source_url": "https://en.wikivoyage.org/wiki/Yangshuo",
+      "wikidata": "Q31358"
+    },
+    {
+      "rank": 236,
+      "title": "Cardiff",
+      "country": "United Kingdom",
+      "page_views": 18376,
+      "source_url": "https://en.wikivoyage.org/wiki/Cardiff",
+      "wikidata": "Q10690"
+    },
+    {
+      "rank": 237,
+      "title": "Riyadh",
+      "country": "Saudi Arabia",
+      "page_views": 18263,
+      "source_url": "https://en.wikivoyage.org/wiki/Riyadh",
+      "wikidata": "Q3692"
+    },
+    {
+      "rank": 238,
+      "title": "Fukuoka",
+      "country": "Japan",
+      "page_views": 18253,
+      "source_url": "https://en.wikivoyage.org/wiki/Fukuoka",
+      "wikidata": "Q26600"
+    },
+    {
+      "rank": 239,
+      "title": "Reykjavík",
+      "country": "Iceland",
+      "page_views": 18244,
+      "source_url": "https://en.wikivoyage.org/wiki/Reykjavík",
+      "wikidata": "Q1764"
+    },
+    {
+      "rank": 240,
+      "title": "Medellín",
+      "country": "Colombia",
+      "page_views": 18151,
+      "source_url": "https://en.wikivoyage.org/wiki/Medellín",
+      "wikidata": "Q48278"
+    },
+    {
+      "rank": 241,
+      "title": "Brighton",
+      "country": "United Kingdom",
+      "page_views": 18130,
+      "source_url": "https://en.wikivoyage.org/wiki/Brighton",
+      "wikidata": "Q131491"
+    },
+    {
+      "rank": 242,
+      "title": "La Paz",
+      "country": "Bolivia",
+      "page_views": 18115,
+      "source_url": "https://en.wikivoyage.org/wiki/La_Paz",
+      "wikidata": "Q1491"
+    },
+    {
+      "rank": 243,
+      "title": "Groningen",
+      "country": "Netherlands",
+      "page_views": 18100,
+      "source_url": "https://en.wikivoyage.org/wiki/Groningen",
+      "wikidata": "Q749"
+    },
+    {
+      "rank": 244,
+      "title": "Ansan",
+      "country": "South Korea",
+      "page_views": 17794,
+      "source_url": "https://en.wikivoyage.org/wiki/Ansan",
+      "wikidata": "Q42117"
+    },
+    {
+      "rank": 245,
+      "title": "Gibraltar",
+      "country": "United Kingdom",
+      "page_views": 17752,
+      "source_url": "https://en.wikivoyage.org/wiki/Gibraltar",
+      "wikidata": "Q1410"
+    },
+    {
+      "rank": 246,
+      "title": "Mysore",
+      "country": "India",
+      "page_views": 17716,
+      "source_url": "https://en.wikivoyage.org/wiki/Mysore",
+      "wikidata": "Q10086"
+    },
+    {
+      "rank": 247,
+      "title": "Busan",
+      "country": "South Korea",
+      "page_views": 17682,
+      "source_url": "https://en.wikivoyage.org/wiki/Busan",
+      "wikidata": "Q16520"
+    },
+    {
+      "rank": 248,
+      "title": "Austin",
+      "country": "United States",
+      "page_views": 17670,
+      "source_url": "https://en.wikivoyage.org/wiki/Austin",
+      "wikidata": "Q16559"
+    },
+    {
+      "rank": 249,
+      "title": "Malacca",
+      "country": "Malaysia",
+      "page_views": 17618,
+      "source_url": "https://en.wikivoyage.org/wiki/Malacca",
+      "wikidata": "Q61089"
+    },
+    {
+      "rank": 250,
+      "title": "Surabaya",
+      "country": "Indonesia",
+      "page_views": 17567,
+      "source_url": "https://en.wikivoyage.org/wiki/Surabaya",
+      "wikidata": "Q11462"
+    },
+    {
+      "rank": 251,
+      "title": "Bacolod",
+      "country": "Philippines",
+      "page_views": 17548,
+      "source_url": "https://en.wikivoyage.org/wiki/Bacolod",
+      "wikidata": "Q5217"
+    },
+    {
+      "rank": 252,
+      "title": "San Antonio",
+      "country": "United States",
+      "page_views": 17541,
+      "source_url": "https://en.wikivoyage.org/wiki/San_Antonio",
+      "wikidata": "Q975"
+    },
+    {
+      "rank": 253,
+      "title": "Phoenix",
+      "country": "United States",
+      "page_views": 17509,
+      "source_url": "https://en.wikivoyage.org/wiki/Phoenix",
+      "wikidata": "Q16556"
+    },
+    {
+      "rank": 254,
+      "title": "Nha Trang",
+      "country": "Vietnam",
+      "page_views": 17399,
+      "source_url": "https://en.wikivoyage.org/wiki/Nha_Trang",
+      "wikidata": "Q19491"
+    },
+    {
+      "rank": 255,
+      "title": "Łódź",
+      "country": "Poland",
+      "page_views": 17331,
+      "source_url": "https://en.wikivoyage.org/wiki/Łódź",
+      "wikidata": "Q580"
+    },
+    {
+      "rank": 256,
+      "title": "Mangalore",
+      "country": "India",
+      "page_views": 17298,
+      "source_url": "https://en.wikivoyage.org/wiki/Mangalore",
+      "wikidata": "Q127041"
+    },
+    {
+      "rank": 257,
+      "title": "Strasbourg",
+      "country": "France",
+      "page_views": 17214,
+      "source_url": "https://en.wikivoyage.org/wiki/Strasbourg",
+      "wikidata": "Q6602"
+    },
+    {
+      "rank": 258,
+      "title": "San Juan",
+      "country": "United States",
+      "page_views": 17179,
+      "source_url": "https://en.wikivoyage.org/wiki/San_Juan",
+      "wikidata": "Q41211"
+    },
+    {
+      "rank": 259,
+      "title": "Chiang Rai",
+      "country": "Thailand",
+      "page_views": 17179,
+      "source_url": "https://en.wikivoyage.org/wiki/Chiang_Rai",
+      "wikidata": "Q856772"
+    },
+    {
+      "rank": 260,
+      "title": "Memphis",
+      "country": "United States",
+      "page_views": 17007,
+      "source_url": "https://en.wikivoyage.org/wiki/Memphis",
+      "wikidata": "Q16563"
+    },
+    {
+      "rank": 261,
+      "title": "Novi Sad",
+      "country": "Serbia",
+      "page_views": 16930,
+      "source_url": "https://en.wikivoyage.org/wiki/Novi_Sad",
+      "wikidata": "Q55630"
+    },
+    {
+      "rank": 262,
+      "title": "San Jose (California)",
+      "country": "United States",
+      "page_views": 16925,
+      "source_url": "https://en.wikivoyage.org/wiki/San_Jose_(California)",
+      "wikidata": "Q16553"
+    },
+    {
+      "rank": 263,
+      "title": "Riga",
+      "country": "Latvia",
+      "page_views": 16888,
+      "source_url": "https://en.wikivoyage.org/wiki/Riga",
+      "wikidata": "Q1773"
+    },
+    {
+      "rank": 264,
+      "title": "Guilin",
+      "country": "People's Republic of China",
+      "page_views": 16870,
+      "source_url": "https://en.wikivoyage.org/wiki/Guilin",
+      "wikidata": "Q189633"
+    },
+    {
+      "rank": 265,
+      "title": "Swansea",
+      "country": "United Kingdom",
+      "page_views": 16827,
+      "source_url": "https://en.wikivoyage.org/wiki/Swansea",
+      "wikidata": "Q23051"
+    },
+    {
+      "rank": 266,
+      "title": "San José (Costa Rica)",
+      "country": "Costa Rica",
+      "page_views": 16817,
+      "source_url": "https://en.wikivoyage.org/wiki/San_José_(Costa_Rica)",
+      "wikidata": "Q3070"
+    },
+    {
+      "rank": 267,
+      "title": "Erice",
+      "country": "Italy",
+      "page_views": 16608,
+      "source_url": "https://en.wikivoyage.org/wiki/Erice",
+      "wikidata": "Q192917"
+    },
+    {
+      "rank": 268,
+      "title": "Uppsala",
+      "country": "Sweden",
+      "page_views": 16508,
+      "source_url": "https://en.wikivoyage.org/wiki/Uppsala",
+      "wikidata": "Q25286"
+    },
+    {
+      "rank": 269,
+      "title": "Damascus",
+      "country": "Syria",
+      "page_views": 16449,
+      "source_url": "https://en.wikivoyage.org/wiki/Damascus",
+      "wikidata": "Q3766"
+    },
+    {
+      "rank": 270,
+      "title": "Katowice",
+      "country": "Poland",
+      "page_views": 16339,
+      "source_url": "https://en.wikivoyage.org/wiki/Katowice",
+      "wikidata": "Q588"
+    },
+    {
+      "rank": 271,
+      "title": "Belfast",
+      "country": "United Kingdom",
+      "page_views": 16310,
+      "source_url": "https://en.wikivoyage.org/wiki/Belfast",
+      "wikidata": "Q10686"
+    },
+    {
+      "rank": 272,
+      "title": "Pittsburgh",
+      "country": "United States",
+      "page_views": 16229,
+      "source_url": "https://en.wikivoyage.org/wiki/Pittsburgh",
+      "wikidata": "Q1342"
+    },
+    {
+      "rank": 273,
+      "title": "Shimla",
+      "country": "India",
+      "page_views": 16197,
+      "source_url": "https://en.wikivoyage.org/wiki/Shimla",
+      "wikidata": "Q83786"
+    },
+    {
+      "rank": 274,
+      "title": "Thiruvananthapuram",
+      "country": "India",
+      "page_views": 16142,
+      "source_url": "https://en.wikivoyage.org/wiki/Thiruvananthapuram",
+      "wikidata": "Q167715"
+    },
+    {
+      "rank": 275,
+      "title": "Kunming",
+      "country": "People's Republic of China",
+      "page_views": 16132,
+      "source_url": "https://en.wikivoyage.org/wiki/Kunming",
+      "wikidata": "Q182852"
+    },
+    {
+      "rank": 276,
+      "title": "Guatemala City",
+      "country": "Guatemala",
+      "page_views": 16073,
+      "source_url": "https://en.wikivoyage.org/wiki/Guatemala_City",
+      "wikidata": "Q1555"
+    },
+    {
+      "rank": 277,
+      "title": "Nashville",
+      "country": "United States",
+      "page_views": 16053,
+      "source_url": "https://en.wikivoyage.org/wiki/Nashville",
+      "wikidata": "Q23197"
+    },
+    {
+      "rank": 278,
+      "title": "Montevideo",
+      "country": "Uruguay",
+      "page_views": 16018,
+      "source_url": "https://en.wikivoyage.org/wiki/Montevideo",
+      "wikidata": "Q1335"
+    },
+    {
+      "rank": 279,
+      "title": "Da Lat",
+      "country": "Vietnam",
+      "page_views": 15937,
+      "source_url": "https://en.wikivoyage.org/wiki/Da_Lat",
+      "wikidata": "Q25281"
+    },
+    {
+      "rank": 280,
+      "title": "Trabzon",
+      "country": "Turkey",
+      "page_views": 15907,
+      "source_url": "https://en.wikivoyage.org/wiki/Trabzon",
+      "wikidata": "Q45301"
+    },
+    {
+      "rank": 281,
+      "title": "Niagara Falls (Ontario)",
+      "country": "Canada",
+      "page_views": 15897,
+      "source_url": "https://en.wikivoyage.org/wiki/Niagara_Falls_(Ontario)",
+      "wikidata": "Q274120"
+    },
+    {
+      "rank": 282,
+      "title": "Kathmandu",
+      "country": "Nepal",
+      "page_views": 15889,
+      "source_url": "https://en.wikivoyage.org/wiki/Kathmandu",
+      "wikidata": "Q3037"
+    },
+    {
+      "rank": 283,
+      "title": "Cartagena (Colombia)",
+      "country": "Colombia",
+      "page_views": 15869,
+      "source_url": "https://en.wikivoyage.org/wiki/Cartagena_(Colombia)",
+      "wikidata": "Q657461"
+    },
+    {
+      "rank": 284,
+      "title": "Visakhapatnam",
+      "country": "India",
+      "page_views": 15787,
+      "source_url": "https://en.wikivoyage.org/wiki/Visakhapatnam",
+      "wikidata": "Q200016"
+    },
+    {
+      "rank": 285,
+      "title": "Panama City",
+      "country": "Panama",
+      "page_views": 15709,
+      "source_url": "https://en.wikivoyage.org/wiki/Panama_City",
+      "wikidata": "Q3306"
+    },
+    {
+      "rank": 286,
+      "title": "Eindhoven",
+      "country": "Netherlands",
+      "page_views": 15607,
+      "source_url": "https://en.wikivoyage.org/wiki/Eindhoven",
+      "wikidata": "Q9832"
+    },
+    {
+      "rank": 287,
+      "title": "Udaipur",
+      "country": "India",
+      "page_views": 15533,
+      "source_url": "https://en.wikivoyage.org/wiki/Udaipur",
+      "wikidata": "Q200340"
+    },
+    {
+      "rank": 288,
+      "title": "Dumaguete",
+      "country": "Philippines",
+      "page_views": 15512,
+      "source_url": "https://en.wikivoyage.org/wiki/Dumaguete",
+      "wikidata": "Q873377"
+    },
+    {
+      "rank": 289,
+      "title": "Charlotte",
+      "country": "United States",
+      "page_views": 15420,
+      "source_url": "https://en.wikivoyage.org/wiki/Charlotte",
+      "wikidata": "Q16565"
+    },
+    {
+      "rank": 290,
+      "title": "Nagoya",
+      "country": "Japan",
+      "page_views": 15407,
+      "source_url": "https://en.wikivoyage.org/wiki/Nagoya",
+      "wikidata": "Q11751"
+    },
+    {
+      "rank": 291,
+      "title": "Ankara",
+      "country": "Turkey",
+      "page_views": 15396,
+      "source_url": "https://en.wikivoyage.org/wiki/Ankara",
+      "wikidata": "Q3640"
+    },
+    {
+      "rank": 292,
+      "title": "Mogadishu",
+      "country": "Somalia",
+      "page_views": 15344,
+      "source_url": "https://en.wikivoyage.org/wiki/Mogadishu",
+      "wikidata": "Q2449"
+    },
+    {
+      "rank": 293,
+      "title": "Wrocław",
+      "country": "Poland",
+      "page_views": 15247,
+      "source_url": "https://en.wikivoyage.org/wiki/Wrocław",
+      "wikidata": "Q1799"
+    },
+    {
+      "rank": 294,
+      "title": "Dunedin",
+      "country": "New Zealand",
+      "page_views": 15221,
+      "source_url": "https://en.wikivoyage.org/wiki/Dunedin",
+      "wikidata": "Q133073"
+    },
+    {
+      "rank": 295,
+      "title": "Rishikesh",
+      "country": "India",
+      "page_views": 15038,
+      "source_url": "https://en.wikivoyage.org/wiki/Rishikesh",
+      "wikidata": "Q502141"
+    },
+    {
+      "rank": 296,
+      "title": "Sheffield",
+      "country": "United Kingdom",
+      "page_views": 15011,
+      "source_url": "https://en.wikivoyage.org/wiki/Sheffield",
+      "wikidata": "Q42448"
+    },
+    {
+      "rank": 297,
+      "title": "Jodhpur",
+      "country": "India",
+      "page_views": 15002,
+      "source_url": "https://en.wikivoyage.org/wiki/Jodhpur",
+      "wikidata": "Q200019"
+    },
+    {
+      "rank": 298,
+      "title": "Banff",
+      "country": "Canada",
+      "page_views": 14979,
+      "source_url": "https://en.wikivoyage.org/wiki/Banff",
+      "wikidata": "Q58337"
+    },
+    {
+      "rank": 299,
+      "title": "Petra",
+      "country": "Jordan",
+      "page_views": 14954,
+      "source_url": "https://en.wikivoyage.org/wiki/Petra",
+      "wikidata": "Q5788"
+    },
+    {
+      "rank": 300,
+      "title": "Abuja",
+      "country": "Nigeria",
+      "page_views": 14939,
+      "source_url": "https://en.wikivoyage.org/wiki/Abuja",
+      "wikidata": "Q3787"
+    },
+    {
+      "rank": 301,
+      "title": "Aberdeen",
+      "country": "United Kingdom",
+      "page_views": 14893,
+      "source_url": "https://en.wikivoyage.org/wiki/Aberdeen",
+      "wikidata": "Q36405"
+    },
+    {
+      "rank": 302,
+      "title": "Galway",
+      "country": "Ireland",
+      "page_views": 14885,
+      "source_url": "https://en.wikivoyage.org/wiki/Galway",
+      "wikidata": "Q129610"
+    },
+    {
+      "rank": 303,
+      "title": "Oulu",
+      "country": "Finland",
+      "page_views": 14832,
+      "source_url": "https://en.wikivoyage.org/wiki/Oulu",
+      "wikidata": "Q47048"
+    },
+    {
+      "rank": 304,
+      "title": "Odesa",
+      "country": "Ukraine",
+      "page_views": 14727,
+      "source_url": "https://en.wikivoyage.org/wiki/Odesa",
+      "wikidata": "Q1874"
+    },
+    {
+      "rank": 305,
+      "title": "Rovaniemi",
+      "country": "Finland",
+      "page_views": 14645,
+      "source_url": "https://en.wikivoyage.org/wiki/Rovaniemi",
+      "wikidata": "Q103717"
+    },
+    {
+      "rank": 306,
+      "title": "Naxos",
+      "country": "Greece",
+      "page_views": 14580,
+      "source_url": "https://en.wikivoyage.org/wiki/Naxos",
+      "wikidata": "Q188527"
+    },
+    {
+      "rank": 307,
+      "title": "Bern",
+      "country": "Switzerland",
+      "page_views": 14577,
+      "source_url": "https://en.wikivoyage.org/wiki/Bern",
+      "wikidata": "Q70"
+    },
+    {
+      "rank": 308,
+      "title": "Wadi Rum",
+      "country": "Jordan",
+      "page_views": 14571,
+      "source_url": "https://en.wikivoyage.org/wiki/Wadi_Rum",
+      "wikidata": "Q40729"
+    },
+    {
+      "rank": 309,
+      "title": "Rochester (New York)",
+      "country": "United States",
+      "page_views": 14449,
+      "source_url": "https://en.wikivoyage.org/wiki/Rochester_(New_York)",
+      "wikidata": "Q49218"
+    },
+    {
+      "rank": 310,
+      "title": "Baghdad",
+      "country": "Iraq",
+      "page_views": 14428,
+      "source_url": "https://en.wikivoyage.org/wiki/Baghdad",
+      "wikidata": "Q1530"
+    },
+    {
+      "rank": 311,
+      "title": "Kaliningrad",
+      "country": "Russia",
+      "page_views": 14401,
+      "source_url": "https://en.wikivoyage.org/wiki/Kaliningrad",
+      "wikidata": "Q1829"
+    },
+    {
+      "rank": 312,
+      "title": "Cork",
+      "country": "Ireland",
+      "page_views": 14320,
+      "source_url": "https://en.wikivoyage.org/wiki/Cork",
+      "wikidata": "Q36647"
+    },
+    {
+      "rank": 313,
+      "title": "Wellington",
+      "country": "New Zealand",
+      "page_views": 14290,
+      "source_url": "https://en.wikivoyage.org/wiki/Wellington",
+      "wikidata": "Q23661"
+    },
+    {
+      "rank": 314,
+      "title": "Puri",
+      "country": "India",
+      "page_views": 14255,
+      "source_url": "https://en.wikivoyage.org/wiki/Puri",
+      "wikidata": "Q207799"
+    },
+    {
+      "rank": 315,
+      "title": "Brasilia",
+      "country": "Brazil",
+      "page_views": 14254,
+      "source_url": "https://en.wikivoyage.org/wiki/Brasilia",
+      "wikidata": "Q2844"
+    },
+    {
+      "rank": 316,
+      "title": "Accra",
+      "country": "Ghana",
+      "page_views": 14207,
+      "source_url": "https://en.wikivoyage.org/wiki/Accra",
+      "wikidata": "Q3761"
+    },
+    {
+      "rank": 317,
+      "title": "Mombasa",
+      "country": "Kenya",
+      "page_views": 14182,
+      "source_url": "https://en.wikivoyage.org/wiki/Mombasa",
+      "wikidata": "Q225641"
+    },
+    {
+      "rank": 318,
+      "title": "Kota Kinabalu",
+      "country": "Malaysia",
+      "page_views": 14164,
+      "source_url": "https://en.wikivoyage.org/wiki/Kota_Kinabalu",
+      "wikidata": "Q137271"
+    },
+    {
+      "rank": 319,
+      "title": "Daegu",
+      "country": "South Korea",
+      "page_views": 14101,
+      "source_url": "https://en.wikivoyage.org/wiki/Daegu",
+      "wikidata": "Q20927"
+    },
+    {
+      "rank": 320,
+      "title": "Utrecht",
+      "country": "Netherlands",
+      "page_views": 14097,
+      "source_url": "https://en.wikivoyage.org/wiki/Utrecht",
+      "wikidata": "Q803"
+    },
+    {
+      "rank": 321,
+      "title": "Thimphu",
+      "country": "Bhutan",
+      "page_views": 14081,
+      "source_url": "https://en.wikivoyage.org/wiki/Thimphu",
+      "wikidata": "Q9270"
+    },
+    {
+      "rank": 322,
+      "title": "Beirut",
+      "country": "Lebanon",
+      "page_views": 14063,
+      "source_url": "https://en.wikivoyage.org/wiki/Beirut",
+      "wikidata": "Q3820"
+    },
+    {
+      "rank": 323,
+      "title": "Xi'an",
+      "country": "People's Republic of China",
+      "page_views": 14047,
+      "source_url": "https://en.wikivoyage.org/wiki/Xi'an",
+      "wikidata": "Q5826"
+    },
+    {
+      "rank": 324,
+      "title": "Amritsar",
+      "country": "India",
+      "page_views": 14013,
+      "source_url": "https://en.wikivoyage.org/wiki/Amritsar",
+      "wikidata": "Q48403"
+    },
+    {
+      "rank": 325,
+      "title": "Lviv",
+      "country": "Ukraine",
+      "page_views": 13971,
+      "source_url": "https://en.wikivoyage.org/wiki/Lviv",
+      "wikidata": "Q36036"
+    },
+    {
+      "rank": 326,
+      "title": "Graz",
+      "country": "Austria",
+      "page_views": 13934,
+      "source_url": "https://en.wikivoyage.org/wiki/Graz",
+      "wikidata": "Q13298"
+    },
+    {
+      "rank": 327,
+      "title": "Nanjing",
+      "country": "People's Republic of China",
+      "page_views": 13932,
+      "source_url": "https://en.wikivoyage.org/wiki/Nanjing",
+      "wikidata": "Q16666"
+    },
+    {
+      "rank": 328,
+      "title": "Des Moines",
+      "country": "United States",
+      "page_views": 13931,
+      "source_url": "https://en.wikivoyage.org/wiki/Des_Moines",
+      "wikidata": "Q39709"
+    },
+    {
+      "rank": 329,
+      "title": "Little Rock",
+      "country": "United States",
+      "page_views": 13925,
+      "source_url": "https://en.wikivoyage.org/wiki/Little_Rock",
+      "wikidata": "Q33405"
+    },
+    {
+      "rank": 330,
+      "title": "Kochi",
+      "country": "India",
+      "page_views": 13913,
+      "source_url": "https://en.wikivoyage.org/wiki/Kochi",
+      "wikidata": "Q1800"
+    },
+    {
+      "rank": 331,
+      "title": "Cuzco",
+      "country": "Peru",
+      "page_views": 13871,
+      "source_url": "https://en.wikivoyage.org/wiki/Cuzco",
+      "wikidata": "Q5582862"
+    },
+    {
+      "rank": 332,
+      "title": "Aurangabad",
+      "country": "India",
+      "page_views": 13860,
+      "source_url": "https://en.wikivoyage.org/wiki/Aurangabad",
+      "wikidata": "Q200713"
+    },
+    {
+      "rank": 333,
+      "title": "Pune",
+      "country": "India",
+      "page_views": 13821,
+      "source_url": "https://en.wikivoyage.org/wiki/Pune",
+      "wikidata": "Q1538"
+    },
+    {
+      "rank": 334,
+      "title": "Sihanoukville",
+      "country": "Cambodia",
+      "page_views": 13764,
+      "source_url": "https://en.wikivoyage.org/wiki/Sihanoukville",
+      "wikidata": "Q18207676"
+    },
+    {
+      "rank": 335,
+      "title": "Lausanne",
+      "country": "Switzerland",
+      "page_views": 13712,
+      "source_url": "https://en.wikivoyage.org/wiki/Lausanne",
+      "wikidata": "Q807"
+    },
+    {
+      "rank": 336,
+      "title": "Quebec City",
+      "country": "Canada",
+      "page_views": 13710,
+      "source_url": "https://en.wikivoyage.org/wiki/Quebec_City",
+      "wikidata": "Q2145"
+    },
+    {
+      "rank": 337,
+      "title": "Pärnu",
+      "country": "Estonia",
+      "page_views": 13706,
+      "source_url": "https://en.wikivoyage.org/wiki/Pärnu",
+      "wikidata": "Q102365"
+    },
+    {
+      "rank": 338,
+      "title": "Milwaukee",
+      "country": "United States",
+      "page_views": 13701,
+      "source_url": "https://en.wikivoyage.org/wiki/Milwaukee",
+      "wikidata": "Q37836"
+    },
+    {
+      "rank": 339,
+      "title": "Antigua Guatemala",
+      "country": "Guatemala",
+      "page_views": 13700,
+      "source_url": "https://en.wikivoyage.org/wiki/Antigua_Guatemala",
+      "wikidata": "Q212773"
+    },
+    {
+      "rank": 340,
+      "title": "Dehradun",
+      "country": "India",
+      "page_views": 13679,
+      "source_url": "https://en.wikivoyage.org/wiki/Dehradun",
+      "wikidata": "Q199528"
+    },
+    {
+      "rank": 341,
+      "title": "Samarkand",
+      "country": "Uzbekistan",
+      "page_views": 13576,
+      "source_url": "https://en.wikivoyage.org/wiki/Samarkand",
+      "wikidata": "Q5753"
+    },
+    {
+      "rank": 342,
+      "title": "Kaunas",
+      "country": "Lithuania",
+      "page_views": 13449,
+      "source_url": "https://en.wikivoyage.org/wiki/Kaunas",
+      "wikidata": "Q4115712"
+    },
+    {
+      "rank": 343,
+      "title": "Bath",
+      "country": "United Kingdom",
+      "page_views": 13448,
+      "source_url": "https://en.wikivoyage.org/wiki/Bath",
+      "wikidata": "Q22889"
+    },
+    {
+      "rank": 344,
+      "title": "Hanover",
+      "country": "Germany",
+      "page_views": 13408,
+      "source_url": "https://en.wikivoyage.org/wiki/Hanover",
+      "wikidata": "Q1715"
+    },
+    {
+      "rank": 345,
+      "title": "Coimbatore",
+      "country": "India",
+      "page_views": 13391,
+      "source_url": "https://en.wikivoyage.org/wiki/Coimbatore",
+      "wikidata": "Q9885"
+    },
+    {
+      "rank": 346,
+      "title": "Stuttgart",
+      "country": "Germany",
+      "page_views": 13388,
+      "source_url": "https://en.wikivoyage.org/wiki/Stuttgart",
+      "wikidata": "Q1022"
+    },
+    {
+      "rank": 347,
+      "title": "Urumqi",
+      "country": "People's Republic of China",
+      "page_views": 13348,
+      "source_url": "https://en.wikivoyage.org/wiki/Urumqi",
+      "wikidata": "Q16959"
+    },
+    {
+      "rank": 348,
+      "title": "Hat Yai",
+      "country": "Thailand",
+      "page_views": 13287,
+      "source_url": "https://en.wikivoyage.org/wiki/Hat_Yai",
+      "wikidata": "Q651286"
+    },
+    {
+      "rank": 349,
+      "title": "Hangzhou",
+      "country": "People's Republic of China",
+      "page_views": 13279,
+      "source_url": "https://en.wikivoyage.org/wiki/Hangzhou",
+      "wikidata": "Q4970"
+    },
+    {
+      "rank": 350,
+      "title": "Thessaloniki",
+      "country": "Greece",
+      "page_views": 13229,
+      "source_url": "https://en.wikivoyage.org/wiki/Thessaloniki",
+      "wikidata": "Q17151"
+    },
+    {
+      "rank": 351,
+      "title": "New Delhi",
+      "country": "India",
+      "page_views": 13134,
+      "source_url": "https://en.wikivoyage.org/wiki/New_Delhi",
+      "wikidata": "Q987"
+    },
+    {
+      "rank": 352,
+      "title": "Recife",
+      "country": "Brazil",
+      "page_views": 13132,
+      "source_url": "https://en.wikivoyage.org/wiki/Recife",
+      "wikidata": "Q48344"
+    },
+    {
+      "rank": 353,
+      "title": "Dili",
+      "country": "Timor-Leste",
+      "page_views": 13107,
+      "source_url": "https://en.wikivoyage.org/wiki/Dili",
+      "wikidata": "Q9310"
+    },
+    {
+      "rank": 354,
+      "title": "Playa del Carmen",
+      "country": "Mexico",
+      "page_views": 13081,
+      "source_url": "https://en.wikivoyage.org/wiki/Playa_del_Carmen",
+      "wikidata": "Q989988"
+    },
+    {
+      "rank": 355,
+      "title": "Phu Quoc",
+      "country": "Vietnam",
+      "page_views": 13047,
+      "source_url": "https://en.wikivoyage.org/wiki/Phu_Quoc",
+      "wikidata": "Q146695"
+    },
+    {
+      "rank": 356,
+      "title": "Tampa",
+      "country": "United States",
+      "page_views": 12976,
+      "source_url": "https://en.wikivoyage.org/wiki/Tampa",
+      "wikidata": "Q49255"
+    },
+    {
+      "rank": 357,
+      "title": "Havana",
+      "country": "Cuba",
+      "page_views": 12901,
+      "source_url": "https://en.wikivoyage.org/wiki/Havana",
+      "wikidata": "Q1563"
+    },
+    {
+      "rank": 358,
+      "title": "Brno",
+      "country": "Czech Republic",
+      "page_views": 12849,
+      "source_url": "https://en.wikivoyage.org/wiki/Brno",
+      "wikidata": "Q14960"
+    },
+    {
+      "rank": 359,
+      "title": "Basel",
+      "country": "Switzerland",
+      "page_views": 12817,
+      "source_url": "https://en.wikivoyage.org/wiki/Basel",
+      "wikidata": "Q78"
+    },
+    {
+      "rank": 360,
+      "title": "Casablanca",
+      "country": "Morocco",
+      "page_views": 12803,
+      "source_url": "https://en.wikivoyage.org/wiki/Casablanca",
+      "wikidata": "Q7903"
+    },
+    {
+      "rank": 361,
+      "title": "Daejeon",
+      "country": "South Korea",
+      "page_views": 12775,
+      "source_url": "https://en.wikivoyage.org/wiki/Daejeon",
+      "wikidata": "Q20921"
+    },
+    {
+      "rank": 362,
+      "title": "Santiago",
+      "country": "Chile",
+      "page_views": 12717,
+      "source_url": "https://en.wikivoyage.org/wiki/Santiago",
+      "wikidata": "Q2887"
+    },
+    {
+      "rank": 363,
+      "title": "Hua Hin",
+      "country": "Thailand",
+      "page_views": 12705,
+      "source_url": "https://en.wikivoyage.org/wiki/Hua_Hin",
+      "wikidata": "Q667576"
+    },
+    {
+      "rank": 364,
+      "title": "Daytona Beach",
+      "country": "United States",
+      "page_views": 12700,
+      "source_url": "https://en.wikivoyage.org/wiki/Daytona_Beach",
+      "wikidata": "Q490595"
+    },
+    {
+      "rank": 365,
+      "title": "Newcastle upon Tyne",
+      "country": "United Kingdom",
+      "page_views": 12689,
+      "source_url": "https://en.wikivoyage.org/wiki/Newcastle_upon_Tyne",
+      "wikidata": "Q1425428"
+    },
+    {
+      "rank": 366,
+      "title": "Manhattan",
+      "country": "United States",
+      "page_views": 12675,
+      "source_url": "https://en.wikivoyage.org/wiki/Manhattan",
+      "wikidata": "Q11299"
+    },
+    {
+      "rank": 367,
+      "title": "Jeddah",
+      "country": "Saudi Arabia",
+      "page_views": 12665,
+      "source_url": "https://en.wikivoyage.org/wiki/Jeddah",
+      "wikidata": "Q374365"
+    },
+    {
+      "rank": 368,
+      "title": "Semarang",
+      "country": "Indonesia",
+      "page_views": 12639,
+      "source_url": "https://en.wikivoyage.org/wiki/Semarang",
+      "wikidata": "Q11025"
+    },
+    {
+      "rank": 369,
+      "title": "Alexandria (Virginia)",
+      "country": "United States",
+      "page_views": 12636,
+      "source_url": "https://en.wikivoyage.org/wiki/Alexandria_(Virginia)",
+      "wikidata": "Q88"
+    },
+    {
+      "rank": 370,
+      "title": "Split",
+      "country": "Croatia",
+      "page_views": 12605,
+      "source_url": "https://en.wikivoyage.org/wiki/Split",
+      "wikidata": "Q1663"
+    },
+    {
+      "rank": 371,
+      "title": "Bishkek",
+      "country": "Kyrgyzstan",
+      "page_views": 12571,
+      "source_url": "https://en.wikivoyage.org/wiki/Bishkek",
+      "wikidata": "Q9361"
+    },
+    {
+      "rank": 372,
+      "title": "Gyeongju",
+      "country": "South Korea",
+      "page_views": 12566,
+      "source_url": "https://en.wikivoyage.org/wiki/Gyeongju",
+      "wikidata": "Q42097"
+    },
+    {
+      "rank": 373,
+      "title": "Oxford (Mississippi)",
+      "country": "United States",
+      "page_views": 12554,
+      "source_url": "https://en.wikivoyage.org/wiki/Oxford_(Mississippi)",
+      "wikidata": "Q983822"
+    },
+    {
+      "rank": 374,
+      "title": "Medan",
+      "country": "Indonesia",
+      "page_views": 12548,
+      "source_url": "https://en.wikivoyage.org/wiki/Medan",
+      "wikidata": "Q5972"
+    },
+    {
+      "rank": 375,
+      "title": "Harbin",
+      "country": "People's Republic of China",
+      "page_views": 12538,
+      "source_url": "https://en.wikivoyage.org/wiki/Harbin",
+      "wikidata": "Q42956"
+    },
+    {
+      "rank": 376,
+      "title": "Cabo San Lucas",
+      "country": "Mexico",
+      "page_views": 12530,
+      "source_url": "https://en.wikivoyage.org/wiki/Cabo_San_Lucas",
+      "wikidata": "Q1020776"
+    },
+    {
+      "rank": 377,
+      "title": "Lijiang",
+      "country": "People's Republic of China",
+      "page_views": 12506,
+      "source_url": "https://en.wikivoyage.org/wiki/Lijiang",
+      "wikidata": "Q205914"
+    },
+    {
+      "rank": 378,
+      "title": "Jacksonville",
+      "country": "United States",
+      "page_views": 12449,
+      "source_url": "https://en.wikivoyage.org/wiki/Jacksonville",
+      "wikidata": "Q16568"
+    },
+    {
+      "rank": 379,
+      "title": "Tunis",
+      "country": "Tunisia",
+      "page_views": 12446,
+      "source_url": "https://en.wikivoyage.org/wiki/Tunis",
+      "wikidata": "Q3572"
+    },
+    {
+      "rank": 380,
+      "title": "Suzhou",
+      "country": "People's Republic of China",
+      "page_views": 12442,
+      "source_url": "https://en.wikivoyage.org/wiki/Suzhou",
+      "wikidata": "Q42622"
+    },
+    {
+      "rank": 381,
+      "title": "Santa Cruz (California)",
+      "country": "United States",
+      "page_views": 12413,
+      "source_url": "https://en.wikivoyage.org/wiki/Santa_Cruz_(California)",
+      "wikidata": "Q159232"
+    },
+    {
+      "rank": 382,
+      "title": "Hobart",
+      "country": "Australia",
+      "page_views": 12394,
+      "source_url": "https://en.wikivoyage.org/wiki/Hobart",
+      "wikidata": "Q40191"
+    },
+    {
+      "rank": 383,
+      "title": "Pisa",
+      "country": "Italy",
+      "page_views": 12328,
+      "source_url": "https://en.wikivoyage.org/wiki/Pisa",
+      "wikidata": "Q13375"
+    },
+    {
+      "rank": 384,
+      "title": "Bremen",
+      "country": "Germany",
+      "page_views": 12226,
+      "source_url": "https://en.wikivoyage.org/wiki/Bremen",
+      "wikidata": "Q24879"
+    },
+    {
+      "rank": 385,
+      "title": "Guadalajara",
+      "country": "Mexico",
+      "page_views": 12215,
+      "source_url": "https://en.wikivoyage.org/wiki/Guadalajara",
+      "wikidata": "Q9022"
+    },
+    {
+      "rank": 386,
+      "title": "Pretoria",
+      "country": "South Africa",
+      "page_views": 12165,
+      "source_url": "https://en.wikivoyage.org/wiki/Pretoria",
+      "wikidata": "Q3926"
+    },
+    {
+      "rank": 387,
+      "title": "Fuzhou",
+      "country": "People's Republic of China",
+      "page_views": 12140,
+      "source_url": "https://en.wikivoyage.org/wiki/Fuzhou",
+      "wikidata": "Q68481"
+    },
+    {
+      "rank": 388,
+      "title": "Nelson (New Zealand)",
+      "country": "New Zealand",
+      "page_views": 12138,
+      "source_url": "https://en.wikivoyage.org/wiki/Nelson_(New_Zealand)",
+      "wikidata": "Q206687"
+    },
+    {
+      "rank": 389,
+      "title": "Patna",
+      "country": "India",
+      "page_views": 12103,
+      "source_url": "https://en.wikivoyage.org/wiki/Patna",
+      "wikidata": "Q80484"
+    },
+    {
+      "rank": 390,
+      "title": "Providence",
+      "country": "United States",
+      "page_views": 12056,
+      "source_url": "https://en.wikivoyage.org/wiki/Providence",
+      "wikidata": "Q18383"
+    },
+    {
+      "rank": 391,
+      "title": "Chattanooga",
+      "country": "United States",
+      "page_views": 12036,
+      "source_url": "https://en.wikivoyage.org/wiki/Chattanooga",
+      "wikidata": "Q186702"
+    },
+    {
+      "rank": 392,
+      "title": "Kanchanaburi",
+      "country": "Thailand",
+      "page_views": 11931,
+      "source_url": "https://en.wikivoyage.org/wiki/Kanchanaburi",
+      "wikidata": "Q239121"
+    },
+    {
+      "rank": 393,
+      "title": "Asunción",
+      "country": "Paraguay",
+      "page_views": 11927,
+      "source_url": "https://en.wikivoyage.org/wiki/Asunción",
+      "wikidata": "Q2933"
+    },
+    {
+      "rank": 394,
+      "title": "Algiers",
+      "country": "Algeria",
+      "page_views": 11910,
+      "source_url": "https://en.wikivoyage.org/wiki/Algiers",
+      "wikidata": "Q3561"
+    },
+    {
+      "rank": 395,
+      "title": "Pyongyang",
+      "country": "North Korea",
+      "page_views": 11865,
+      "source_url": "https://en.wikivoyage.org/wiki/Pyongyang",
+      "wikidata": "Q18808"
+    },
+    {
+      "rank": 396,
+      "title": "Leh",
+      "country": "India",
+      "page_views": 11854,
+      "source_url": "https://en.wikivoyage.org/wiki/Leh",
+      "wikidata": "Q230818"
+    },
+    {
+      "rank": 397,
+      "title": "Arequipa",
+      "country": "Peru",
+      "page_views": 11851,
+      "source_url": "https://en.wikivoyage.org/wiki/Arequipa",
+      "wikidata": "Q159273"
+    },
+    {
+      "rank": 398,
+      "title": "Mykonos",
+      "country": "Greece",
+      "page_views": 11833,
+      "source_url": "https://en.wikivoyage.org/wiki/Mykonos",
+      "wikidata": "Q190210"
+    },
+    {
+      "rank": 399,
+      "title": "Hamamatsu",
+      "country": "Japan",
+      "page_views": 11824,
+      "source_url": "https://en.wikivoyage.org/wiki/Hamamatsu",
+      "wikidata": "Q185125"
+    },
+    {
+      "rank": 400,
+      "title": "Lagos City",
+      "country": "Nigeria",
+      "page_views": 11812,
+      "source_url": "https://en.wikivoyage.org/wiki/Lagos_City",
+      "wikidata": "Q8673"
+    },
+    {
+      "rank": 401,
+      "title": "Varanasi",
+      "country": "India",
+      "page_views": 11809,
+      "source_url": "https://en.wikivoyage.org/wiki/Varanasi",
+      "wikidata": "Q79980"
+    },
+    {
+      "rank": 402,
+      "title": "Trieste",
+      "country": "Italy",
+      "page_views": 11793,
+      "source_url": "https://en.wikivoyage.org/wiki/Trieste",
+      "wikidata": "Q546"
+    },
+    {
+      "rank": 403,
+      "title": "Tacoma",
+      "country": "United States",
+      "page_views": 11792,
+      "source_url": "https://en.wikivoyage.org/wiki/Tacoma",
+      "wikidata": "Q199797"
+    },
+    {
+      "rank": 404,
+      "title": "Bonn",
+      "country": "Germany",
+      "page_views": 11776,
+      "source_url": "https://en.wikivoyage.org/wiki/Bonn",
+      "wikidata": "Q586"
+    },
+    {
+      "rank": 405,
+      "title": "Islamabad",
+      "country": "Pakistan",
+      "page_views": 11562,
+      "source_url": "https://en.wikivoyage.org/wiki/Islamabad",
+      "wikidata": "Q1362"
+    },
+    {
+      "rank": 406,
+      "title": "Tulum",
+      "country": "Mexico",
+      "page_views": 11435,
+      "source_url": "https://en.wikivoyage.org/wiki/Tulum",
+      "wikidata": "Q725883"
+    },
+    {
+      "rank": 407,
+      "title": "Kingston (Ontario)",
+      "country": "Canada",
+      "page_views": 11431,
+      "source_url": "https://en.wikivoyage.org/wiki/Kingston_(Ontario)",
+      "wikidata": "Q202973"
+    },
+    {
+      "rank": 408,
+      "title": "Lille",
+      "country": "France",
+      "page_views": 11391,
+      "source_url": "https://en.wikivoyage.org/wiki/Lille",
+      "wikidata": "Q648"
+    },
+    {
+      "rank": 409,
+      "title": "Ooty",
+      "country": "India",
+      "page_views": 11373,
+      "source_url": "https://en.wikivoyage.org/wiki/Ooty",
+      "wikidata": "Q9888"
+    },
+    {
+      "rank": 410,
+      "title": "Cleveland",
+      "country": "United States",
+      "page_views": 11367,
+      "source_url": "https://en.wikivoyage.org/wiki/Cleveland",
+      "wikidata": "Q37320"
+    },
+    {
+      "rank": 411,
+      "title": "Caracas",
+      "country": "Venezuela",
+      "page_views": 11367,
+      "source_url": "https://en.wikivoyage.org/wiki/Caracas",
+      "wikidata": "Q1533"
+    },
+    {
+      "rank": 412,
+      "title": "Dar es Salaam",
+      "country": "Tanzania",
+      "page_views": 11360,
+      "source_url": "https://en.wikivoyage.org/wiki/Dar_es_Salaam",
+      "wikidata": "Q1960"
+    },
+    {
+      "rank": 413,
+      "title": "Colombo",
+      "country": "Sri Lanka",
+      "page_views": 11326,
+      "source_url": "https://en.wikivoyage.org/wiki/Colombo",
+      "wikidata": "Q35381"
+    },
+    {
+      "rank": 414,
+      "title": "El Paso",
+      "country": "United States",
+      "page_views": 11223,
+      "source_url": "https://en.wikivoyage.org/wiki/El_Paso",
+      "wikidata": "Q16562"
+    },
+    {
+      "rank": 415,
+      "title": "Brașov",
+      "country": "Romania",
+      "page_views": 11179,
+      "source_url": "https://en.wikivoyage.org/wiki/Brașov",
+      "wikidata": "Q82174"
+    },
+    {
+      "rank": 416,
+      "title": "Reno",
+      "country": "United States",
+      "page_views": 11148,
+      "source_url": "https://en.wikivoyage.org/wiki/Reno",
+      "wikidata": "Q49225"
+    },
+    {
+      "rank": 417,
+      "title": "Xiamen",
+      "country": "People's Republic of China",
+      "page_views": 11148,
+      "source_url": "https://en.wikivoyage.org/wiki/Xiamen",
+      "wikidata": "Q68744"
+    },
+    {
+      "rank": 418,
+      "title": "Aachen",
+      "country": "Germany",
+      "page_views": 11004,
+      "source_url": "https://en.wikivoyage.org/wiki/Aachen",
+      "wikidata": "Q1017"
+    },
+    {
+      "rank": 419,
+      "title": "Vang Vieng",
+      "country": "Laos",
+      "page_views": 10965,
+      "source_url": "https://en.wikivoyage.org/wiki/Vang_Vieng",
+      "wikidata": "Q1012615"
+    },
+    {
+      "rank": 420,
+      "title": "Ghent",
+      "country": "Belgium",
+      "page_views": 10949,
+      "source_url": "https://en.wikivoyage.org/wiki/Ghent",
+      "wikidata": "Q1296"
+    },
+    {
+      "rank": 421,
+      "title": "Makati",
+      "country": "Philippines",
+      "page_views": 10910,
+      "source_url": "https://en.wikivoyage.org/wiki/Makati",
+      "wikidata": "Q1508"
+    },
+    {
+      "rank": 422,
+      "title": "Key West",
+      "country": "United States",
+      "page_views": 10838,
+      "source_url": "https://en.wikivoyage.org/wiki/Key_West",
+      "wikidata": "Q485186"
+    },
+    {
+      "rank": 423,
+      "title": "Nottingham",
+      "country": "United Kingdom",
+      "page_views": 10806,
+      "source_url": "https://en.wikivoyage.org/wiki/Nottingham",
+      "wikidata": "Q41262"
+    },
+    {
+      "rank": 424,
+      "title": "Genoa",
+      "country": "Italy",
+      "page_views": 10779,
+      "source_url": "https://en.wikivoyage.org/wiki/Genoa",
+      "wikidata": "Q1449"
+    },
+    {
+      "rank": 425,
+      "title": "Izmir",
+      "country": "Turkey",
+      "page_views": 10748,
+      "source_url": "https://en.wikivoyage.org/wiki/Izmir",
+      "wikidata": "Q35997"
+    },
+    {
+      "rank": 426,
+      "title": "Quanzhou",
+      "country": "People's Republic of China",
+      "page_views": 10725,
+      "source_url": "https://en.wikivoyage.org/wiki/Quanzhou",
+      "wikidata": "Q68695"
+    },
+    {
+      "rank": 427,
+      "title": "London (Ontario)",
+      "country": "Canada",
+      "page_views": 10667,
+      "source_url": "https://en.wikivoyage.org/wiki/London_(Ontario)",
+      "wikidata": "Q92561"
+    },
+    {
+      "rank": 428,
+      "title": "Allentown",
+      "country": "United States",
+      "page_views": 10613,
+      "source_url": "https://en.wikivoyage.org/wiki/Allentown",
+      "wikidata": "Q142811"
+    },
+    {
+      "rank": 429,
+      "title": "Nashik",
+      "country": "India",
+      "page_views": 10533,
+      "source_url": "https://en.wikivoyage.org/wiki/Nashik",
+      "wikidata": "Q200235"
+    },
+    {
+      "rank": 430,
+      "title": "Srinagar",
+      "country": "India",
+      "page_views": 10525,
+      "source_url": "https://en.wikivoyage.org/wiki/Srinagar",
+      "wikidata": "Q170115"
+    },
+    {
+      "rank": 431,
+      "title": "Ko Tao",
+      "country": "Thailand",
+      "page_views": 10515,
+      "source_url": "https://en.wikivoyage.org/wiki/Ko_Tao",
+      "wikidata": "Q525940"
+    },
+    {
+      "rank": 432,
+      "title": "Kilkenny",
+      "country": "Ireland",
+      "page_views": 10458,
+      "source_url": "https://en.wikivoyage.org/wiki/Kilkenny",
+      "wikidata": "Q109092"
+    },
+    {
+      "rank": 433,
+      "title": "Bhubaneswar",
+      "country": "India",
+      "page_views": 10455,
+      "source_url": "https://en.wikivoyage.org/wiki/Bhubaneswar",
+      "wikidata": "Q171771"
+    },
+    {
+      "rank": 434,
+      "title": "Tulsa",
+      "country": "United States",
+      "page_views": 10454,
+      "source_url": "https://en.wikivoyage.org/wiki/Tulsa",
+      "wikidata": "Q44989"
+    },
+    {
+      "rank": 435,
+      "title": "Chandigarh",
+      "country": "India",
+      "page_views": 10376,
+      "source_url": "https://en.wikivoyage.org/wiki/Chandigarh",
+      "wikidata": "Q43433"
+    },
+    {
+      "rank": 436,
+      "title": "Lancaster (Pennsylvania)",
+      "country": "United States",
+      "page_views": 10336,
+      "source_url": "https://en.wikivoyage.org/wiki/Lancaster_(Pennsylvania)",
+      "wikidata": "Q320514"
+    },
+    {
+      "rank": 437,
+      "title": "Jersey City",
+      "country": "United States",
+      "page_views": 10259,
+      "source_url": "https://en.wikivoyage.org/wiki/Jersey_City",
+      "wikidata": "Q26339"
+    },
+    {
+      "rank": 438,
+      "title": "Long Beach",
+      "country": "United States",
+      "page_views": 10242,
+      "source_url": "https://en.wikivoyage.org/wiki/Long_Beach",
+      "wikidata": "Q16739"
+    },
+    {
+      "rank": 439,
+      "title": "Ao Nang",
+      "country": "Thailand",
+      "page_views": 10156,
+      "source_url": "https://en.wikivoyage.org/wiki/Ao_Nang",
+      "wikidata": "Q375819"
+    },
+    {
+      "rank": 440,
+      "title": "Boise",
+      "country": "United States",
+      "page_views": 10143,
+      "source_url": "https://en.wikivoyage.org/wiki/Boise",
+      "wikidata": "Q35775"
+    },
+    {
+      "rank": 441,
+      "title": "Baltimore",
+      "country": "United States",
+      "page_views": 10103,
+      "source_url": "https://en.wikivoyage.org/wiki/Baltimore",
+      "wikidata": "Q5092"
+    },
+    {
+      "rank": 442,
+      "title": "Tabriz",
+      "country": "Iran",
+      "page_views": 10069,
+      "source_url": "https://en.wikivoyage.org/wiki/Tabriz",
+      "wikidata": "Q80053"
+    },
+    {
+      "rank": 443,
+      "title": "Chernobyl",
+      "country": "Ukraine",
+      "page_views": 10066,
+      "source_url": "https://en.wikivoyage.org/wiki/Chernobyl",
+      "wikidata": "Q129677"
+    },
+    {
+      "rank": 444,
+      "title": "Lexington (Kentucky)",
+      "country": "United States",
+      "page_views": 10065,
+      "source_url": "https://en.wikivoyage.org/wiki/Lexington_(Kentucky)",
+      "wikidata": "Q49241"
+    },
+    {
+      "rank": 445,
+      "title": "Ann Arbor",
+      "country": "United States",
+      "page_views": 10056,
+      "source_url": "https://en.wikivoyage.org/wiki/Ann_Arbor",
+      "wikidata": "Q485172"
+    },
+    {
+      "rank": 446,
+      "title": "Tijuana",
+      "country": "Mexico",
+      "page_views": 10017,
+      "source_url": "https://en.wikivoyage.org/wiki/Tijuana",
+      "wikidata": "Q124739"
+    },
+    {
+      "rank": 447,
+      "title": "Okayama",
+      "country": "Japan",
+      "page_views": 9946,
+      "source_url": "https://en.wikivoyage.org/wiki/Okayama",
+      "wikidata": "Q200078"
+    },
+    {
+      "rank": 448,
+      "title": "Salvador",
+      "country": "Brazil",
+      "page_views": 9941,
+      "source_url": "https://en.wikivoyage.org/wiki/Salvador",
+      "wikidata": "Q36947"
+    },
+    {
+      "rank": 449,
+      "title": "Zaragoza",
+      "country": "Spain",
+      "page_views": 9888,
+      "source_url": "https://en.wikivoyage.org/wiki/Zaragoza",
+      "wikidata": "Q10305"
+    },
+    {
+      "rank": 450,
+      "title": "Fez",
+      "country": "Morocco",
+      "page_views": 9787,
+      "source_url": "https://en.wikivoyage.org/wiki/Fez",
+      "wikidata": "Q80985"
+    },
+    {
+      "rank": 451,
+      "title": "Dali",
+      "country": "People's Republic of China",
+      "page_views": 9782,
+      "source_url": "https://en.wikivoyage.org/wiki/Dali",
+      "wikidata": "Q855228"
+    },
+    {
+      "rank": 452,
+      "title": "Ayutthaya",
+      "country": "Thailand",
+      "page_views": 9746,
+      "source_url": "https://en.wikivoyage.org/wiki/Ayutthaya",
+      "wikidata": "Q203370"
+    },
+    {
+      "rank": 453,
+      "title": "Stavanger",
+      "country": "Norway",
+      "page_views": 9691,
+      "source_url": "https://en.wikivoyage.org/wiki/Stavanger",
+      "wikidata": "Q25416"
+    },
+    {
+      "rank": 454,
+      "title": "Reading (England)",
+      "country": "United Kingdom",
+      "page_views": 9604,
+      "source_url": "https://en.wikivoyage.org/wiki/Reading_(England)",
+      "wikidata": "Q161491"
+    },
+    {
+      "rank": 455,
+      "title": "Santa Barbara",
+      "country": "United States",
+      "page_views": 9603,
+      "source_url": "https://en.wikivoyage.org/wiki/Santa_Barbara",
+      "wikidata": "Q159288"
+    },
+    {
+      "rank": 456,
+      "title": "Taganga",
+      "country": "Colombia",
+      "page_views": 9595,
+      "source_url": "https://en.wikivoyage.org/wiki/Taganga",
+      "wikidata": "Q2387771"
+    },
+    {
+      "rank": 457,
+      "title": "Szczecin",
+      "country": "Poland",
+      "page_views": 9594,
+      "source_url": "https://en.wikivoyage.org/wiki/Szczecin",
+      "wikidata": "Q393"
+    },
+    {
+      "rank": 458,
+      "title": "Kozhikode",
+      "country": "India",
+      "page_views": 9575,
+      "source_url": "https://en.wikivoyage.org/wiki/Kozhikode",
+      "wikidata": "Q28729"
+    },
+    {
+      "rank": 459,
+      "title": "Albuquerque",
+      "country": "United States",
+      "page_views": 9507,
+      "source_url": "https://en.wikivoyage.org/wiki/Albuquerque",
+      "wikidata": "Q34804"
+    },
+    {
+      "rank": 460,
+      "title": "Spokane",
+      "country": "United States",
+      "page_views": 9471,
+      "source_url": "https://en.wikivoyage.org/wiki/Spokane",
+      "wikidata": "Q187805"
+    },
+    {
+      "rank": 461,
+      "title": "Alice Springs",
+      "country": "Australia",
+      "page_views": 9439,
+      "source_url": "https://en.wikivoyage.org/wiki/Alice_Springs",
+      "wikidata": "Q17872"
+    },
+    {
+      "rank": 462,
+      "title": "Bari",
+      "country": "Italy",
+      "page_views": 9429,
+      "source_url": "https://en.wikivoyage.org/wiki/Bari",
+      "wikidata": "Q3519"
+    },
+    {
+      "rank": 463,
+      "title": "Freiburg",
+      "country": "Germany",
+      "page_views": 9404,
+      "source_url": "https://en.wikivoyage.org/wiki/Freiburg",
+      "wikidata": "Q2833"
+    },
+    {
+      "rank": 464,
+      "title": "San Salvador",
+      "country": "El Salvador",
+      "page_views": 9396,
+      "source_url": "https://en.wikivoyage.org/wiki/San_Salvador",
+      "wikidata": "Q3110"
+    },
+    {
+      "rank": 465,
+      "title": "Queenstown (New Zealand)",
+      "country": "New Zealand",
+      "page_views": 9315,
+      "source_url": "https://en.wikivoyage.org/wiki/Queenstown_(New_Zealand)",
+      "wikidata": "Q613602"
+    },
+    {
+      "rank": 466,
+      "title": "Luton",
+      "country": "United Kingdom",
+      "page_views": 9305,
+      "source_url": "https://en.wikivoyage.org/wiki/Luton",
+      "wikidata": "Q203889"
+    },
+    {
+      "rank": 467,
+      "title": "Taichung",
+      "country": "Taiwan",
+      "page_views": 9230,
+      "source_url": "https://en.wikivoyage.org/wiki/Taichung",
+      "wikidata": "Q245023"
+    },
+    {
+      "rank": 468,
+      "title": "Chișinău",
+      "country": "Moldova",
+      "page_views": 9199,
+      "source_url": "https://en.wikivoyage.org/wiki/Chișinău",
+      "wikidata": "Q21197"
+    },
+    {
+      "rank": 469,
+      "title": "Cambridge (Massachusetts)",
+      "country": "United States",
+      "page_views": 9197,
+      "source_url": "https://en.wikivoyage.org/wiki/Cambridge_(Massachusetts)",
+      "wikidata": "Q49111"
+    },
+    {
+      "rank": 470,
+      "title": "Dortmund",
+      "country": "Germany",
+      "page_views": 9151,
+      "source_url": "https://en.wikivoyage.org/wiki/Dortmund",
+      "wikidata": "Q1295"
+    },
+    {
+      "rank": 471,
+      "title": "Girona",
+      "country": "Spain",
+      "page_views": 9142,
+      "source_url": "https://en.wikivoyage.org/wiki/Girona",
+      "wikidata": "Q7038"
+    },
+    {
+      "rank": 472,
+      "title": "Baguio",
+      "country": "Philippines",
+      "page_views": 9094,
+      "source_url": "https://en.wikivoyage.org/wiki/Baguio",
+      "wikidata": "Q1822"
+    },
+    {
+      "rank": 473,
+      "title": "Savannah",
+      "country": "United States",
+      "page_views": 9060,
+      "source_url": "https://en.wikivoyage.org/wiki/Savannah",
+      "wikidata": "Q83813"
+    },
+    {
+      "rank": 474,
+      "title": "Sapporo",
+      "country": "Japan",
+      "page_views": 8977,
+      "source_url": "https://en.wikivoyage.org/wiki/Sapporo",
+      "wikidata": "Q37951"
+    },
+    {
+      "rank": 475,
+      "title": "Leicester",
+      "country": "United Kingdom",
+      "page_views": 8949,
+      "source_url": "https://en.wikivoyage.org/wiki/Leicester",
+      "wikidata": "Q83065"
+    },
+    {
+      "rank": 476,
+      "title": "Santa Fe (New Mexico)",
+      "country": "United States",
+      "page_views": 8927,
+      "source_url": "https://en.wikivoyage.org/wiki/Santa_Fe_(New_Mexico)",
+      "wikidata": "Q38555"
+    },
+    {
+      "rank": 477,
+      "title": "Tromsø",
+      "country": "Norway",
+      "page_views": 8878,
+      "source_url": "https://en.wikivoyage.org/wiki/Tromsø",
+      "wikidata": "Q26087"
+    },
+    {
+      "rank": 478,
+      "title": "Hampi",
+      "country": "India",
+      "page_views": 8878,
+      "source_url": "https://en.wikivoyage.org/wiki/Hampi",
+      "wikidata": "Q26732"
+    },
+    {
+      "rank": 479,
+      "title": "Lansing",
+      "country": "United States",
+      "page_views": 8876,
+      "source_url": "https://en.wikivoyage.org/wiki/Lansing",
+      "wikidata": "Q28237"
+    },
+    {
+      "rank": 480,
+      "title": "Vladivostok",
+      "country": "Russia",
+      "page_views": 8792,
+      "source_url": "https://en.wikivoyage.org/wiki/Vladivostok",
+      "wikidata": "Q959"
+    },
+    {
+      "rank": 481,
+      "title": "Batumi",
+      "country": "Georgia",
+      "page_views": 8789,
+      "source_url": "https://en.wikivoyage.org/wiki/Batumi",
+      "wikidata": "Q25475"
+    },
+    {
+      "rank": 482,
+      "title": "Punta Cana",
+      "country": "Dominican Republic",
+      "page_views": 8779,
+      "source_url": "https://en.wikivoyage.org/wiki/Punta_Cana",
+      "wikidata": "Q1568095"
+    },
+    {
+      "rank": 483,
+      "title": "Puerto Morelos",
+      "country": "Mexico",
+      "page_views": 8725,
+      "source_url": "https://en.wikivoyage.org/wiki/Puerto_Morelos",
+      "wikidata": "Q2117481"
+    },
+    {
+      "rank": 484,
+      "title": "Arlington (Virginia)",
+      "country": "United States",
+      "page_views": 8712,
+      "source_url": "https://en.wikivoyage.org/wiki/Arlington_(Virginia)",
+      "wikidata": "Q107126"
+    },
+    {
+      "rank": 485,
+      "title": "Derry",
+      "country": "United Kingdom",
+      "page_views": 8680,
+      "source_url": "https://en.wikivoyage.org/wiki/Derry",
+      "wikidata": "Q163584"
+    },
+    {
+      "rank": 486,
+      "title": "Udon Thani",
+      "country": "Thailand",
+      "page_views": 8657,
+      "source_url": "https://en.wikivoyage.org/wiki/Udon_Thani",
+      "wikidata": "Q816331"
+    },
+    {
+      "rank": 487,
+      "title": "Plymouth (England)",
+      "country": "United Kingdom",
+      "page_views": 8639,
+      "source_url": "https://en.wikivoyage.org/wiki/Plymouth_(England)",
+      "wikidata": "Q43382"
+    },
+    {
+      "rank": 488,
+      "title": "Nazca",
+      "country": "Peru",
+      "page_views": 8561,
+      "source_url": "https://en.wikivoyage.org/wiki/Nazca",
+      "wikidata": "Q1711521"
+    },
+    {
+      "rank": 489,
+      "title": "Hurghada",
+      "country": "Egypt",
+      "page_views": 8557,
+      "source_url": "https://en.wikivoyage.org/wiki/Hurghada",
+      "wikidata": "Q187284"
+    },
+    {
+      "rank": 490,
+      "title": "Entebbe",
+      "country": "Uganda",
+      "page_views": 8517,
+      "source_url": "https://en.wikivoyage.org/wiki/Entebbe",
+      "wikidata": "Q211970"
+    },
+    {
+      "rank": 491,
+      "title": "Bodh Gaya",
+      "country": "India",
+      "page_views": 8507,
+      "source_url": "https://en.wikivoyage.org/wiki/Bodh_Gaya",
+      "wikidata": "Q176767"
+    },
+    {
+      "rank": 492,
+      "title": "Ohrid",
+      "country": "North Macedonia",
+      "page_views": 8459,
+      "source_url": "https://en.wikivoyage.org/wiki/Ohrid",
+      "wikidata": "Q1223508"
+    },
+    {
+      "rank": 493,
+      "title": "Berkeley",
+      "country": "United States",
+      "page_views": 8439,
+      "source_url": "https://en.wikivoyage.org/wiki/Berkeley",
+      "wikidata": "Q484678"
+    },
+    {
+      "rank": 494,
+      "title": "Sudbury (Ontario)",
+      "country": "Canada",
+      "page_views": 8432,
+      "source_url": "https://en.wikivoyage.org/wiki/Sudbury_(Ontario)",
+      "wikidata": "Q383434"
+    },
+    {
+      "rank": 495,
+      "title": "Madurai",
+      "country": "India",
+      "page_views": 8394,
+      "source_url": "https://en.wikivoyage.org/wiki/Madurai",
+      "wikidata": "Q228405"
+    },
+    {
+      "rank": 496,
+      "title": "Manaus",
+      "country": "Brazil",
+      "page_views": 8387,
+      "source_url": "https://en.wikivoyage.org/wiki/Manaus",
+      "wikidata": "Q40236"
+    },
+    {
+      "rank": 497,
+      "title": "Salzburg",
+      "country": "Austria",
+      "page_views": 8321,
+      "source_url": "https://en.wikivoyage.org/wiki/Salzburg",
+      "wikidata": "Q34713"
+    },
+    {
+      "rank": 498,
+      "title": "Windhoek",
+      "country": "Namibia",
+      "page_views": 8317,
+      "source_url": "https://en.wikivoyage.org/wiki/Windhoek",
+      "wikidata": "Q3935"
+    },
+    {
+      "rank": 499,
+      "title": "Linz",
+      "country": "Austria",
+      "page_views": 8228,
+      "source_url": "https://en.wikivoyage.org/wiki/Linz",
+      "wikidata": "Q41329"
+    },
+    {
+      "rank": 500,
+      "title": "Erbil",
+      "country": "Iraq",
+      "page_views": 8091,
+      "source_url": "https://en.wikivoyage.org/wiki/Erbil",
+      "wikidata": "Q132754"
+    }
+  ]
+}

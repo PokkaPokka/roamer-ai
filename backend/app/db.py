@@ -44,6 +44,37 @@ CREATE TABLE IF NOT EXISTS trips (
 )
 """,
     "CREATE INDEX IF NOT EXISTS trips_user_updated_idx ON trips (user_id, updated_at DESC)",
+
+    # Destination knowledge base (Wikivoyage), used for RAG.
+    "CREATE EXTENSION IF NOT EXISTS vector",
+    """
+CREATE TABLE IF NOT EXISTS kb_cities (
+    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    title       TEXT NOT NULL UNIQUE,
+    country     TEXT,
+    page_views  BIGINT NOT NULL DEFAULT 0,
+    revision_id BIGINT,
+    source_url  TEXT NOT NULL,
+    fetched_at  TIMESTAMPTZ
+)
+""",
+    # `embedding` is a bge-m3 vector (1024 dimensions) for semantic search.
+    # `tsv` is filled in by Postgres from `content` for keyword search.
+    """
+CREATE TABLE IF NOT EXISTS kb_chunks (
+    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    city_id     BIGINT NOT NULL REFERENCES kb_cities(id) ON DELETE CASCADE,
+    section     TEXT NOT NULL,
+    chunk_index INT NOT NULL,
+    content     TEXT NOT NULL,
+    source_url  TEXT NOT NULL,
+    embedding   vector(1024) NOT NULL,
+    tsv         tsvector GENERATED ALWAYS AS (to_tsvector('english', content)) STORED,
+    UNIQUE (city_id, chunk_index)
+)
+""",
+    "CREATE INDEX IF NOT EXISTS kb_chunks_embedding_idx ON kb_chunks USING hnsw (embedding vector_cosine_ops)",
+    "CREATE INDEX IF NOT EXISTS kb_chunks_tsv_idx ON kb_chunks USING gin (tsv)",
 ]
 
 

@@ -7,3 +7,6 @@ env.bak/
 venv.bak/
 # Secrets
 .env
+
+# Knowledge-base downloads
+backend/data/cache/

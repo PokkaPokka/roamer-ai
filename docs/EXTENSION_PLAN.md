@@ -69,6 +69,13 @@ START → router_agent ─┬─ "plan" / "new_search" → flight → hotel → 
 - [ ] **Human-in-the-loop:** LangGraph `interrupt()` so the user approves the flight before the itinerary is built
 - [ ] **Reflection loop:** a critic node checks the plan against budget and dates, and the graph replans if it fails
 - [ ] Fix `llm_calls` so it counts only real LLM calls
+- [ ] **Live progress streaming** (the UI currently shows only a spinner, so the user can't tell progress from a stuck run):
+  - Graph: `astream()` with `custom` mode (agents send status lines via `get_stream_writer()`, e.g. "Searching Google Flights MEL → NRT", "Found 5 options from AUD 1,042") and `messages` mode (stream tokens from `itinerary_agent`, `final_agent`, `revise_agent` only; structured-output calls stay silent)
+  - Backend: `POST /api/travel/stream` sends Server-Sent Events (`step`, `status`, `token`, `done`, `error`), same auth and ownership checks, trip row saved only on success, heartbeat every 10 s. Keep `POST /api/travel` for curl and scripts
+  - Frontend: read the stream with `fetch()` + a stream reader (`EventSource` can't send the login token); step list with ○ waiting / ● running / ✓ done / ✗ failed and a timer per step; the plan renders live as Markdown
+  - Stuck warning after 90 s with no events, and a clear error if the connection drops
+  - Stop button: closing the stream cancels the graph run on the server
+  - No percentage progress bar: run time varies too much (80–400 s) for it to be honest
 
 ## Phase 4 — MCP in both directions
 
