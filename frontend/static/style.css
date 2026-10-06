@@ -510,6 +510,48 @@ textarea.input {
     min-height: 42px;
 }
 
+/* Optional dates */
+
+.dates-box summary {
+    cursor: pointer;
+    font-weight: 600;
+    width: fit-content;
+}
+
+.dates-box summary .muted {
+    font-weight: 400;
+    font-size: 0.85rem;
+}
+
+.dates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.dates-grid .field-label {
+    display: grid;
+    gap: 6px;
+}
+
+.dates-grid .input {
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    min-height: 44px;
+}
+
+.dates-note {
+    font-size: 0.82rem;
+    margin-top: 10px;
+}
+
+.flight-dates {
+    font-weight: 600;
+    color: var(--accent);
+    font-size: 0.88rem;
+}
+
 /* Live progress */
 
 .progress-panel {
@@ -856,10 +898,24 @@ footer {
         gap: 20px;
     }
 
+    /* One column: the planner, then My Trips, then the plan. The workspace's
+       children join the page grid so My Trips can sit between them. */
+    .workspace {
+        display: contents;
+    }
+
+    .planner {
+        order: 1;
+    }
+
     .sidebar {
         position: static;
         max-height: none;
         order: 2;
+    }
+
+    .paper {
+        order: 3;
     }
 
     .topbar {

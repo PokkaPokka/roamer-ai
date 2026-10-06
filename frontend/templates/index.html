@@ -93,6 +93,39 @@
           <label class="visually-hidden" for="userInput">Your trip request</label>
           <textarea id="userInput" class="input" rows="4"></textarea>
 
+          <!-- Optional dates; when set they win over dates in the text -->
+          <details id="datesBox" class="dates-box">
+            <summary>Dates <span class="muted">(optional, these win over the text)</span></summary>
+            <div class="dates-grid">
+              <label class="field-label" for="departDate">
+                Depart
+                <input id="departDate" class="input" type="date" />
+              </label>
+              <label class="field-label" for="returnDate">
+                Return
+                <input id="returnDate" class="input" type="date" />
+              </label>
+              <label class="field-label" for="tripDays">
+                Or trip length (days)
+                <input id="tripDays" class="input" type="number" min="1" max="60" inputmode="numeric" />
+              </label>
+              <label class="field-label" for="flexibility">
+                Flexibility
+                <select id="flexibility" class="input">
+                  <option value="exact">Exact dates</option>
+                  <option value="1">± 1 day</option>
+                  <option value="2">± 2 days</option>
+                  <option value="3">± 3 days</option>
+                  <option value="month">Any time that month</option>
+                </select>
+              </label>
+            </div>
+            <p class="muted dates-note">
+              Flexible dates search up to 7 departure days and keep the trip length the same.
+            </p>
+            <button type="button" class="button button-quiet" onclick="clearDates()">Clear dates</button>
+          </details>
+
           <div class="planner-actions">
             <span class="muted shortcut">Ctrl + Enter to send</span>
             <button id="sendBtn" class="button button-primary" onclick="sendMessage()">

@@ -89,6 +89,7 @@ LLM_PROVIDER=ollama
 OLLAMA_MODEL=qwen3:8b
 OLLAMA_NUM_CTX=16384   # context window; guide excerpts need about 8K tokens
 OLLAMA_NUM_PREDICT=3000 # max tokens per response; stops a runaway answer
+FLEX_MAX_SEARCHES=7       # max Google Flights searches for one flexible-date trip
 ```
 
 For local development, install [Ollama](https://ollama.com), then run `ollama pull qwen3:8b` and `ollama pull bge-m3` (the embedding model for the travel guide search).

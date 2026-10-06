@@ -141,22 +141,21 @@ UI pass after Stage C:
 - [x] Removed the old quick-prompt buttons; deleted test accounts and test threads from the database
 - [x] Redesign: cream background, warm ink text, one deep-teal accent, soft raised/inset shadows, serif headings (Libre Caslon) with IBM Plex Sans; My Trips is a sidebar on desktop and stacks below on phones
 
+Stage D (done): flexible dates
+
+- [x] `TripRequest` gained `flex_days` (0–3) and `month` (YYYY-MM); the parser fills them from text ("around 2026-12-10, flexible by a couple of days" → ±2). The model wrote "January" once, so a month that isn't YYYY-MM falls back to the departure date's month
+- [x] Optional Dates form (depart, return or trip length, flexibility: exact / ±1–3 days / any time that month), checked in the browser and again by the server (400). Form dates win over the text and are written into the request text, so later feedback keeps them
+- [x] One flexibility for the whole trip: ±N days moves departure and return together (2N+1 searches); a whole month is sampled at 7 departure dates. Capped by `FLEX_MAX_SEARCHES` (default 7) to protect the SerpApi quota; the searches run in parallel threads
+- [x] The flight cards show the cheapest 5 options across all dates, each with its dates; the prompt gets the cheapest fare per date pair and the chosen flight's dates for the whole plan
+- [x] Router example: "go a week later, my dates are flexible" → `new_search`
+- Tested: stubbed windows (±2, near today, whole month, current month), validation rules, parser on 3 requests, and a browser run (Tokyo ±2 days: 5 searches, cheapest AUD 1,054 two days after the date entered; the plan said it picked the cheapest fare in the ±2-day window)
+- Known issue: "3 days" still means return = departure + 2 days, so with a long flight there's little time at the destination
+- Separate flexibility for departure and return (up to 49 searches) and a minimum–maximum trip length were left out to keep the search count small
+
 ### Still to do
 
 - [ ] Turn the agents into **tool-calling ReAct agents** that choose their own tools
 - [ ] **Reflection loop:** a critic node checks the plan against budget and dates, and the graph replans if it fails
-- [ ] **Trip dates with flexibility:** the user picks a start and end date, and can mark each as flexible
-  - UI: start and end date pickers, plus a flexibility option for each date:
-    - Exact: only that date
-    - ± 1 / 2 / 3 days around the date
-    - Whole month: "anytime in November"
-  - Optional trip length (e.g. 5–7 nights) when the dates are loose
-  - Backend: add `start_date`, `end_date`, `flex_days` and `trip_length` to `TripRequest`. The LLM parser fills them from free text ("around mid-Nov for a week"), and the form values override it
-  - Flights: search each date in the flexible window and show the cheapest combinations (SerpApi Google Flights price insights). Cap the number of searches so the API quota isn't burned
-  - Hotels and itinerary: use the date range chosen by the user. Say in the plan which dates were picked and why (e.g. "cheapest fares")
-  - Router: feedback like "make the dates flexible" or "go a week later" counts as `new_search`
-  - Validation: end date must be after the start date, and neither can be in the past
-
 ## Phase 4 — MCP in both directions
 
 - [ ] **MCP server:** expose `search_flights`, `search_hotels`, `query_travel_kb` and `get_my_trips`

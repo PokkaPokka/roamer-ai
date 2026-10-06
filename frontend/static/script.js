@@ -440,6 +440,8 @@ function setMode(hasPlan) {
   document.getElementById("inputHint").textContent = text.hint;
   document.getElementById("userInput").placeholder = text.placeholder;
   document.getElementById("btnText").textContent = text.button;
+  // Dates are for new trips; feedback like "go a week later" changes them on a plan.
+  document.getElementById("datesBox").classList.toggle("hidden", hasPlan);
 }
 
 // Takes the running plan off screen; it keeps going in the background.
@@ -805,6 +807,15 @@ function formatPrice(option) {
     : `${option.currency} ${option.price.toLocaleString()}`;
 }
 
+// "2026-11-20" -> "Fri 20 Nov"
+function shortDate(isoDate) {
+  return new Date(`${isoDate}T00:00:00`).toLocaleDateString(undefined, {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  });
+}
+
 // "2026-11-20 06:15" -> "06:15"
 function timeOf(dateTime) {
   return (dateTime || "").split(" ").pop() || "?";
@@ -843,6 +854,15 @@ function flightCard(option) {
     `${option.arrival_airport} ${timeOf(option.arrival_time)}` +
     daysLater(option.departure_time, option.arrival_time);
 
+  // Flexible-date searches mix dates, so each card says when it flies.
+  const dates = document.createElement("div");
+  dates.className = "flight-dates";
+  if (option.outbound_date) {
+    dates.textContent =
+      shortDate(option.outbound_date) +
+      (option.return_date ? ` → ${shortDate(option.return_date)}` : "");
+  }
+
   const details = document.createElement("div");
   details.className = "flight-note";
   const stops = option.stops === 0 ? "Direct" : `${option.stops} stop${option.stops > 1 ? "s" : ""}`;
@@ -853,7 +873,7 @@ function flightCard(option) {
   button.textContent = "Use this flight";
   button.onclick = () => chooseFlight(option.number);
 
-  card.append(price, airlines, route, details, button);
+  card.append(price, dates, airlines, route, details, button);
   return card;
 }
 
@@ -881,6 +901,64 @@ function chooseFlight(number) {
 // Sending a request
 // =========================
 
+// =========================
+// Optional dates
+// =========================
+
+// YYYY-MM-DD in local time (toISOString would use UTC and can be a day off).
+function isoDay(day) {
+  const month = String(day.getMonth() + 1).padStart(2, "0");
+  return `${day.getFullYear()}-${month}-${String(day.getDate()).padStart(2, "0")}`;
+}
+
+function setDateLimits() {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  document.getElementById("departDate").min = isoDay(tomorrow);
+  document.getElementById("returnDate").min = isoDay(tomorrow);
+}
+
+function clearDates() {
+  ["departDate", "returnDate", "tripDays"].forEach((id) => (document.getElementById(id).value = ""));
+  document.getElementById("flexibility").value = "exact";
+}
+
+// The dates from the form, or null if none were set. Throws with a message the
+// user can act on; the server checks the same rules.
+function readDates() {
+  const departure = document.getElementById("departDate").value;
+  const returnDate = document.getElementById("returnDate").value;
+  const tripDays = document.getElementById("tripDays").value;
+  const flexibility = document.getElementById("flexibility").value;
+
+  if (!departure && !returnDate && !tripDays && flexibility === "exact") {
+    return null;
+  }
+
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  if (!departure) {
+    throw new Error("Pick a departure date.");
+  }
+  if (departure < isoDay(tomorrow)) {
+    throw new Error("The departure date must be after today.");
+  }
+  if (returnDate && returnDate <= departure) {
+    throw new Error("The return date must be after the departure date.");
+  }
+  if (tripDays && !(Number.isInteger(Number(tripDays)) && tripDays >= 1 && tripDays <= 60)) {
+    throw new Error("The trip length must be 1 to 60 days.");
+  }
+
+  return {
+    departure_date: departure,
+    return_date: returnDate || null,
+    trip_days: tripDays ? Number(tripDays) : null,
+    flexibility: flexibility,
+  };
+}
+
 async function sendMessage() {
   hideError();
 
@@ -892,8 +970,24 @@ async function sendMessage() {
     return;
   }
 
-  await runPlan({ message: message, thread_id: currentThreadId }, () => {
+  const body = { message: message, thread_id: currentThreadId };
+
+  // Dates only apply to a new trip (the form is hidden for feedback).
+  if (!currentThreadId) {
+    try {
+      const dates = readDates();
+      if (dates) {
+        body.dates = dates;
+      }
+    } catch (error) {
+      showError(error.message);
+      return;
+    }
+  }
+
+  await runPlan(body, () => {
     input.value = "";
+    clearDates();
   });
 }
 
@@ -1133,6 +1227,8 @@ document.addEventListener("keydown", function (event) {
     closeTripMenus();
   }
 });
+
+setDateLimits();
 
 if (authToken) {
   showApp();

@@ -8,6 +8,7 @@ os.environ["SSL_CERT_FILE"] = certifi.where()
 os.environ["REQUESTS_CA_BUNDLE"] = certifi.where()
 
 from typing import TypedDict, Annotated, Literal
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date, timedelta
 import asyncio
 import operator
@@ -97,6 +98,7 @@ class TravelState(TypedDict):
     user_query: str        # the current trip request the plan is built from
     route: str             # "plan", "new_search" or "revise"
     trip_request: dict     # TripRequest fields extracted once by plan_trip
+    date_overrides: dict   # dates picked in the form for this run; they win over the text
     destination: str       # where the trip goes, as extracted from the request
     flight_results: str
     flight_options: list[dict]   # the same flights as data, for the UI's flight cards
@@ -142,6 +144,8 @@ def router_agent(state: TravelState):
                 "the trip request to include the feedback.\n"
                 'Example: request "3 days in Tokyo from Melbourne", feedback "make it 5 days" -> '
                 '{"action": "new_search", "updated_request": "5 days in Tokyo from Melbourne"}\n'
+                'Example: request "3 days in Tokyo from Melbourne leaving 2026-11-20", feedback "go a week later, my dates are flexible" -> '
+                '{"action": "new_search", "updated_request": "3 days in Tokyo from Melbourne leaving 2026-11-27, dates flexible by a few days"}\n'
                 'Example: request "3 days in Tokyo from Melbourne", feedback "add more food spots on day 2" -> '
                 '{"action": "revise", "updated_request": "3 days in Tokyo from Melbourne, with more food spots on day 2"}'
             )),
@@ -175,6 +179,13 @@ class TripRequest(BaseModel):
     return_date: str | None = Field(None, description="Return date as YYYY-MM-DD. Null if not mentioned.")
     trip_days: int | None = Field(None, description="Trip length in days, e.g. 3 for 'a 3 day trip'.")
     adults: int = Field(1, description="Number of adult travellers.")
+    flex_days: int = Field(0, description=(
+        "How many days earlier or later the traveller could leave, 0 to 3. "
+        "'around 15 Nov' or 'give or take a few days' -> 2 or 3. 0 if exact or not mentioned."
+    ))
+    month: str | None = Field(None, description=(
+        "YYYY-MM if the traveller can leave any time in a month ('sometime in November'). Otherwise null."
+    ))
     needs_flights: bool = Field(True, description=(
         "False only if the traveller is not flying: driving, taking a train or bus, "
         "or already has flights booked. Otherwise true."
@@ -205,7 +216,12 @@ def extract_trip_request(query: str) -> TripRequest:
                 "Use null for anything the user did not mention.\n"
                 'Example: "5 days in Paris from London, leaving 2026-05-01" -> '
                 '{"origin": "London", "destination": "Paris", "departure_date": "2026-05-01", '
-                '"return_date": null, "trip_days": 5, "adults": 1, "needs_flights": true, "needs_hotels": true}\n'
+                '"return_date": null, "trip_days": 5, "adults": 1, "flex_days": 0, "month": null, '
+                '"needs_flights": true, "needs_hotels": true}\n'
+                'Example: "a week in Bangkok from Sydney around 2026-07-15, dates are flexible" -> '
+                '{"origin": "Sydney", "destination": "Bangkok", "departure_date": "2026-07-15", '
+                '"return_date": null, "trip_days": 7, "adults": 1, "flex_days": 3, "month": null, '
+                '"needs_flights": true, "needs_hotels": true}\n'
                 'Example: "3 day road trip from Melbourne to Sydney, I\'m driving" -> '
                 '{"origin": "Melbourne", "destination": "Sydney", "departure_date": null, '
                 '"return_date": null, "trip_days": 3, "adults": 1, "needs_flights": false, "needs_hotels": true}\n'
@@ -242,11 +258,48 @@ FLIGHTS_NOT_NEEDED = "Flight search not needed: the traveller isn't flying (e.g.
 HOTELS_NOT_NEEDED = "Hotel search not needed: the traveller already has somewhere to stay."
 
 
+MAX_FLEX_DAYS = 3
+
+
+def describe_dates(trip: TripRequest) -> str:
+    """E.g. "leaving 2026-11-20 ±2 days, returning 2026-11-23" or "leaving any time in 2026-11, 5 days"."""
+    if trip.month:
+        parts = [f"leaving any time in {trip.month}"]
+    elif trip.departure_date:
+        parts = [f"leaving {trip.departure_date}" + (f" ±{trip.flex_days} days" if trip.flex_days else "")]
+    else:
+        parts = []
+    if trip.return_date:
+        parts.append(f"returning {trip.return_date}")
+    elif trip.trip_days:
+        parts.append(f"{trip.trip_days} days")
+    return ", ".join(parts)
+
+
 def plan_trip(state: TravelState):
     # Extract the trip once, so the searches can all start at the same time, and
     # decide which searches this trip needs (see route_searches).
     report("Reading your trip request")
-    trip = extract_trip_request(state["user_query"])
+    query = state["user_query"]
+    trip = extract_trip_request(query)
+    trip.flex_days = min(max(trip.flex_days or 0, 0), MAX_FLEX_DAYS)
+    # The model sometimes writes the month as "January"; use the departure date's month then.
+    if trip.month and not re.fullmatch(r"\d{4}-\d{2}", trip.month):
+        trip.month = trip.departure_date[:7] if trip.departure_date else None
+
+    # Dates picked in the form win over what the model read from the text. They
+    # are also written into the request text, so feedback later ("make it 5 days")
+    # is rewritten from a request that still has them.
+    overrides = state.get("date_overrides") or {}
+    if overrides:
+        trip.departure_date = overrides.get("departure_date") or trip.departure_date
+        trip.return_date = overrides.get("return_date") or trip.return_date
+        trip.trip_days = overrides.get("trip_days") or trip.trip_days
+        flexibility = overrides.get("flexibility", "exact")
+        trip.month = trip.departure_date[:7] if flexibility == "month" and trip.departure_date else None
+        trip.flex_days = int(flexibility) if flexibility.isdigit() else 0
+        query = f"{query} (dates picked in the form, these win: {describe_dates(trip)})"
+
     if not trip.needs_flights and not NO_FLIGHT_HINTS.search(state["user_query"]):
         trip.needs_flights = True
     if not trip.needs_hotels and not NO_HOTEL_HINTS.search(state["user_query"]):
@@ -255,12 +308,12 @@ def plan_trip(state: TravelState):
     details = [part for part in [
         f"to {trip.destination}" if trip.destination else "",
         f"from {trip.origin}" if trip.origin else "",
-        f"leaving {trip.departure_date}" if trip.departure_date else "",
-        f"{trip.trip_days} days" if trip.trip_days else "",
+        describe_dates(trip),
     ] if part]
     report("Trip: " + ", ".join(details) if details else "Could not find trip details; using defaults")
 
     updates = {
+        "user_query": query,
         "trip_request": trip.model_dump(),
         "destination": trip.destination or "",
         # Clear the previous run's flight choice; a new search asks again.
@@ -290,6 +343,46 @@ def route_searches(state: TravelState) -> list[str]:
     return searches
 
 
+# Each flexible date is one SerpApi search, so cap them to protect the monthly quota.
+FLEX_MAX_SEARCHES = int(os.getenv("FLEX_MAX_SEARCHES", "7"))
+MAX_FLIGHT_CARDS = 5
+
+
+def candidate_departures(trip: TripRequest, departure: date, today: date) -> tuple[list[date], str]:
+    """
+    The departure dates to search, and a note for the plan when they are a sample.
+    ±N days searches every day in the window; a whole month is sampled evenly.
+    """
+    if trip.month:
+        try:
+            first = date.fromisoformat(f"{trip.month}-01")
+        except ValueError:
+            return [departure], ""
+        last = (first.replace(day=28) + timedelta(days=4)).replace(day=1) - timedelta(days=1)
+        start = max(first, today + timedelta(days=1))
+        if start > last:
+            return [departure], ""
+        span = (last - start).days
+        if span + 1 <= FLEX_MAX_SEARCHES:
+            return [start + timedelta(days=i) for i in range(span + 1)], ""
+        days = sorted({start + timedelta(days=round(i * span / (FLEX_MAX_SEARCHES - 1)))
+                       for i in range(FLEX_MAX_SEARCHES)})
+        return days, f"searched {len(days)} departure dates spread across {trip.month}, not every day"
+
+    if trip.flex_days:
+        window = [departure + timedelta(days=offset) for offset in range(-trip.flex_days, trip.flex_days + 1)]
+        window = [day for day in window if day > today]
+        # Keep the dates closest to the one asked for if the cap is smaller than the window.
+        window = sorted(window, key=lambda day: abs((day - departure).days))[:FLEX_MAX_SEARCHES]
+        return sorted(window), ""
+
+    return [departure], ""
+
+
+def short_date(day: date) -> str:
+    return f"{day.strftime('%a')} {day.day} {day.strftime('%b')}"
+
+
 def flight_agent(state: TravelState):
     query = state["user_query"]
     trip = TripRequest(**state.get("trip_request", {}))
@@ -305,6 +398,8 @@ def flight_agent(state: TravelState):
     assumptions = []
 
     departure = parse_future_date(trip.departure_date, today)
+    if not departure and trip.month:
+        departure = parse_future_date(f"{trip.month}-01", today) or today + timedelta(days=1)
     if not departure:
         departure = today + timedelta(days=30)
         assumptions.append(f"no valid travel date given, so searched {departure.isoformat()} (30 days from today)")
@@ -312,6 +407,13 @@ def flight_agent(state: TravelState):
     return_day = parse_future_date(trip.return_date, departure)
     if not return_day and trip.trip_days:
         return_day = departure + timedelta(days=max(trip.trip_days - 1, 1))
+    # Flexible dates move the whole trip, so the length stays the same.
+    trip_length = (return_day - departure).days if return_day else None
+
+    departures, sample_note = candidate_departures(trip, departure, today)
+    if sample_note:
+        assumptions.append(sample_note)
+    date_pairs = [(day, day + timedelta(days=trip_length) if trip_length else None) for day in departures]
 
     flight_options = []
 
@@ -319,19 +421,47 @@ def flight_agent(state: TravelState):
         flight_data = "Flight search skipped: could not work out the destination from the request."
         report("Skipped: could not work out the destination airport")
     else:
-        report(f"Searching Google Flights {origin_iata} → {destination_iata}, {departure.isoformat()}")
-        flight_data, flight_options = search_google_flights_with_options(
-            origin_iata=origin_iata,
-            destination_iata=destination_iata,
-            outbound_date=departure.isoformat(),
-            return_date=return_day.isoformat() if return_day else None,
-            adults=max(trip.adults, 1),
-        )
+        if len(date_pairs) == 1:
+            report(f"Searching Google Flights {origin_iata} → {destination_iata}, {departure.isoformat()}")
+        else:
+            report(f"Searching Google Flights {origin_iata} → {destination_iata} on {len(date_pairs)} dates, "
+                   f"{short_date(departures[0])} to {short_date(departures[-1])}")
+
+        def search(pair):
+            outbound, inbound = pair
+            return search_google_flights_with_options(
+                origin_iata=origin_iata,
+                destination_iata=destination_iata,
+                outbound_date=outbound.isoformat(),
+                return_date=inbound.isoformat() if inbound else None,
+                adults=max(trip.adults, 1),
+            )
+
+        # The searches are independent web requests, so run them at the same time.
+        with ThreadPoolExecutor(max_workers=len(date_pairs)) as pool:
+            results = list(pool.map(search, date_pairs))
+
+        for (outbound, inbound), (_, options) in zip(date_pairs, results):
+            for option in options:
+                option["outbound_date"] = outbound.isoformat()
+                option["return_date"] = inbound.isoformat() if inbound else None
+
+        if len(date_pairs) == 1:
+            flight_data, flight_options = results[0]
+        else:
+            flight_data, flight_options = combine_flexible_results(
+                origin_iata, destination_iata, date_pairs, results, trip.adults
+            )
+
         prices = [option["price"] for option in flight_options if option["price"] is not None]
-        if prices:
+        if not prices:
+            report("No flight options found")
+        elif len(date_pairs) == 1:
             report(f"Found {len(flight_options)} options from {flight_options[0]['currency']} {min(prices):,}")
         else:
-            report("No flight options found")
+            cheapest = flight_options[0]
+            report(f"Searched {len(date_pairs)} dates; cheapest {cheapest['currency']} {cheapest['price']:,} "
+                   f"leaving {short_date(date.fromisoformat(cheapest['outbound_date']))}")
 
     if assumptions:
         flight_data = "Assumptions: " + "; ".join(assumptions) + "\n\n" + flight_data
@@ -343,6 +473,37 @@ def flight_agent(state: TravelState):
             AIMessage(content="Flight results fetched.")
         ],
     }
+
+
+def combine_flexible_results(origin, destination, date_pairs, results, adults) -> tuple[str, list[dict]]:
+    """
+    Merges one search per date pair into a summary (cheapest fare per date pair)
+    plus the cheapest options overall, renumbered 1..N for the flight cards.
+    """
+    all_options = [option for _, options in results for option in options]
+    if not all_options:
+        # Every search failed or found nothing: pass on the first message.
+        return results[0][0], []
+
+    currency = all_options[0]["currency"]
+    lines = [
+        f"Flexible-date search, {origin} -> {destination}, {adults} adult{'s' if adults > 1 else ''}, "
+        f"prices in {currency}: searched {len(date_pairs)} date pairs.",
+        "Cheapest fare for each date pair:",
+    ]
+    for (outbound, inbound), (_, options) in zip(date_pairs, results):
+        prices = [option["price"] for option in options if option["price"] is not None]
+        when = f"leave {outbound.isoformat()}" + (f", return {inbound.isoformat()}" if inbound else "")
+        lines.append(f"- {when}: {f'{currency} {min(prices):,}' if prices else 'no flights found'}")
+
+    best = sorted(all_options, key=lambda option: (option["price"] is None, option["price"] or 0))
+    best = best[:MAX_FLIGHT_CARDS]
+    for number, option in enumerate(best, start=1):
+        when = f"leave {option['outbound_date']}" + (f", return {option['return_date']}" if option["return_date"] else "")
+        option["number"] = number
+        option["text"] = re.sub(r"^Option \d+:", f"Option {number} ({when}):", option["text"])
+
+    return "\n".join(lines) + "\n\n" + "\n\n".join(option["text"] for option in best), best
 
 
 # =========================
@@ -363,6 +524,11 @@ def chosen_flight_text(option: dict, adults: int) -> str:
         f"{'for the whole round trip' if option['round_trip'] else 'one way'}, "
         f"{adults} adult{'s' if adults > 1 else ''}. Count it once in the budget.",
     ]
+    if option.get("outbound_date"):
+        lines.append(
+            f"Travel dates for the whole plan: leave {option['outbound_date']}"
+            + (f", return {option['return_date']}." if option.get("return_date") else ".")
+        )
     if option["round_trip"]:
         lines.append(
             "Only the outbound flights are listed; the return flight is picked when booking, "
@@ -416,7 +582,7 @@ def flight_section(state: TravelState) -> str:
     if not chosen:
         return results
     # Keep the summary lines (assumptions, route, price insight) but not the option list.
-    summary = results.split("\n\nOption 1:")[0]
+    summary = re.split(r"\n\nOption 1\b", results)[0]
     return f"{summary}\n\n{chosen}"
 
 
@@ -596,6 +762,7 @@ Important:
 - Mention any search assumptions listed in the Flights section, such as assumed travel dates.
 - If the flight search failed, say so and do not invent flight prices.
 - If flights or hotels were not needed, say so briefly in that section instead of suggesting any.
+- If the Flights section is a flexible-date search, build the plan on the chosen flight's travel dates and say in the Trip Summary which dates were picked and why (for example the cheapest fare in the window).
 - Do not add a sources or references section; it is added automatically.
 """
 
@@ -735,14 +902,16 @@ def run_config(thread_id: str, llm_counter: LLMCallCounter, ask_flight_choice: b
     }
 
 
-def run_input(user_input: str) -> dict:
+def run_input(user_input: str, dates: dict | None = None) -> dict:
     # Only send the new input. Earlier results in this thread are loaded from the
-    # checkpoint, so feedback can revise the existing plan.
+    # checkpoint, so feedback can revise the existing plan. date_overrides is
+    # always sent, so form dates from an earlier run don't stick.
     return {
         "messages": [
             HumanMessage(content=user_input)
         ],
         "latest_input": user_input,
+        "date_overrides": dates or {},
     }
 
 
@@ -813,7 +982,12 @@ def skipped_steps(trip_request: dict) -> list[tuple[str, str]]:
     return skipped
 
 
-async def stream_travel_agent(thread_id: str, user_input: str | None = None, flight_choice: int | None = None):
+async def stream_travel_agent(
+    thread_id: str,
+    user_input: str | None = None,
+    flight_choice: int | None = None,
+    dates: dict | None = None,
+):
     """
     Runs the graph like run_travel_agent, but yields progress events as it goes:
       steps  - the list of steps this run will take (sent again once the route is known)
@@ -835,7 +1009,7 @@ async def stream_travel_agent(thread_id: str, user_input: str | None = None, fli
         graph_input = Command(resume=flight_choice)
         yield {"type": "steps", "steps": step_list(["choose_flight", "final_agent"])}
     else:
-        graph_input = run_input(user_input)
+        graph_input = run_input(user_input, dates)
         yield {"type": "steps", "steps": step_list(["router_agent"])}
 
     # choose_flight still runs (and passes straight through) when flights were

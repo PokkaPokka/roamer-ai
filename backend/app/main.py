@@ -10,6 +10,9 @@ from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from datetime import date
+from typing import Literal
+
 from pydantic import BaseModel
 
 from app.graph import (
@@ -63,12 +66,52 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 
 
+class TripDates(BaseModel):
+    """Dates picked in the form; they override what the planner reads from the text."""
+    departure_date: date | None = None
+    return_date: date | None = None
+    trip_days: int | None = None
+    # "exact", "1"/"2"/"3" for ± days around the departure date, or "month" for any day that month.
+    flexibility: Literal["exact", "1", "2", "3", "month"] = "exact"
+
+
 class TravelRequest(BaseModel):
     message: str = ""
     thread_id: str | None = None
     # Answer to a paused run's flight question: an option number, or 0 for none.
     # Only /api/travel/stream uses it.
     flight_choice: int | None = None
+    dates: TripDates | None = None
+
+
+MAX_TRIP_DAYS = 60
+
+
+def check_dates(dates: TripDates) -> str | None:
+    """An error message for dates that can't be searched, or None if they're fine."""
+    today = date.today()
+    if dates.departure_date and dates.departure_date <= today:
+        return "The departure date must be after today."
+    if dates.return_date and not dates.departure_date:
+        return "Pick a departure date as well as a return date."
+    if dates.return_date and dates.return_date <= dates.departure_date:
+        return "The return date must be after the departure date."
+    if dates.trip_days is not None and not 1 <= dates.trip_days <= MAX_TRIP_DAYS:
+        return f"The trip length must be 1 to {MAX_TRIP_DAYS} days."
+    if dates.flexibility != "exact" and not dates.departure_date:
+        return "Pick a departure date to search around."
+    return None
+
+
+def dates_for_graph(dates: TripDates | None) -> dict:
+    if not dates:
+        return {}
+    return {
+        "departure_date": dates.departure_date.isoformat() if dates.departure_date else None,
+        "return_date": dates.return_date.isoformat() if dates.return_date else None,
+        "trip_days": dates.trip_days,
+        "flexibility": dates.flexibility,
+    }
 
 
 class RenameRequest(BaseModel):
@@ -314,6 +357,11 @@ async def travel_planner_stream(request_data: TravelRequest, user: dict = Depend
     if not user_message and flight_choice is None:
         return JSONResponse(status_code=400, content={"success": False, "error": "Message cannot be empty."})
 
+    if request_data.dates:
+        date_error = check_dates(request_data.dates)
+        if date_error:
+            return JSONResponse(status_code=400, content={"success": False, "error": date_error})
+
     # Same ownership rule as /api/travel; checked before the stream starts so
     # errors are plain JSON responses.
     thread_id = request_data.thread_id
@@ -345,7 +393,9 @@ async def travel_planner_stream(request_data: TravelRequest, user: dict = Depend
 
         async def run_graph():
             try:
-                async for event in stream_travel_agent(thread_id, user_message or None, flight_choice):
+                async for event in stream_travel_agent(
+                    thread_id, user_message or None, flight_choice, dates_for_graph(request_data.dates)
+                ):
                     # Save the trip when the plan is finished, or when the run pauses
                     # for a flight choice, so the paused trip shows in My Trips.
                     if event["type"] in ("done", "choose"):
