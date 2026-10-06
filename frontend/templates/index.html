@@ -2,50 +2,40 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Roamer AI</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+    />
     <link rel="stylesheet" href="/static/style.css" />
   </head>
 
   <body>
-    <div class="page-bg">
-      <div class="gradient-circle circle-1"></div>
-      <div class="gradient-circle circle-2"></div>
-      <div class="gradient-circle circle-3"></div>
-    </div>
-
-    <main class="app-container">
-      <div id="accountBar" class="account-bar hidden">
-        <span id="accountEmail"></span>
-        <button class="copy-btn" onclick="logout()">Log out</button>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-name">Roamer</span>
+        <span class="brand-tagline">A travel planner run by a team of AI agents</span>
       </div>
 
-      <section class="hero-section">
-        <div class="badge">
-          ✈️ Roamer AI — A Multi-Agent Travel Planner with LangGraph
-        </div>
+      <div id="accountBar" class="account-bar hidden">
+        <span id="accountEmail"></span>
+        <button class="button button-quiet button-small" onclick="logout()">Log out</button>
+      </div>
+    </header>
 
-        <h1>Plan Your Perfect Trip with AI</h1>
-
-        <p>
-          Search flights, discover hotels, and generate a complete travel
-          itinerary using a multi-agent LangGraph system.
+    <!-- Login -->
+    <main id="authCard" class="auth-view hidden">
+      <section class="panel auth-panel">
+        <h1>Plan your next trip</h1>
+        <p class="muted">
+          Flights, hotels and a day-by-day plan with sources, saved to your
+          account so you can come back and revise it.
         </p>
-      </section>
-
-      <section id="authCard" class="planner-card auth-card hidden">
-        <div class="card-header">
-          <div>
-            <h2>Log in to plan your trips</h2>
-            <p>
-              Your plans are saved to your account so you can come back and
-              revise them.
-            </p>
-          </div>
-        </div>
 
         <form
           class="auth-form"
@@ -54,172 +44,137 @@
             submitAuth('login');
           "
         >
-          <input
-            id="authEmail"
-            type="email"
-            placeholder="Email"
-            autocomplete="email"
-            required
-          />
+          <label class="field-label" for="authEmail">Email</label>
+          <input id="authEmail" class="input" type="email" autocomplete="email" required />
+
+          <label class="field-label" for="authPassword">Password</label>
           <input
             id="authPassword"
+            class="input"
             type="password"
-            placeholder="Password (at least 8 characters)"
+            placeholder="At least 8 characters"
             autocomplete="current-password"
             required
           />
 
           <div class="auth-actions">
-            <button type="submit" id="loginBtn" class="auth-primary">
-              Log in
-            </button>
-            <button
-              type="button"
-              id="registerBtn"
-              class="copy-btn"
-              onclick="submitAuth('register')"
-            >
+            <button type="submit" id="loginBtn" class="button button-primary">Log in</button>
+            <button type="button" id="registerBtn" class="button" onclick="submitAuth('register')">
               Create account
             </button>
           </div>
         </form>
+
+        <p id="authError" class="alert alert-error hidden" role="alert"></p>
       </section>
+    </main>
 
-      <section id="plannerCard" class="planner-card hidden">
-        <div class="card-header">
-          <div>
-            <h2 id="inputTitle">Where do you want to go?</h2>
-            <p id="inputHint">
-              Example: Plan a complete 7 days Japan trip from Bangladesh under 2
-              lakhs.
-            </p>
-          </div>
-
-          <div class="status-pill">
-            <span class="status-dot"></span>
-            Online
-          </div>
-        </div>
-
-        <div class="input-area">
-          <textarea
-            id="userInput"
-            placeholder="Plan a complete 7 days Japan trip including flights, hotels and sightseeing under 2 lakhs..."
-          ></textarea>
-
-          <button id="sendBtn" onclick="sendMessage()">
-            <span id="btnText">Generate Plan</span>
-            <span id="btnLoader" class="loader hidden"></span>
-          </button>
-        </div>
-
-        <!-- Live progress while a plan is being made (filled by script.js) -->
-        <div id="progressPanel" class="progress-panel hidden" aria-live="polite">
-          <div class="progress-header">
-            <span id="progressTitle" class="progress-title">Planning your trip</span>
-            <button id="stopBtn" class="copy-btn stop-btn" onclick="stopPlanning()">Stop</button>
-          </div>
-          <ol id="stepList" class="step-list"></ol>
-          <p id="progressWarning" class="progress-warning hidden"></p>
-        </div>
-
-        <!-- Flight options when the planner pauses for a choice (filled by script.js) -->
-        <div id="flightChoice" class="flight-choice hidden">
-          <div class="flight-choice-header">
-            <h3>Pick your flight</h3>
-            <p>
-              The plan is built around the flight you pick. Round-trip prices
-              cover both ways; only the outbound flights are shown, and you pick
-              the return flight when booking.
-            </p>
-          </div>
-          <ol id="flightOptions" class="flight-options"></ol>
-          <button class="copy-btn" onclick="chooseFlight(0)">
-            Continue without a flight
-          </button>
-        </div>
-
-        <div id="quickPrompts" class="quick-prompts">
-          <button
-            onclick="
-              setPrompt(
-                'Plan a complete 7 days Japan trip from Bangladesh including flights, hotels and sightseeing under 2 lakhs.',
-              )
-            "
-          >
-            Japan Trip
-          </button>
-
-          <button
-            onclick="
-              setPrompt(
-                'Plan a 5 days Dubai trip from Dhaka with flights, hotels and sightseeing.',
-              )
-            "
-          >
-            Dubai Trip
-          </button>
-
-          <button
-            onclick="
-              setPrompt(
-                'Plan a 7 days Thailand trip from Bangladesh with budget hotels and sightseeing.',
-              )
-            "
-          >
-            Thailand Trip
-          </button>
-
-          <button onclick="setPrompt('Give me all country flight info.')">
-            Global Flights
-          </button>
-        </div>
-      </section>
-
-      <section id="tripsSection" class="planner-card trips-card hidden">
-        <div class="card-header">
-          <div>
-            <h2>My Trips</h2>
-            <p>Open an earlier plan to view or revise it.</p>
-          </div>
+    <!-- App: trips on the left, the planner and the plan on the right -->
+    <div id="appView" class="app-layout hidden">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h2>My Trips</h2>
+          <button class="button button-small" onclick="newTrip()">New trip</button>
         </div>
 
         <ul id="tripsList" class="trips-list"></ul>
-        <p id="tripsEmpty" class="trips-empty hidden">
+        <p id="tripsEmpty" class="muted trips-empty hidden">
           No trips yet. Your plans will appear here.
         </p>
-      </section>
+      </aside>
 
-      <section id="resultSection" class="result-section hidden">
-        <div class="result-header">
-          <div>
-            <h2>Your AI Travel Plan</h2>
-            <p id="threadInfo">Thread ID: -</p>
-          </div>
+      <main class="workspace">
+        <section id="plannerCard" class="panel planner">
+          <h1 id="inputTitle">Where do you want to go?</h1>
+          <p id="inputHint" class="muted">
+            Example: Plan a 3 day trip from Melbourne to Tokyo leaving 20 November.
+          </p>
 
-          <div class="result-actions">
-            <button class="copy-btn" onclick="copyResult()">Copy</button>
+          <label class="visually-hidden" for="userInput">Your trip request</label>
+          <textarea id="userInput" class="input" rows="4"></textarea>
 
-            <button class="download-btn" onclick="downloadPDF()">
-              Download PDF
+          <div class="planner-actions">
+            <span class="muted shortcut">Ctrl + Enter to send</span>
+            <button id="sendBtn" class="button button-primary" onclick="sendMessage()">
+              <span id="btnText">Generate plan</span>
+              <span id="btnLoader" class="loader hidden"></span>
             </button>
-
-            <button class="copy-btn" onclick="newTrip()">New Trip</button>
           </div>
-        </div>
 
-        <div id="pdfContent" class="pdf-content">
-          <h1 class="pdf-title">AI Travel Plan</h1>
-          <div id="resultBox" class="result-box"></div>
-        </div>
-      </section>
+          <!-- Live progress while a plan is being made (filled by script.js) -->
+          <div id="progressPanel" class="progress-panel hidden" aria-live="polite">
+            <div class="progress-header">
+              <span id="progressTitle" class="progress-title">Planning your trip</span>
+              <button id="stopBtn" class="button button-small" onclick="stopPlanning()">Stop</button>
+            </div>
+            <ol id="stepList" class="step-list"></ol>
+            <p id="progressWarning" class="alert alert-warning hidden"></p>
+          </div>
 
-      <section id="errorBox" class="error-box hidden"></section>
-    </main>
+          <!-- Flight options when the planner pauses for a choice (filled by script.js) -->
+          <div id="flightChoice" class="flight-choice hidden">
+            <div>
+              <h2>Pick your flight</h2>
+              <p class="muted">
+                The plan is built around the flight you pick. Round-trip prices
+                cover both ways; only the outbound flights are shown, and you pick
+                the return flight when booking.
+              </p>
+            </div>
+            <ol id="flightOptions" class="flight-options"></ol>
+            <button class="button button-quiet" onclick="chooseFlight(0)">
+              Continue without a flight
+            </button>
+          </div>
+
+          <p id="errorBox" class="alert alert-error hidden" role="alert"></p>
+        </section>
+
+        <section id="resultSection" class="paper hidden">
+          <div class="paper-header">
+            <div>
+              <h2>Your travel plan</h2>
+              <p id="threadInfo" class="muted"></p>
+            </div>
+
+            <div class="paper-actions">
+              <button class="button button-small copy-btn" onclick="copyResult()">Copy</button>
+              <button class="button button-small download-btn" onclick="downloadPDF()">
+                Download PDF
+              </button>
+            </div>
+          </div>
+
+          <div id="pdfContent" class="pdf-content">
+            <h1 class="pdf-title">Travel Plan</h1>
+            <div id="resultBox" class="result-box"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Notices about a plan running in the background -->
+    <div id="toast" class="toast hidden" role="status">
+      <span id="toastText"></span>
+      <button id="toastAction" class="button button-small button-primary hidden"></button>
+      <button class="toast-close" aria-label="Dismiss" onclick="hideToast()">×</button>
+    </div>
+
+    <!-- Delete confirmation -->
+    <dialog id="confirmDialog" class="dialog">
+      <form method="dialog">
+        <h2>Delete this trip?</h2>
+        <p id="confirmText" class="muted"></p>
+        <div class="dialog-actions">
+          <button value="cancel" class="button">Cancel</button>
+          <button value="confirm" class="button button-danger">Delete</button>
+        </div>
+      </form>
+    </dialog>
 
     <footer>
-      Built with FastAPI, LangGraph, Ollama/Groq, PostgreSQL, Tavily and SerpApi
-      Google Flights
+      Built with FastAPI, LangGraph, Ollama/Groq, PostgreSQL + pgvector, Tavily and
+      SerpApi Google Flights. Travel guide text from Wikivoyage.
     </footer>
 
     <!-- Markdown Renderer -->
@@ -231,7 +186,6 @@
     <!-- PDF Download Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-    <!-- Your Custom JS -->
     <script src="/static/script.js"></script>
   </body>
 </html>

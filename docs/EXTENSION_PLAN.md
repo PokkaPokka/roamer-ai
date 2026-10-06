@@ -133,6 +133,14 @@ Tested: stubbed graph tests for every path (skip, pause, resume with an option, 
 
 Known issues: the model's budget arithmetic can still be wrong (Tokyo range 2,114–3,444 should be 2,114–2,494), which is the Stage E critic's job. If you press Stop after choosing a flight, the trip has neither a plan nor a pending choice, and reopening it starts a new trip.
 
+UI pass after Stage C:
+
+- [x] Rename and delete trips from a ⋯ menu in My Trips (`PATCH` / `DELETE /api/trips/{thread_id}`; delete also removes the thread's checkpoints with `adelete_thread`)
+- [x] A plan keeps generating while you open another trip: the page tracks the trip on screen separately from the running one, and the stream's new `start` event gives the trip id right away, so the running trip shows as "Planning…" in My Trips and can be reopened. A notice with an Open button says when it's ready or waiting for a flight choice. Closing the tab still stops it
+- [x] One plan per account at a time, enforced by the server (409) and shown in the UI
+- [x] Removed the old quick-prompt buttons; deleted test accounts and test threads from the database
+- [x] Redesign: cream background, warm ink text, one deep-teal accent, soft raised/inset shadows, serif headings (Libre Caslon) with IBM Plex Sans; My Trips is a sidebar on desktop and stacks below on phones
+
 ### Still to do
 
 - [ ] Turn the agents into **tool-calling ReAct agents** that choose their own tools

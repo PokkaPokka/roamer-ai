@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 import asyncio
 import json
+import time
 import traceback
 import uvicorn
 
@@ -11,10 +12,12 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
-from app.graph import run_travel_agent, stream_travel_agent, new_thread_id, get_trip_plan, open_travel_graph
+from app.graph import (
+    run_travel_agent, stream_travel_agent, new_thread_id, get_trip_plan, open_travel_graph, delete_trip_state,
+)
 from app.db import open_db, close_db
 from app.auth import authenticate_user, create_access_token, create_user, get_current_user
-from app.trips import create_trip, list_trips, touch_trip, user_owns_trip
+from app.trips import create_trip, delete_trip, list_trips, make_title, rename_trip, touch_trip, user_owns_trip
 
 # The frontend lives in <repo>/frontend; FastAPI serves it.
 FRONTEND_DIR = Path(__file__).resolve().parents[2] / "frontend"
@@ -66,6 +69,10 @@ class TravelRequest(BaseModel):
     # Answer to a paused run's flight question: an option number, or 0 for none.
     # Only /api/travel/stream uses it.
     flight_choice: int | None = None
+
+
+class RenameRequest(BaseModel):
+    title: str
 
 
 class AuthRequest(BaseModel):
@@ -143,6 +150,76 @@ async def get_trips(user: dict = Depends(get_current_user)):
     return {"success": True, "trips": await list_trips(user["id"])}
 
 
+MAX_TITLE_LENGTH = 80
+
+
+@app.patch("/api/trips/{thread_id}")
+async def rename_trip_route(thread_id: str, request_data: RenameRequest, user: dict = Depends(get_current_user)):
+    title = " ".join(request_data.title.split())
+    if not title or len(title) > MAX_TITLE_LENGTH:
+        return JSONResponse(
+            status_code=400,
+            content={"success": False, "error": f"Enter a name of 1 to {MAX_TITLE_LENGTH} characters."},
+        )
+
+    if not await rename_trip(user["id"], thread_id, title):
+        return JSONResponse(status_code=404, content=TRIP_NOT_FOUND)
+
+    return {"success": True, "thread_id": thread_id, "title": title}
+
+
+@app.delete("/api/trips/{thread_id}")
+async def delete_trip_route(thread_id: str, user: dict = Depends(get_current_user)):
+    if not await user_owns_trip(user["id"], thread_id):
+        return JSONResponse(status_code=404, content=TRIP_NOT_FOUND)
+
+    run = ACTIVE_RUNS.get(user["id"])
+    if run and run["thread_id"] == thread_id:
+        return JSONResponse(
+            status_code=409,
+            content={"success": False, "error": "This trip is being planned. Stop it before deleting it."},
+        )
+
+    await delete_trip(user["id"], thread_id)
+    await delete_trip_state(thread_id)
+    return {"success": True}
+
+
+# =========================
+# One run at a time
+# =========================
+
+# user id -> {"thread_id", "since", "started"}. One plan per account at a time:
+# the local model can only work on one anyway. Kept in memory, which is enough
+# for a single server process.
+ACTIVE_RUNS: dict[int, dict] = {}
+
+# A run registered but never started (the client left before the stream began)
+# stops blocking after this long.
+UNSTARTED_RUN_SECONDS = 60
+
+RUN_IN_PROGRESS = {
+    "success": False,
+    "error": "A plan is already being generated. Wait for it to finish or press Stop.",
+}
+
+
+def claim_run(user_id: int, thread_id: str) -> dict | None:
+    """Registers a run for this user, or returns None if one is already going."""
+    current = ACTIVE_RUNS.get(user_id)
+    if current and (current["started"] or time.monotonic() - current["since"] < UNSTARTED_RUN_SECONDS):
+        return None
+
+    run = {"thread_id": thread_id, "since": time.monotonic(), "started": False}
+    ACTIVE_RUNS[user_id] = run
+    return run
+
+
+def release_run(user_id: int, run: dict):
+    if ACTIVE_RUNS.get(user_id) is run:
+        del ACTIVE_RUNS[user_id]
+
+
 @app.post("/api/travel")
 async def travel_planner(request_data: TravelRequest, user: dict = Depends(get_current_user)):
     try:
@@ -164,10 +241,18 @@ async def travel_planner(request_data: TravelRequest, user: dict = Depends(get_c
         if thread_id and not await user_owns_trip(user["id"], thread_id):
             return JSONResponse(status_code=404, content=TRIP_NOT_FOUND)
 
-        result = await run_travel_agent(
-            user_input=user_message,
-            thread_id=thread_id
-        )
+        run = claim_run(user["id"], thread_id or "")
+        if run is None:
+            return JSONResponse(status_code=409, content=RUN_IN_PROGRESS)
+
+        run["started"] = True
+        try:
+            result = await run_travel_agent(
+                user_input=user_message,
+                thread_id=thread_id
+            )
+        finally:
+            release_run(user["id"], run)
 
         if thread_id:
             await touch_trip(user["id"], thread_id)
@@ -247,7 +332,13 @@ async def travel_planner_stream(request_data: TravelRequest, user: dict = Depend
     is_new_trip = not thread_id
     thread_id = thread_id or new_thread_id()
 
+    run = claim_run(user["id"], thread_id)
+    if run is None:
+        return JSONResponse(status_code=409, content=RUN_IN_PROGRESS)
+
     async def events():
+        run["started"] = True
+
         # The graph runs in its own task and hands events over through a queue,
         # so a heartbeat can be sent while the graph is quiet.
         queue: asyncio.Queue = asyncio.Queue()
@@ -272,6 +363,15 @@ async def travel_planner_stream(request_data: TravelRequest, user: dict = Depend
         graph_task = asyncio.create_task(run_graph())
 
         try:
+            # Tell the UI which trip this is right away, so a new trip can be
+            # listed (and switched back to) while it is still being planned.
+            yield sse({
+                "type": "start",
+                "thread_id": thread_id,
+                "is_new": is_new_trip,
+                "title": make_title(user_message) if user_message else "",
+            })
+
             while True:
                 try:
                     event = await asyncio.wait_for(queue.get(), timeout=HEARTBEAT_SECONDS)
@@ -287,6 +387,7 @@ async def travel_planner_stream(request_data: TravelRequest, user: dict = Depend
             if not graph_task.done():
                 graph_task.cancel()
                 print(f"Stream closed early, cancelled run for {thread_id}")
+            release_run(user["id"], run)
 
     return StreamingResponse(
         events(),

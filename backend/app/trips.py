@@ -33,6 +33,24 @@ async def touch_trip(user_id: int, thread_id: str):
         )
 
 
+async def rename_trip(user_id: int, thread_id: str, title: str) -> bool:
+    async with get_pool().connection() as conn:
+        cur = await conn.execute(
+            "UPDATE trips SET title = %s WHERE thread_id = %s AND user_id = %s RETURNING 1",
+            (make_title(title), thread_id, user_id),
+        )
+        return await cur.fetchone() is not None
+
+
+async def delete_trip(user_id: int, thread_id: str) -> bool:
+    async with get_pool().connection() as conn:
+        cur = await conn.execute(
+            "DELETE FROM trips WHERE thread_id = %s AND user_id = %s RETURNING 1",
+            (thread_id, user_id),
+        )
+        return await cur.fetchone() is not None
+
+
 async def list_trips(user_id: int) -> list[dict]:
     async with get_pool().connection() as conn:
         cur = await conn.execute(

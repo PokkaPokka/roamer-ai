@@ -139,8 +139,10 @@ Every stage can be stopped and re-run; finished work is skipped. The full knowle
 - POST /api/auth/login - Log in, returns a token
 - GET /api/auth/me - The logged-in user
 - GET /api/trips - Your saved trips
+- PATCH /api/trips/{thread_id} - Rename a trip (`{"title": "..."}`)
+- DELETE /api/trips/{thread_id} - Delete a trip and its saved plan
 - POST /api/travel - Submit a travel request, or feedback on an existing trip (`thread_id`)
-- POST /api/travel/stream - Same as above, but streams progress as Server-Sent Events (`steps`, `step`, `status`, `token`, `choose`, `done`, `error`); the web UI uses this. It pauses with a `choose` event so the user can pick a flight; resume with `{"thread_id": ..., "flight_choice": <option number, or 0 for none>}`
+- POST /api/travel/stream - Same as above, but streams progress as Server-Sent Events (`steps`, `step`, `status`, `token`, `choose`, `done`, `error`); the web UI uses this. It pauses with a `choose` event so the user can pick a flight; resume with `{"thread_id": ..., "flight_choice": <option number, or 0 for none>}`. One plan per account runs at a time; a second request gets 409 (also `POST /api/travel`)
 - GET /api/travel/{thread_id} - Get the latest plan for one of your trips
 
 All `/api/trips` and `/api/travel` routes need an `Authorization: Bearer <token>` header.

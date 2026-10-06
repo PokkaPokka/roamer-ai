@@ -903,3 +903,11 @@ async def get_trip_plan(thread_id: str) -> dict:
         "answer": snapshot.values.get("final_plan", ""),
         "flight_options": choice["options"] if choice else None,
     }
+
+
+async def delete_trip_state(thread_id: str):
+    """Deletes every saved checkpoint of a thread (the plan, search results, pauses)."""
+    if travel_graph is None:
+        raise RuntimeError("Travel graph is not open. Call open_travel_graph() first.")
+
+    await travel_graph.checkpointer.adelete_thread(thread_id)
