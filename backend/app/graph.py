@@ -17,6 +17,7 @@ import uuid
 from pydantic import BaseModel, Field
 
 from langgraph.graph import StateGraph, START, END
+from langchain_core.callbacks import BaseCallbackHandler
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from langchain_core.messages import (
     AnyMessage,
@@ -77,14 +78,13 @@ class TravelState(TypedDict):
     latest_input: str      # what the user just sent: a new trip or feedback
     user_query: str        # the current trip request the plan is built from
     route: str             # "plan", "new_search" or "revise"
+    trip_request: dict     # TripRequest fields extracted once by plan_trip
     destination: str       # where the trip goes, as extracted from the request
     flight_results: str
     hotel_results: str
-    guide_context: str     # numbered Wikivoyage excerpts for the itinerary prompt
+    guide_context: str     # numbered Wikivoyage excerpts for the plan prompt
     guide_sources: list[dict]
-    itinerary: str
     final_plan: str
-    llm_calls: int
 
 
 # =========================
@@ -136,12 +136,11 @@ def router_agent(state: TravelState):
     return {
         "route": decision.action,
         "user_query": decision.updated_request or state["user_query"],
-        "llm_calls": state.get("llm_calls", 0) + 1
     }
 
 
 def route_after_router(state: TravelState):
-    return "revise_agent" if state["route"] == "revise" else "flight_agent"
+    return "revise_agent" if state["route"] == "revise" else "plan_trip"
 
 
 # =========================
@@ -186,9 +185,24 @@ def extract_trip_request(query: str) -> TripRequest:
         return TripRequest()
 
 
+# =========================
+# Plan Trip (runs before the parallel searches)
+# =========================
+
+def plan_trip(state: TravelState):
+    # Extract the trip once, so flight, hotel and guide searches can all start
+    # at the same time instead of the guide waiting for the flight agent.
+    trip = extract_trip_request(state["user_query"])
+
+    return {
+        "trip_request": trip.model_dump(),
+        "destination": trip.destination or "",
+    }
+
+
 def flight_agent(state: TravelState):
     query = state["user_query"]
-    trip = extract_trip_request(query)
+    trip = TripRequest(**state.get("trip_request", {}))
 
     # Fall back to the regex parser for any location the LLM missed.
     regex_origin, regex_destination = parse_route(query)
@@ -224,12 +238,10 @@ def flight_agent(state: TravelState):
         flight_data = "Assumptions: " + "; ".join(assumptions) + "\n\n" + flight_data
 
     return {
-        "destination": trip.destination or "",
         "flight_results": flight_data,
         "messages": [
             AIMessage(content="Flight results fetched.")
         ],
-        "llm_calls": state.get("llm_calls", 0) + 1
     }
 
 
@@ -247,7 +259,6 @@ def hotel_agent(state: TravelState):
         "messages": [
             AIMessage(content="Hotel information fetched.")
         ],
-        "llm_calls": state.get("llm_calls", 0) + 1
     }
 
 
@@ -368,45 +379,14 @@ def strip_sources(plan: str) -> str:
 
 
 # =========================
-# Itinerary Agent
-# =========================
-
-def itinerary_agent(state: TravelState):
-    prompt = f"""
-Create a complete travel itinerary.
-
-User Query:
-{state['user_query']}
-
-Flight Results:
-{state['flight_results']}
-
-Hotel Results:
-{state['hotel_results']}
-{guide_prompt_section(state)}
-Make the itinerary practical, budget-aware, and easy to follow.
-"""
-
-    response = llm.invoke([
-        SystemMessage(content="You are an expert travel planner."),
-        HumanMessage(content=prompt)
-    ])
-
-    return {
-        "itinerary": response.content,
-        "messages": [response],
-        "llm_calls": state.get("llm_calls", 0) + 1
-    }
-
-
-
-# =========================
 # Final Response Agent
 # =========================
 
+# One call writes the whole plan. It used to be two (draft itinerary, then a
+# rewrite into sections), which doubled the run time on a local model.
 def final_agent(state: TravelState):
     final_prompt = f"""
-Generate the final travel response for the user.
+Create the complete travel plan for the user.
 
 User Request:
 {state['user_query']}
@@ -416,11 +396,8 @@ Flights:
 
 Hotels:
 {state['hotel_results']}
-
-Itinerary:
-{state['itinerary']}
-
-Format the final answer beautifully using these sections:
+{guide_prompt_section(state)}
+Format the answer using these sections:
 
 1. Trip Summary
 2. Flight Information
@@ -430,17 +407,15 @@ Format the final answer beautifully using these sections:
 6. Final Recommendations
 
 Important:
-- Be clear and practical.
+- Make the plan practical, budget-aware, and easy to follow.
 - Base the flight part of the budget on the real prices in the Flights section, and state its currency.
 - Mention any search assumptions listed in the Flights section, such as assumed travel dates.
 - If the flight search failed, say so and do not invent flight prices.
-- Keep every citation number like [2] from the itinerary next to the same fact. Do not add new numbers.
 - Do not add a sources or references section; it is added automatically.
-- Keep the response useful for real travel planning.
 """
 
     response = llm.invoke([
-        SystemMessage(content="You are a professional AI travel booking assistant."),
+        SystemMessage(content="You are an expert travel planner and booking assistant."),
         HumanMessage(content=final_prompt)
     ])
 
@@ -449,7 +424,6 @@ Important:
     return {
         "final_plan": plan + format_sources(plan, state.get("guide_sources", [])),
         "messages": [response],
-        "llm_calls": state.get("llm_calls", 0) + 1
     }
 
 
@@ -492,7 +466,6 @@ Important:
     return {
         "final_plan": plan + format_sources(plan, state.get("guide_sources", [])),
         "messages": [response],
-        "llm_calls": state.get("llm_calls", 0) + 1
     }
 
 
@@ -503,19 +476,21 @@ Important:
 graph = StateGraph(TravelState)
 
 graph.add_node("router_agent", router_agent)
+graph.add_node("plan_trip", plan_trip)
 graph.add_node("flight_agent", flight_agent)
 graph.add_node("hotel_agent", hotel_agent)
 graph.add_node("guide_agent", guide_agent)
-graph.add_node("itinerary_agent", itinerary_agent)
 graph.add_node("final_agent", final_agent)
 graph.add_node("revise_agent", revise_agent)
 
 graph.add_edge(START, "router_agent")
-graph.add_conditional_edges("router_agent", route_after_router, ["flight_agent", "revise_agent"])
-graph.add_edge("flight_agent", "hotel_agent")
-graph.add_edge("hotel_agent", "guide_agent")
-graph.add_edge("guide_agent", "itinerary_agent")
-graph.add_edge("itinerary_agent", "final_agent")
+graph.add_conditional_edges("router_agent", route_after_router, ["plan_trip", "revise_agent"])
+# Fan out: the three searches run in the same step, in parallel.
+graph.add_edge("plan_trip", "flight_agent")
+graph.add_edge("plan_trip", "hotel_agent")
+graph.add_edge("plan_trip", "guide_agent")
+# Fan in: the plan waits for all three.
+graph.add_edge(["flight_agent", "hotel_agent", "guide_agent"], "final_agent")
 graph.add_edge("final_agent", END)
 graph.add_edge("revise_agent", END)
 
@@ -542,6 +517,16 @@ async def open_travel_graph():
 # Function for FastAPI
 # =========================
 
+class LLMCallCounter(BaseCallbackHandler):
+    """Counts chat model calls in one graph run, including failed and retried ones."""
+
+    def __init__(self):
+        self.count = 0
+
+    def on_chat_model_start(self, serialized, messages, **kwargs):
+        self.count += 1
+
+
 async def run_travel_agent(user_input: str, thread_id: str | None = None):
     if travel_graph is None:
         raise RuntimeError("Travel graph is not open. Call open_travel_graph() first.")
@@ -549,10 +534,12 @@ async def run_travel_agent(user_input: str, thread_id: str | None = None):
     if not thread_id:
         thread_id = f"user_{uuid.uuid4().hex}"
 
+    llm_counter = LLMCallCounter()
     config = {
         "configurable": {
             "thread_id": thread_id
-        }
+        },
+        "callbacks": [llm_counter],
     }
 
     # Only send the new input. Earlier results in this thread are loaded from the
@@ -563,7 +550,6 @@ async def run_travel_agent(user_input: str, thread_id: str | None = None):
                 HumanMessage(content=user_input)
             ],
             "latest_input": user_input,
-            "llm_calls": 0
         },
         config=config
     )
@@ -574,9 +560,8 @@ async def run_travel_agent(user_input: str, thread_id: str | None = None):
         "route": result.get("route", ""),
         "flight_results": result.get("flight_results", ""),
         "hotel_results": result.get("hotel_results", ""),
-        "itinerary": result.get("itinerary", ""),
         "guide_sources": result.get("guide_sources", []),
-        "llm_calls": result.get("llm_calls", 0),
+        "llm_calls": llm_counter.count,
     }
 
 

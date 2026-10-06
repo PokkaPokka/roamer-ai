@@ -177,7 +177,6 @@ async def travel_planner(request_data: TravelRequest, user: dict = Depends(get_c
                 "route": result["route"],
                 "flight_results": result["flight_results"],
                 "hotel_results": result["hotel_results"],
-                "itinerary": result["itinerary"],
                 "llm_calls": result["llm_calls"],
             }
         )

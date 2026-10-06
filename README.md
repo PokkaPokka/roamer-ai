@@ -6,10 +6,9 @@ An open-source AI travel planner that turns a natural-language trip request into
 
 Planning a trip usually means jumping between multiple websites, tools, and spreadsheets. This project brings that flow into one experience by combining:
 
-- a flight-search agent,
-- a hotel-research agent,
-- an itinerary-planning agent, and
-- a final response agent,
+- a trip-parsing step,
+- flight-search, hotel-research and travel-guide agents that run in parallel, and
+- a planner agent that writes the cited plan,
 
 all coordinated through a LangGraph workflow.
 
@@ -120,7 +119,7 @@ To run one request in the terminal instead: `python -m scripts.run_agent` (also 
 
 ## Building the Travel Guide Knowledge Base
 
-The itinerary agent searches Wikivoyage guides stored in PostgreSQL (pgvector). Build them once, from the `backend` folder:
+The guide agent searches Wikivoyage guides stored in PostgreSQL (pgvector). Build them once, from the `backend` folder:
 
 ```bash
 python -m scripts.rank_cities          # pick the 500 most-read Wikivoyage city guides -> data/kb_cities.json (already committed)
@@ -160,11 +159,10 @@ curl -X POST http://127.0.0.1:8000/api/travel \
 ## How the Workflow Works
 
 1. The user submits a travel request (or feedback on an existing plan, which the router sends to a revise step or a new search).
-2. The flight agent extracts the trip details and searches Google Flights.
-3. The hotel agent searches for accommodation suggestions.
-4. The guide agent retrieves numbered excerpts from the Wikivoyage knowledge base with hybrid search.
-5. The itinerary agent creates the day-by-day plan and cites the excerpts it used, like `[2]`.
-6. The final agent formats the result; the code appends a Sources list with links for the cited excerpts.
+2. The plan step extracts the trip details (origin, destination, dates, travellers) once.
+3. Three agents run in parallel: flights (Google Flights), hotels (Tavily), and the guide agent, which retrieves numbered Wikivoyage excerpts with hybrid search.
+4. When all three finish, the final agent writes the plan in one LLM call and cites the excerpts it used, like `[2]`.
+5. The code appends a Sources list with links for the cited excerpts.
 
 ## Contributing
 

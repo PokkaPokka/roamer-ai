@@ -73,8 +73,10 @@ Why it matters: hybrid search with citations stands out from the usual "I called
 The planner used to be one-off: each message started from scratch and ignored the saved thread.
 
 ```
-START → router_agent ─┬─ "plan" / "new_search" → flight → hotel → itinerary → final → END
-                      └─ "revise" ─────────────→ revise_agent ──────────────────────→ END
+START → router_agent ─┬─ "plan" / "new_search" → plan_trip ─┬─ flight ─┬─→ final_agent → END
+                      │                                     ├─ hotel ──┤
+                      │                                     └─ guide ──┘
+                      └─ "revise" ─────────────→ revise_agent ──────────────→ END
 ```
 
 - `router_agent`: first message in a thread → `plan`. Later messages are feedback; the LLM (structured output `FeedbackDecision`) picks:
@@ -85,14 +87,24 @@ START → router_agent ─┬─ "plan" / "new_search" → flight → hotel → 
 - UI: after the first plan, the input becomes "Revise Plan"; a **New Trip** button starts a new thread
 - Tested: plan → "add more food spots on day 2" (`revise`, no searches) → "make it 5 days" (`new_search`, return date moved 11-22 → 11-24)
 
+Stage A (done):
+
+- [x] Run flight, hotel and guide searches **in parallel**: a new `plan_trip` node extracts the trip once, then the three searches fan out and `final_agent` waits for all of them (search stage 9 s → 5 s)
+- [x] Fix `llm_calls`: a LangChain callback (`LLMCallCounter.on_chat_model_start`) counts real chat-model calls, including failed ones; removed the hand-written counter from the state and every node
+- [x] Merged `itinerary_agent` into `final_agent`: one call writes the six-section plan instead of a draft plus a rewrite
+
+Measured (Tokyo, local `qwen3:8b` on an M2):
+
+- Generating text is the bottleneck: about 6 tokens/s, so 80% of the run is the model writing
+- Tokyo 622 s → 373 s, Bali 741 s → 432 s; all six sections present; LLM calls per plan 3 → 2
+- Known issue (both before and after): the 8B model mishandles the flight budget, e.g. counts a round-trip fare twice or leaves it out, and invents return-leg flight numbers. The Stage E critic should catch this
+
 ### Still to do
 
 - [ ] **Supervisor/router** node with conditional edges (e.g. skip flights when the user says "I'm driving")
-- [ ] Run flight and hotel searches **in parallel** (they currently run one after the other)
 - [ ] Turn the agents into **tool-calling ReAct agents** that choose their own tools
 - [ ] **Human-in-the-loop:** LangGraph `interrupt()` so the user approves the flight before the itinerary is built
 - [ ] **Reflection loop:** a critic node checks the plan against budget and dates, and the graph replans if it fails
-- [ ] Fix `llm_calls` so it counts only real LLM calls
 - [ ] **Live progress streaming** (the UI currently shows only a spinner, so the user can't tell progress from a stuck run):
   - Graph: `astream()` with `custom` mode (agents send status lines via `get_stream_writer()`, e.g. "Searching Google Flights MEL → NRT", "Found 5 options from AUD 1,042") and `messages` mode (stream tokens from `itinerary_agent`, `final_agent`, `revise_agent` only; structured-output calls stay silent)
   - Backend: `POST /api/travel/stream` sends Server-Sent Events (`step`, `status`, `token`, `done`, `error`), same auth and ownership checks, trip row saved only on success, heartbeat every 10 s. Keep `POST /api/travel` for curl and scripts
