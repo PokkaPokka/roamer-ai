@@ -73,10 +73,10 @@ Why it matters: hybrid search with citations stands out from the usual "I called
 The planner used to be one-off: each message started from scratch and ignored the saved thread.
 
 ```
-START → router_agent ─┬─ "plan" / "new_search" → plan_trip ─┬─ flight ─┬─→ final_agent → END
-                      │                                     ├─ hotel ──┤
-                      │                                     └─ guide ──┘
-                      └─ "revise" ─────────────→ revise_agent ──────────────→ END
+START → router_agent ─┬─ "plan" / "new_search" → plan_trip ─┬─ flight? ─┬─→ choose_flight ──→ final_agent → END
+                      │                     (supervisor)    ├─ hotel? ──┤   (interrupt:
+                      │                                     └─ guide ───┘    user picks)
+                      └─ "revise" ─────────────→ revise_agent ─────────────────────────────→ END
 ```
 
 - `router_agent`: first message in a thread → `plan`. Later messages are feedback; the LLM (structured output `FeedbackDecision`) picks:
@@ -115,11 +115,27 @@ Measured: first token after about 60 s of reading; a 2-day Rome plan took 5:18 i
 
 Known issue found while testing: a revision ("add more food spots on day 2") ran away. The model copied the raw hotel and guide text into the plan until it hit the 16K context limit (7,900 tokens, 26 min). Capped responses at 3,000 tokens (`OLLAMA_NUM_PREDICT`, about twice a normal plan); the Stage E critic is the real fix.
 
+Stage C (done): the agents decide, and the user picks the flight
+
+- [x] **Supervisor:** `plan_trip` now also decides which searches the trip needs. `TripRequest` gained `needs_flights` and `needs_hotels`, filled by the same LLM call (no extra call). `route_searches()` is a conditional fan-out that returns only the needed searches, e.g. `["hotel_agent", "guide_agent"]` for "I'm driving"
+  - The 8B model over-skipped at first (it skipped hotels for a driving trip after copying a prompt example), so a skip only counts when the request mentions a reason (regex check, e.g. "driving", "staying with"). Tested on 4 requests: all correct
+  - Fan-in changed from one list edge (which would wait forever for a skipped search) to one edge per search; they run in the same step, so the next node runs once
+  - A skipped search writes "not needed" into its results, so the plan says so and a later new search doesn't reuse old results
+- [x] **Human in the loop:** a `choose_flight` node after the searches calls `interrupt()` with the flight options. The graph stops and its state is saved in Postgres, so the pause survives a closed tab or a server restart
+  - The flight tool returns structured options as well as text, which the UI shows as cards with "Use this flight" and "Continue without a flight"
+  - The UI resumes the run by sending `flight_choice` to `/api/travel/stream`; the graph continues with `Command(resume=<option>)`. The server checks that the trip is paused (409 if not) and that the option exists (400 if not)
+  - `GET /api/travel/{thread_id}` returns `flight_options` for a paused trip, so reopening it shows the cards again. The trip row is created at the pause, so it appears in My Trips
+  - `final_agent` gets only the chosen flight, with "price is for the whole round trip, count it once" and "don't invent return flights". In the Tokyo test the budget used AUD 1,354 once, where earlier runs counted it twice or left it out
+  - `POST /api/travel` (curl, scripts) never pauses: it takes the cheapest option
+  - A new message on a paused trip starts over instead of resuming
+
+Tested: stubbed graph tests for every path (skip, pause, resume with an option, resume with 0, new message while paused, cheapest pick); real runs: driving trip (flights skipped, plan says "Flights not needed"), and Tokyo in the browser (5 cards, still there after a reload, plan built on the chosen option).
+
+Known issues: the model's budget arithmetic can still be wrong (Tokyo range 2,114–3,444 should be 2,114–2,494), which is the Stage E critic's job. If you press Stop after choosing a flight, the trip has neither a plan nor a pending choice, and reopening it starts a new trip.
+
 ### Still to do
 
-- [ ] **Supervisor/router** node with conditional edges (e.g. skip flights when the user says "I'm driving")
 - [ ] Turn the agents into **tool-calling ReAct agents** that choose their own tools
-- [ ] **Human-in-the-loop:** LangGraph `interrupt()` so the user approves the flight before the itinerary is built
 - [ ] **Reflection loop:** a critic node checks the plan against budget and dates, and the graph replans if it fails
 - [ ] **Trip dates with flexibility:** the user picks a start and end date, and can mark each as flexible
   - UI: start and end date pickers, plus a flexibility option for each date:

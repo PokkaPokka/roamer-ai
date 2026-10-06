@@ -224,6 +224,7 @@ function setMode(hasPlan) {
 function newTrip() {
   stopPlanning();
   document.getElementById("progressPanel").classList.add("hidden");
+  hideFlightChoice();
   currentThreadId = null;
   latestAnswerMarkdown = "";
   localStorage.removeItem("travel_thread_id");
@@ -250,8 +251,19 @@ async function restorePlan() {
     const data = await response.json();
 
     if (response.ok && data.success) {
-      showResult(data.answer, currentThreadId);
-      setMode(true);
+      // A trip paused on a flight choice has options but no plan yet.
+      if (data.flight_options) {
+        showFlightChoice(data.flight_options);
+      } else {
+        hideFlightChoice();
+      }
+
+      if (data.answer) {
+        showResult(data.answer, currentThreadId);
+      } else {
+        document.getElementById("resultSection").classList.add("hidden");
+      }
+      setMode(Boolean(data.answer));
       return;
     }
   } catch (error) {
@@ -306,7 +318,14 @@ const CONNECTION_LOST_MS = 30000;
 const SLOW_PROGRESS_MS = 240000;
 const RENDER_EVERY_MS = 200;
 
-const STEP_ICONS = { waiting: "○", running: "●", done: "✓", failed: "✗" };
+const STEP_ICONS = {
+  waiting: "○",
+  running: "●",
+  done: "✓",
+  failed: "✗",
+  skipped: "–",
+  paused: "⏸",
+};
 
 let planController = null; // AbortController of the running request
 let progressTimer = null; // checks once a second whether the run looks stuck
@@ -489,6 +508,96 @@ async function readEvents(response, onEvent) {
   }
 }
 
+// =========================
+// Flight choice (the run pauses until the user picks one)
+// =========================
+
+function formatPrice(option) {
+  return option.price === null
+    ? "Price unavailable"
+    : `${option.currency} ${option.price.toLocaleString()}`;
+}
+
+// "2026-11-20 06:15" -> "06:15"
+function timeOf(dateTime) {
+  return (dateTime || "").split(" ").pop() || "?";
+}
+
+// Days between the departure and arrival dates, shown as "+1 day" for overnight flights.
+function daysLater(departure, arrival) {
+  const days = Math.round(
+    (Date.parse((arrival || "").split(" ")[0]) -
+      Date.parse((departure || "").split(" ")[0])) /
+      86400000,
+  );
+  return days > 0 ? ` (+${days} day${days > 1 ? "s" : ""})` : "";
+}
+
+// Built with textContent, so nothing from the search can inject HTML.
+function flightCard(option) {
+  const card = document.createElement("li");
+  card.className = "flight-card";
+
+  const price = document.createElement("div");
+  price.className = "flight-price";
+  price.textContent = formatPrice(option);
+
+  const priceNote = document.createElement("span");
+  priceNote.className = "flight-note";
+  priceNote.textContent = option.round_trip ? "round trip" : "one way";
+  price.append(" ", priceNote);
+
+  const airlines = document.createElement("div");
+  airlines.className = "flight-airlines";
+  airlines.textContent = option.airlines.join(", ");
+
+  const route = document.createElement("div");
+  route.textContent =
+    `${option.departure_airport} ${timeOf(option.departure_time)} → ` +
+    `${option.arrival_airport} ${timeOf(option.arrival_time)}` +
+    daysLater(option.departure_time, option.arrival_time);
+
+  const details = document.createElement("div");
+  details.className = "flight-note";
+  const stops =
+    option.stops === 0
+      ? "Direct"
+      : `${option.stops} stop${option.stops > 1 ? "s" : ""}`;
+  details.textContent = `${option.duration} · ${stops}`;
+
+  const button = document.createElement("button");
+  button.className = "auth-primary";
+  button.textContent = "Use this flight";
+  button.onclick = () => chooseFlight(option.number);
+
+  card.append(price, airlines, route, details, button);
+  return card;
+}
+
+function showFlightChoice(options) {
+  document.getElementById("flightOptions").replaceChildren(...options.map(flightCard));
+  const section = document.getElementById("flightChoice");
+  section.classList.remove("hidden");
+  section.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function hideFlightChoice() {
+  document.getElementById("flightChoice").classList.add("hidden");
+  document.getElementById("flightOptions").replaceChildren();
+}
+
+// 0 means "continue without a flight".
+function chooseFlight(number) {
+  if (!currentThreadId) {
+    return;
+  }
+  runPlan({ thread_id: currentThreadId, flight_choice: number });
+}
+
+// =========================
+// Sending a request
+// =========================
+
 async function sendMessage() {
   hideError();
 
@@ -500,6 +609,16 @@ async function sendMessage() {
     return;
   }
 
+  await runPlan({ message: message, thread_id: currentThreadId }, () => {
+    input.value = "";
+  });
+}
+
+// Streams one run: a new request, feedback, or the answer to a flight choice.
+// onAccepted runs once the server has taken the request (plan done or paused).
+async function runPlan(body, onAccepted = () => {}) {
+  hideError();
+  hideFlightChoice();
   setLoading(true);
   startProgress();
   planController = new AbortController();
@@ -513,10 +632,7 @@ async function sendMessage() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        message: message,
-        thread_id: currentThreadId,
-      }),
+      body: JSON.stringify(body),
       signal: planController.signal,
     });
 
@@ -550,6 +666,18 @@ async function sendMessage() {
           liveText += event.text;
           showLivePlan(() => liveText);
           break;
+        case "choose":
+          // The run is paused and saved; it continues when a flight is picked.
+          finished = true;
+          endProgress("Pick a flight to continue");
+
+          currentThreadId = event.thread_id;
+          localStorage.setItem("travel_thread_id", currentThreadId);
+
+          showFlightChoice(event.options);
+          onAccepted();
+          loadTrips();
+          break;
         case "done":
           finished = true;
           endProgress("Plan ready");
@@ -558,7 +686,7 @@ async function sendMessage() {
           localStorage.setItem("travel_thread_id", currentThreadId);
 
           showResult(event.answer, event.thread_id, event.route, false);
-          input.value = "";
+          onAccepted();
           setMode(true);
           loadTrips();
           break;
@@ -580,13 +708,12 @@ async function sendMessage() {
       showError(error.message);
     }
 
-    // Drop the half-written plan and show the saved one, if there is one.
-    if (liveText) {
-      if (currentThreadId) {
-        restorePlan();
-      } else {
-        document.getElementById("resultSection").classList.add("hidden");
-      }
+    // Drop the half-written plan and show the saved state (a plan, or the
+    // flight cards of a paused trip), if there is one.
+    if (currentThreadId) {
+      restorePlan();
+    } else if (liveText) {
+      document.getElementById("resultSection").classList.add("hidden");
     }
   } finally {
     planController = null;

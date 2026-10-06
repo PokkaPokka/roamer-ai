@@ -538,6 +538,80 @@ footer {
     }
 }
 
+.step.skipped {
+    color: #64748b;
+}
+
+.step.paused,
+.step.paused .step-icon {
+    color: #fde68a;
+}
+
+/* Flight choice */
+
+.flight-choice {
+    margin-top: 18px;
+    padding: 18px 20px;
+    border: 1px solid rgba(96, 165, 250, 0.45);
+    border-radius: 18px;
+    background: rgba(37, 99, 235, 0.08);
+    display: grid;
+    gap: 14px;
+}
+
+.flight-choice-header h3 {
+    margin-bottom: 6px;
+}
+
+.flight-choice-header p {
+    color: #94a3b8;
+    line-height: 1.5;
+}
+
+.flight-options {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.flight-card {
+    display: grid;
+    gap: 6px;
+    align-content: start;
+    padding: 14px;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    border-radius: 14px;
+    background: rgba(15, 23, 42, 0.8);
+    color: #dbeafe;
+    min-width: 0;
+}
+
+.flight-price {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #ffffff;
+    font-variant-numeric: tabular-nums;
+}
+
+.flight-airlines {
+    font-weight: 700;
+}
+
+.flight-note {
+    color: #94a3b8;
+    font-size: 0.88rem;
+    font-weight: 400;
+}
+
+.flight-card button {
+    margin-top: 6px;
+}
+
+.flight-choice > .copy-btn {
+    justify-self: start;
+}
+
 /* Account and login */
 
 .account-bar {

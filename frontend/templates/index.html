@@ -123,6 +123,22 @@
           <p id="progressWarning" class="progress-warning hidden"></p>
         </div>
 
+        <!-- Flight options when the planner pauses for a choice (filled by script.js) -->
+        <div id="flightChoice" class="flight-choice hidden">
+          <div class="flight-choice-header">
+            <h3>Pick your flight</h3>
+            <p>
+              The plan is built around the flight you pick. Round-trip prices
+              cover both ways; only the outbound flights are shown, and you pick
+              the return flight when booking.
+            </p>
+          </div>
+          <ol id="flightOptions" class="flight-options"></ol>
+          <button class="copy-btn" onclick="chooseFlight(0)">
+            Continue without a flight
+          </button>
+        </div>
+
         <div id="quickPrompts" class="quick-prompts">
           <button
             onclick="

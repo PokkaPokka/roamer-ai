@@ -52,6 +52,28 @@ def format_option(index: int, option: dict, currency: str) -> str:
     return "\n".join(lines)
 
 
+def option_details(index: int, option: dict, currency: str) -> dict:
+    """The same option as format_option, as data the UI can show as a card."""
+    legs = option.get("flights", [])
+    first = legs[0] if legs else {}
+    last = legs[-1] if legs else {}
+
+    return {
+        "number": index,
+        "price": option.get("price"),
+        "currency": currency,
+        "airlines": sorted({leg.get("airline", "Unknown airline") for leg in legs}),
+        "departure_airport": first.get("departure_airport", {}).get("id", "?"),
+        "departure_time": first.get("departure_airport", {}).get("time", "?"),
+        "arrival_airport": last.get("arrival_airport", {}).get("id", "?"),
+        "arrival_time": last.get("arrival_airport", {}).get("time", "?"),
+        "duration": format_minutes(option.get("total_duration")),
+        "stops": max(len(legs) - 1, 0),
+        "round_trip": option.get("type") == "Round trip",
+        "text": format_option(index, option, currency),
+    }
+
+
 def search_google_flights(
     origin_iata: str,
     destination_iata: str,
@@ -60,11 +82,30 @@ def search_google_flights(
     adults: int = 1,
     currency: str = DEFAULT_CURRENCY,
     max_results: int = 5,
-):
+) -> str:
     """
     Searches Google Flights through SerpApi for real future fares.
 
     Dates use YYYY-MM-DD. Leave return_date empty for a one-way search.
+    """
+    text, _ = search_google_flights_with_options(
+        origin_iata, destination_iata, outbound_date, return_date, adults, currency, max_results
+    )
+    return text
+
+
+def search_google_flights_with_options(
+    origin_iata: str,
+    destination_iata: str,
+    outbound_date: str,
+    return_date: str | None = None,
+    adults: int = 1,
+    currency: str = DEFAULT_CURRENCY,
+    max_results: int = 5,
+) -> tuple[str, list[dict]]:
+    """
+    Like search_google_flights, but also returns the options as a list of dicts
+    (see option_details). The list is empty when the search fails.
     """
 
     if not API_KEY:
@@ -72,7 +113,7 @@ def search_google_flights(
             "Flight API error: SERPAPI_API_KEY is missing.\n"
             "Please add this in your .env file:\n"
             "SERPAPI_API_KEY=your_api_key_here"
-        )
+        ), []
 
     params = {
         "engine": "google_flights",
@@ -93,12 +134,12 @@ def search_google_flights(
         response = requests.get(BASE_URL, params=params, timeout=60)
         data = response.json()
     except requests.exceptions.RequestException as e:
-        return f"Flight API request failed: {e}"
+        return f"Flight API request failed: {e}", []
     except ValueError:
-        return "Flight API returned invalid JSON."
+        return "Flight API returned invalid JSON.", []
 
     if "error" in data:
-        return f"Flight API error: {data['error']}"
+        return f"Flight API error: {data['error']}", []
 
     options = (data.get("best_flights") or []) + (data.get("other_flights") or [])
 
@@ -108,7 +149,7 @@ def search_google_flights(
     trip_text += f", {adults} adult{'s' if adults > 1 else ''}"
 
     if not options:
-        return f"No flights found for {trip_text}."
+        return f"No flights found for {trip_text}.", []
 
     sections = [f"Google Flights results for {trip_text} (prices in {currency})"]
 
@@ -121,12 +162,13 @@ def search_google_flights(
             f"typical range {typical_text}, current level: {insights.get('price_level', 'unknown')}"
         )
 
-    sections.extend(
-        format_option(i, option, currency)
+    details = [
+        option_details(i, option, currency)
         for i, option in enumerate(options[:max_results], 1)
-    )
+    ]
+    sections.extend(option["text"] for option in details)
 
-    return "\n\n".join(sections)
+    return "\n\n".join(sections), details
 
 
 if __name__ == "__main__":

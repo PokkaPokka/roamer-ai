@@ -18,6 +18,7 @@ from pydantic import BaseModel, Field
 
 from langgraph.graph import StateGraph, START, END
 from langgraph.config import get_config, get_stream_writer
+from langgraph.types import Command, interrupt
 from langchain_core.callbacks import BaseCallbackHandler
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from langchain_core.messages import (
@@ -30,7 +31,7 @@ from langchain_groq import ChatGroq
 from langchain_ollama import ChatOllama
 from app.tools.tavily_tool import tavily_search
 from app.tools.flight_tool import resolve_location_to_iata, parse_route, DEFAULT_ORIGIN_IATA
-from app.tools.google_flights_tool import search_google_flights
+from app.tools.google_flights_tool import search_google_flights_with_options
 from app.db import get_pool
 from app.knowledge_base import search_knowledge_base, city_in_knowledge_base
 
@@ -98,6 +99,8 @@ class TravelState(TypedDict):
     trip_request: dict     # TripRequest fields extracted once by plan_trip
     destination: str       # where the trip goes, as extracted from the request
     flight_results: str
+    flight_options: list[dict]   # the same flights as data, for the UI's flight cards
+    chosen_flight: str     # the flight the user picked, as text for the plan prompt
     hotel_results: str
     guide_context: str     # numbered Wikivoyage excerpts for the plan prompt
     guide_sources: list[dict]
@@ -172,6 +175,14 @@ class TripRequest(BaseModel):
     return_date: str | None = Field(None, description="Return date as YYYY-MM-DD. Null if not mentioned.")
     trip_days: int | None = Field(None, description="Trip length in days, e.g. 3 for 'a 3 day trip'.")
     adults: int = Field(1, description="Number of adult travellers.")
+    needs_flights: bool = Field(True, description=(
+        "False only if the traveller is not flying: driving, taking a train or bus, "
+        "or already has flights booked. Otherwise true."
+    ))
+    needs_hotels: bool = Field(True, description=(
+        "False only if the traveller already has somewhere to stay (staying with friends "
+        "or family, hotel already booked) or it is a day trip. Otherwise true."
+    ))
 
 
 def parse_future_date(value: str | None, today: date) -> date | None:
@@ -194,7 +205,13 @@ def extract_trip_request(query: str) -> TripRequest:
                 "Use null for anything the user did not mention.\n"
                 'Example: "5 days in Paris from London, leaving 2026-05-01" -> '
                 '{"origin": "London", "destination": "Paris", "departure_date": "2026-05-01", '
-                '"return_date": null, "trip_days": 5, "adults": 1}'
+                '"return_date": null, "trip_days": 5, "adults": 1, "needs_flights": true, "needs_hotels": true}\n'
+                'Example: "3 day road trip from Melbourne to Sydney, I\'m driving" -> '
+                '{"origin": "Melbourne", "destination": "Sydney", "departure_date": null, '
+                '"return_date": null, "trip_days": 3, "adults": 1, "needs_flights": false, "needs_hotels": true}\n'
+                'Example: "A week in Rome from Paris, staying with my sister" -> '
+                '{"origin": "Paris", "destination": "Rome", "departure_date": null, '
+                '"return_date": null, "trip_days": 7, "adults": 1, "needs_flights": true, "needs_hotels": false}'
             )),
             HumanMessage(content=query)
         ])
@@ -204,14 +221,36 @@ def extract_trip_request(query: str) -> TripRequest:
 
 
 # =========================
-# Plan Trip (runs before the parallel searches)
+# Plan Trip: the supervisor (runs before the parallel searches)
 # =========================
 
+# The small model sometimes skips a search the user never mentioned, so a skip
+# only counts when the request says something related.
+NO_FLIGHT_HINTS = re.compile(
+    r"\b(driv\w*|road ?trip|by (car|train|bus|ferry)|take the (train|bus)"
+    r"|already (have|booked) (my |our )?(flights?|tickets?)|flights? (are |is )?(already )?booked)\b",
+    re.I,
+)
+NO_HOTEL_HINTS = re.compile(
+    r"\b(staying (with|at)|stay with|friends'|(a|one) day trip"
+    r"|already (have|booked) (a |my |our )?(hotel|room|accommodation|place)"
+    r"|(hotel|accommodation) (is |are )?(already )?booked)\b",
+    re.I,
+)
+
+FLIGHTS_NOT_NEEDED = "Flight search not needed: the traveller isn't flying (e.g. driving) or already has flights."
+HOTELS_NOT_NEEDED = "Hotel search not needed: the traveller already has somewhere to stay."
+
+
 def plan_trip(state: TravelState):
-    # Extract the trip once, so flight, hotel and guide searches can all start
-    # at the same time instead of the guide waiting for the flight agent.
+    # Extract the trip once, so the searches can all start at the same time, and
+    # decide which searches this trip needs (see route_searches).
     report("Reading your trip request")
     trip = extract_trip_request(state["user_query"])
+    if not trip.needs_flights and not NO_FLIGHT_HINTS.search(state["user_query"]):
+        trip.needs_flights = True
+    if not trip.needs_hotels and not NO_HOTEL_HINTS.search(state["user_query"]):
+        trip.needs_hotels = True
 
     details = [part for part in [
         f"to {trip.destination}" if trip.destination else "",
@@ -221,10 +260,34 @@ def plan_trip(state: TravelState):
     ] if part]
     report("Trip: " + ", ".join(details) if details else "Could not find trip details; using defaults")
 
-    return {
+    updates = {
         "trip_request": trip.model_dump(),
         "destination": trip.destination or "",
+        # Clear the previous run's flight choice; a new search asks again.
+        "flight_options": [],
+        "chosen_flight": "",
     }
+
+    # A skipped search still writes its results, so a new search in the same
+    # thread doesn't reuse old flights and the plan can say why there are none.
+    if not trip.needs_flights:
+        updates["flight_results"] = FLIGHTS_NOT_NEEDED
+    if not trip.needs_hotels:
+        updates["hotel_results"] = HOTELS_NOT_NEEDED
+
+    return updates
+
+
+def route_searches(state: TravelState) -> list[str]:
+    """Conditional fan-out: only the searches this trip needs run in parallel."""
+    trip = state.get("trip_request", {})
+    searches = []
+    if trip.get("needs_flights", True):
+        searches.append("flight_agent")
+    if trip.get("needs_hotels", True):
+        searches.append("hotel_agent")
+    searches.append("guide_agent")
+    return searches
 
 
 def flight_agent(state: TravelState):
@@ -250,23 +313,23 @@ def flight_agent(state: TravelState):
     if not return_day and trip.trip_days:
         return_day = departure + timedelta(days=max(trip.trip_days - 1, 1))
 
+    flight_options = []
+
     if not destination_iata:
         flight_data = "Flight search skipped: could not work out the destination from the request."
         report("Skipped: could not work out the destination airport")
     else:
         report(f"Searching Google Flights {origin_iata} → {destination_iata}, {departure.isoformat()}")
-        flight_data = search_google_flights(
+        flight_data, flight_options = search_google_flights_with_options(
             origin_iata=origin_iata,
             destination_iata=destination_iata,
             outbound_date=departure.isoformat(),
             return_date=return_day.isoformat() if return_day else None,
             adults=max(trip.adults, 1),
         )
-        prices = re.findall(r"^Option \d+: ([A-Z]{3}) (\d+)", flight_data, re.MULTILINE)
+        prices = [option["price"] for option in flight_options if option["price"] is not None]
         if prices:
-            currency = prices[0][0]
-            cheapest = min(int(price) for _, price in prices)
-            report(f"Found {len(prices)} options from {currency} {cheapest:,}")
+            report(f"Found {len(flight_options)} options from {flight_options[0]['currency']} {min(prices):,}")
         else:
             report("No flight options found")
 
@@ -275,10 +338,87 @@ def flight_agent(state: TravelState):
 
     return {
         "flight_results": flight_data,
+        "flight_options": flight_options,
         "messages": [
             AIMessage(content="Flight results fetched.")
         ],
     }
+
+
+# =========================
+# Choose Flight (human in the loop)
+# =========================
+
+NO_FLIGHT_CHOSEN = (
+    "The user chose none of the flights found. Don't recommend a specific flight or price; "
+    "suggest comparing fares closer to the travel date."
+)
+
+
+def chosen_flight_text(option: dict, adults: int) -> str:
+    lines = [
+        f"The user picked this flight (Option {option['number']}):",
+        option["text"],
+        f"Price: {option['currency']} {option['price']} "
+        f"{'for the whole round trip' if option['round_trip'] else 'one way'}, "
+        f"{adults} adult{'s' if adults > 1 else ''}. Count it once in the budget.",
+    ]
+    if option["round_trip"]:
+        lines.append(
+            "Only the outbound flights are listed; the return flight is picked when booking, "
+            "so don't invent return flight numbers or times."
+        )
+    return "\n".join(lines)
+
+
+def cheapest_option(options: list[dict]) -> dict:
+    priced = [option for option in options if option["price"] is not None]
+    return min(priced, key=lambda option: option["price"]) if priced else options[0]
+
+
+def choose_flight(state: TravelState):
+    """
+    Fan-in point after the searches. When the run asks for it (the web UI does),
+    the graph pauses here with interrupt() until the user picks a flight. The
+    paused state is saved in Postgres, so the user can come back later.
+    """
+    options = state.get("flight_options") or []
+    if not options:
+        return {}
+
+    if get_config()["configurable"].get("ask_flight_choice"):
+        report("Waiting for you to pick a flight")
+        # The value goes to the UI; the run resumes with Command(resume=<option number>),
+        # or 0 to skip. On resume this node runs again from the top.
+        choice = interrupt({
+            "type": "choose_flight",
+            "options": [{key: value for key, value in option.items() if key != "text"} for option in options],
+        })
+    else:
+        # curl and scripts can't answer a question, so take the cheapest.
+        choice = cheapest_option(options)["number"]
+
+    chosen = next((option for option in options if option["number"] == choice), None)
+    if chosen is None:
+        report("No flight chosen")
+        return {"chosen_flight": NO_FLIGHT_CHOSEN}
+
+    adults = max(state.get("trip_request", {}).get("adults") or 1, 1)
+    report(f"Using option {chosen['number']}: {', '.join(chosen['airlines'])}, "
+           f"{chosen['currency']} {chosen['price']:,}")
+    return {"chosen_flight": chosen_flight_text(chosen, adults)}
+
+
+def flight_section(state: TravelState) -> str:
+    """The Flights part of the plan prompt: the chosen flight instead of every option."""
+    results = state.get("flight_results", "")
+    chosen = state.get("chosen_flight")
+    if not chosen:
+        return results
+    # Keep the summary lines (assumptions, route, price insight) but not the option list.
+    summary = results.split("\n\nOption 1:")[0]
+    return f"{summary}\n\n{chosen}"
+
 
 
 
@@ -436,7 +576,7 @@ User Request:
 {state['user_query']}
 
 Flights:
-{state['flight_results']}
+{flight_section(state)}
 
 Hotels:
 {state['hotel_results']}
@@ -452,9 +592,10 @@ Format the answer using these sections:
 
 Important:
 - Make the plan practical, budget-aware, and easy to follow.
-- Base the flight part of the budget on the real prices in the Flights section, and state its currency.
+- Base the flight part of the budget on the real price in the Flights section, counted once, and state its currency.
 - Mention any search assumptions listed in the Flights section, such as assumed travel dates.
 - If the flight search failed, say so and do not invent flight prices.
+- If flights or hotels were not needed, say so briefly in that section instead of suggesting any.
 - Do not add a sources or references section; it is added automatically.
 """
 
@@ -490,7 +631,7 @@ Current Plan:
 {strip_sources(state['final_plan'])}
 
 Flights found earlier (real search results):
-{state.get('flight_results', '')}
+{flight_section(state)}
 
 Hotels found earlier (real search results):
 {state.get('hotel_results', '')}
@@ -529,17 +670,20 @@ graph.add_node("plan_trip", plan_trip)
 graph.add_node("flight_agent", flight_agent)
 graph.add_node("hotel_agent", hotel_agent)
 graph.add_node("guide_agent", guide_agent)
+graph.add_node("choose_flight", choose_flight)
 graph.add_node("final_agent", final_agent)
 graph.add_node("revise_agent", revise_agent)
 
 graph.add_edge(START, "router_agent")
 graph.add_conditional_edges("router_agent", route_after_router, ["plan_trip", "revise_agent"])
-# Fan out: the three searches run in the same step, in parallel.
-graph.add_edge("plan_trip", "flight_agent")
-graph.add_edge("plan_trip", "hotel_agent")
-graph.add_edge("plan_trip", "guide_agent")
-# Fan in: the plan waits for all three.
-graph.add_edge(["flight_agent", "hotel_agent", "guide_agent"], "final_agent")
+# Fan out: the searches this trip needs run in the same step, in parallel.
+graph.add_conditional_edges("plan_trip", route_searches, ["flight_agent", "hotel_agent", "guide_agent"])
+# Fan in: the searches all run in one step, so choose_flight runs once after them,
+# however many were skipped. (A list edge would wait forever for a skipped one.)
+graph.add_edge("flight_agent", "choose_flight")
+graph.add_edge("hotel_agent", "choose_flight")
+graph.add_edge("guide_agent", "choose_flight")
+graph.add_edge("choose_flight", "final_agent")
 graph.add_edge("final_agent", END)
 graph.add_edge("revise_agent", END)
 
@@ -580,10 +724,12 @@ def new_thread_id() -> str:
     return f"user_{uuid.uuid4().hex}"
 
 
-def run_config(thread_id: str, llm_counter: LLMCallCounter) -> dict:
+def run_config(thread_id: str, llm_counter: LLMCallCounter, ask_flight_choice: bool = False) -> dict:
     return {
         "configurable": {
-            "thread_id": thread_id
+            "thread_id": thread_id,
+            # Pause for the user to pick a flight; only the streaming UI can answer.
+            "ask_flight_choice": ask_flight_choice,
         },
         "callbacks": [llm_counter],
     }
@@ -630,13 +776,14 @@ STEP_LABELS = {
     "flight_agent": "Searching flights",
     "hotel_agent": "Searching hotels",
     "guide_agent": "Searching the travel guide",
+    "choose_flight": "Choosing your flight",
     "final_agent": "Writing your plan",
     "revise_agent": "Revising your plan",
 }
 
 ROUTE_STEPS = {
-    "plan": ["plan_trip", "flight_agent", "hotel_agent", "guide_agent", "final_agent"],
-    "new_search": ["plan_trip", "flight_agent", "hotel_agent", "guide_agent", "final_agent"],
+    "plan": ["plan_trip", "flight_agent", "hotel_agent", "guide_agent", "choose_flight", "final_agent"],
+    "new_search": ["plan_trip", "flight_agent", "hotel_agent", "guide_agent", "choose_flight", "final_agent"],
     "revise": ["revise_agent"],
 }
 
@@ -648,35 +795,66 @@ def step_list(nodes: list[str]) -> list[dict]:
     return [{"node": node, "label": STEP_LABELS[node]} for node in nodes]
 
 
-async def stream_travel_agent(user_input: str, thread_id: str):
+def pending_flight_choice(snapshot) -> dict | None:
+    """The flight options a paused run is waiting on, or None if it isn't paused."""
+    for item in snapshot.interrupts:
+        if isinstance(item.value, dict) and item.value.get("type") == "choose_flight":
+            return item.value
+    return None
+
+
+def skipped_steps(trip_request: dict) -> list[tuple[str, str]]:
+    """The searches the supervisor skipped, with the reason shown in the UI."""
+    skipped = []
+    if not trip_request.get("needs_flights", True):
+        skipped += [("flight_agent", "Not needed for this trip"), ("choose_flight", "No flights to choose")]
+    if not trip_request.get("needs_hotels", True):
+        skipped.append(("hotel_agent", "Not needed: you have somewhere to stay"))
+    return skipped
+
+
+async def stream_travel_agent(thread_id: str, user_input: str | None = None, flight_choice: int | None = None):
     """
     Runs the graph like run_travel_agent, but yields progress events as it goes:
       steps  - the list of steps this run will take (sent again once the route is known)
-      step   - a node started, finished or failed
+      step   - a node is running, done, failed, skipped or paused
       status - a status line from a node, e.g. "Found 5 options from AUD 1,354"
       token  - a piece of the plan as the model writes it
+      choose - the run paused for the user to pick a flight
       done   - the finished plan
-    An exception from the graph is raised to the caller.
+    Pass user_input to start a run, or flight_choice (an option number, 0 to skip
+    flights) to resume a paused one. An exception from the graph is raised to the caller.
     """
     if travel_graph is None:
         raise RuntimeError("Travel graph is not open. Call open_travel_graph() first.")
 
     llm_counter = LLMCallCounter()
-    config = run_config(thread_id, llm_counter)
+    config = run_config(thread_id, llm_counter, ask_flight_choice=True)
 
-    yield {"type": "steps", "steps": step_list(["router_agent"])}
+    if flight_choice is not None:
+        graph_input = Command(resume=flight_choice)
+        yield {"type": "steps", "steps": step_list(["choose_flight", "final_agent"])}
+    else:
+        graph_input = run_input(user_input)
+        yield {"type": "steps", "steps": step_list(["router_agent"])}
+
+    # choose_flight still runs (and passes straight through) when flights were
+    # skipped; keep it shown as skipped.
+    skipped_nodes = set()
 
     async for mode, chunk in travel_graph.astream(
-        run_input(user_input),
+        graph_input,
         config=config,
         stream_mode=["tasks", "custom", "messages"],
     ):
         if mode == "tasks":
             node = chunk["name"]
-            if node not in STEP_LABELS:
+            if node not in STEP_LABELS or node in skipped_nodes:
                 continue
             if "result" not in chunk:
                 yield {"type": "step", "node": node, "status": "running"}
+            elif chunk.get("interrupts"):
+                yield {"type": "step", "node": node, "status": "paused"}
             elif chunk["error"] is not None:
                 yield {"type": "step", "node": node, "status": "failed"}
             else:
@@ -684,6 +862,11 @@ async def stream_travel_agent(user_input: str, thread_id: str):
                 if node == "router_agent":
                     route = chunk["result"].get("route", "plan")
                     yield {"type": "steps", "steps": step_list(["router_agent", *ROUTE_STEPS[route]])}
+                if node == "plan_trip":
+                    for skipped, reason in skipped_steps(chunk["result"].get("trip_request", {})):
+                        skipped_nodes.add(skipped)
+                        yield {"type": "step", "node": skipped, "status": "skipped"}
+                        yield {"type": "status", "node": skipped, "message": reason}
 
         elif mode == "custom":
             yield {"type": "status", "node": chunk["node"], "message": chunk["message"]}
@@ -694,6 +877,12 @@ async def stream_travel_agent(user_input: str, thread_id: str):
                 yield {"type": "token", "text": message.content}
 
     snapshot = await travel_graph.aget_state(config)
+
+    choice = pending_flight_choice(snapshot)
+    if choice:
+        yield {"type": "choose", "thread_id": thread_id, "options": choice["options"]}
+        return
+
     yield {
         "type": "done",
         "thread_id": thread_id,
@@ -703,9 +892,14 @@ async def stream_travel_agent(user_input: str, thread_id: str):
     }
 
 
-async def get_trip_plan(thread_id: str):
+async def get_trip_plan(thread_id: str) -> dict:
+    """The saved plan, and the flight options if the run is paused on a choice."""
     if travel_graph is None:
         raise RuntimeError("Travel graph is not open. Call open_travel_graph() first.")
 
     snapshot = await travel_graph.aget_state({"configurable": {"thread_id": thread_id}})
-    return snapshot.values.get("final_plan", "")
+    choice = pending_flight_choice(snapshot)
+    return {
+        "answer": snapshot.values.get("final_plan", ""),
+        "flight_options": choice["options"] if choice else None,
+    }

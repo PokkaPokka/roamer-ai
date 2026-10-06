@@ -61,8 +61,11 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 
 class TravelRequest(BaseModel):
-    message: str
+    message: str = ""
     thread_id: str | None = None
+    # Answer to a paused run's flight question: an option number, or 0 for none.
+    # Only /api/travel/stream uses it.
+    flight_choice: int | None = None
 
 
 class AuthRequest(BaseModel):
@@ -221,8 +224,9 @@ def friendly_error(error: Exception) -> str:
 @app.post("/api/travel/stream")
 async def travel_planner_stream(request_data: TravelRequest, user: dict = Depends(get_current_user)):
     user_message = request_data.message.strip()
+    flight_choice = request_data.flight_choice
 
-    if not user_message:
+    if not user_message and flight_choice is None:
         return JSONResponse(status_code=400, content={"success": False, "error": "Message cannot be empty."})
 
     # Same ownership rule as /api/travel; checked before the stream starts so
@@ -230,6 +234,15 @@ async def travel_planner_stream(request_data: TravelRequest, user: dict = Depend
     thread_id = request_data.thread_id
     if thread_id and not await user_owns_trip(user["id"], thread_id):
         return JSONResponse(status_code=404, content=TRIP_NOT_FOUND)
+
+    if flight_choice is not None:
+        # Resuming: the trip must be paused on a flight choice, and the answer
+        # must be one of its options (or 0 for none).
+        pending = (await get_trip_plan(thread_id))["flight_options"] if thread_id else None
+        if not pending:
+            return JSONResponse(status_code=409, content={"success": False, "error": "This trip isn't waiting for a flight choice."})
+        if flight_choice != 0 and flight_choice not in {option["number"] for option in pending}:
+            return JSONResponse(status_code=400, content={"success": False, "error": "That flight option doesn't exist."})
 
     is_new_trip = not thread_id
     thread_id = thread_id or new_thread_id()
@@ -241,9 +254,10 @@ async def travel_planner_stream(request_data: TravelRequest, user: dict = Depend
 
         async def run_graph():
             try:
-                async for event in stream_travel_agent(user_message, thread_id):
-                    if event["type"] == "done":
-                        # Save the trip only when the plan is finished.
+                async for event in stream_travel_agent(thread_id, user_message or None, flight_choice):
+                    # Save the trip when the plan is finished, or when the run pauses
+                    # for a flight choice, so the paused trip shows in My Trips.
+                    if event["type"] in ("done", "choose"):
                         if is_new_trip:
                             await create_trip(user["id"], thread_id, user_message)
                         else:
@@ -290,12 +304,13 @@ async def get_travel_plan(thread_id: str, user: dict = Depends(get_current_user)
     if not await user_owns_trip(user["id"], thread_id):
         return JSONResponse(status_code=404, content=TRIP_NOT_FOUND)
 
-    answer = await get_trip_plan(thread_id)
+    trip = await get_trip_plan(thread_id)
 
-    if not answer:
+    if not trip["answer"] and not trip["flight_options"]:
         return JSONResponse(status_code=404, content=TRIP_NOT_FOUND)
 
-    return {"success": True, "thread_id": thread_id, "answer": answer}
+    # flight_options is set when the trip is paused, waiting for a flight choice.
+    return {"success": True, "thread_id": thread_id, **trip}
 
 
 @app.get("/health")

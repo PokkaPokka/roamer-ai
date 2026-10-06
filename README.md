@@ -140,7 +140,7 @@ Every stage can be stopped and re-run; finished work is skipped. The full knowle
 - GET /api/auth/me - The logged-in user
 - GET /api/trips - Your saved trips
 - POST /api/travel - Submit a travel request, or feedback on an existing trip (`thread_id`)
-- POST /api/travel/stream - Same as above, but streams progress as Server-Sent Events (`steps`, `step`, `status`, `token`, `done`, `error`); the web UI uses this
+- POST /api/travel/stream - Same as above, but streams progress as Server-Sent Events (`steps`, `step`, `status`, `token`, `choose`, `done`, `error`); the web UI uses this. It pauses with a `choose` event so the user can pick a flight; resume with `{"thread_id": ..., "flight_choice": <option number, or 0 for none>}`
 - GET /api/travel/{thread_id} - Get the latest plan for one of your trips
 
 All `/api/trips` and `/api/travel` routes need an `Authorization: Bearer <token>` header.
@@ -161,10 +161,11 @@ curl -X POST http://127.0.0.1:8000/api/travel \
 ## How the Workflow Works
 
 1. The user submits a travel request (or feedback on an existing plan, which the router sends to a revise step or a new search).
-2. The plan step extracts the trip details (origin, destination, dates, travellers) once.
-3. Three agents run in parallel: flights (Google Flights), hotels (Tavily), and the guide agent, which retrieves numbered Wikivoyage excerpts with hybrid search.
-4. When all three finish, the final agent writes the plan in one LLM call and cites the excerpts it used, like `[2]`.
-5. The code appends a Sources list with links for the cited excerpts.
+2. The plan step (the supervisor) extracts the trip details once and decides which searches are needed, e.g. no flight search for "I'm driving".
+3. The needed agents run in parallel: flights (Google Flights), hotels (Tavily), and the guide agent, which retrieves numbered Wikivoyage excerpts with hybrid search.
+4. The graph pauses (LangGraph `interrupt()`) so the user can pick a flight; the paused state is saved in Postgres.
+5. The final agent writes the plan around the chosen flight in one LLM call and cites the excerpts it used, like `[2]`.
+6. The code appends a Sources list with links for the cited excerpts.
 
 ## Contributing
 
