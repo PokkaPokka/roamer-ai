@@ -113,6 +113,16 @@
           </button>
         </div>
 
+        <!-- Live progress while a plan is being made (filled by script.js) -->
+        <div id="progressPanel" class="progress-panel hidden" aria-live="polite">
+          <div class="progress-header">
+            <span id="progressTitle" class="progress-title">Planning your trip</span>
+            <button id="stopBtn" class="copy-btn stop-btn" onclick="stopPlanning()">Stop</button>
+          </div>
+          <ol id="stepList" class="step-list"></ol>
+          <p id="progressWarning" class="progress-warning hidden"></p>
+        </div>
+
         <div id="quickPrompts" class="quick-prompts">
           <button
             onclick="
@@ -198,6 +208,9 @@
 
     <!-- Markdown Renderer -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Cleans the rendered Markdown so model output can't inject scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.4.16/purify.min.js"></script>
 
     <!-- PDF Download Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>

@@ -17,6 +17,7 @@ import uuid
 from pydantic import BaseModel, Field
 
 from langgraph.graph import StateGraph, START, END
+from langgraph.config import get_config, get_stream_writer
 from langchain_core.callbacks import BaseCallbackHandler
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from langchain_core.messages import (
@@ -51,6 +52,9 @@ def get_llm():
             # Ollama's default context window is small and silently cuts long prompts.
             # Guide excerpts + flights + hotels need about 8K tokens.
             num_ctx=int(os.getenv("OLLAMA_NUM_CTX", "16384")),
+            # A plan is about 1,500 tokens. Without a cap, a model that starts copying
+            # its prompt keeps going until the context is full (once: 7,900 tokens, 26 min).
+            num_predict=int(os.getenv("OLLAMA_NUM_PREDICT", "3000")),
         )
 
     if LLM_PROVIDER == "groq":
@@ -67,6 +71,19 @@ def get_llm():
 
 
 llm = get_llm()
+
+
+# =========================
+# Progress messages
+# =========================
+
+def report(message: str):
+    """
+    Sends a status line to the UI while the graph is streaming, e.g.
+    "Searching Google Flights MEL → NRT". Does nothing in a plain ainvoke() run.
+    """
+    node = get_config()["metadata"].get("langgraph_node", "")
+    get_stream_writer()({"node": node, "message": message})
 
 
 # =========================
@@ -111,6 +128,7 @@ def router_agent(state: TravelState):
     if not state.get("final_plan"):
         return {"route": "plan", "user_query": latest_input}
 
+    report("Deciding whether your feedback needs new searches")
     decider = llm.with_structured_output(FeedbackDecision)
 
     try:
@@ -192,7 +210,16 @@ def extract_trip_request(query: str) -> TripRequest:
 def plan_trip(state: TravelState):
     # Extract the trip once, so flight, hotel and guide searches can all start
     # at the same time instead of the guide waiting for the flight agent.
+    report("Reading your trip request")
     trip = extract_trip_request(state["user_query"])
+
+    details = [part for part in [
+        f"to {trip.destination}" if trip.destination else "",
+        f"from {trip.origin}" if trip.origin else "",
+        f"leaving {trip.departure_date}" if trip.departure_date else "",
+        f"{trip.trip_days} days" if trip.trip_days else "",
+    ] if part]
+    report("Trip: " + ", ".join(details) if details else "Could not find trip details; using defaults")
 
     return {
         "trip_request": trip.model_dump(),
@@ -225,7 +252,9 @@ def flight_agent(state: TravelState):
 
     if not destination_iata:
         flight_data = "Flight search skipped: could not work out the destination from the request."
+        report("Skipped: could not work out the destination airport")
     else:
+        report(f"Searching Google Flights {origin_iata} → {destination_iata}, {departure.isoformat()}")
         flight_data = search_google_flights(
             origin_iata=origin_iata,
             destination_iata=destination_iata,
@@ -233,6 +262,13 @@ def flight_agent(state: TravelState):
             return_date=return_day.isoformat() if return_day else None,
             adults=max(trip.adults, 1),
         )
+        prices = re.findall(r"^Option \d+: ([A-Z]{3}) (\d+)", flight_data, re.MULTILINE)
+        if prices:
+            currency = prices[0][0]
+            cheapest = min(int(price) for _, price in prices)
+            report(f"Found {len(prices)} options from {currency} {cheapest:,}")
+        else:
+            report("No flight options found")
 
     if assumptions:
         flight_data = "Assumptions: " + "; ".join(assumptions) + "\n\n" + flight_data
@@ -252,7 +288,9 @@ def flight_agent(state: TravelState):
 
 def hotel_agent(state: TravelState):
     query = f"Best hotels for {state['user_query']}"
+    report("Searching the web for hotels")
     hotel_results = tavily_search(query)
+    report("Found hotel suggestions")
 
     return {
         "hotel_results": hotel_results,
@@ -290,6 +328,10 @@ async def guide_agent(state: TravelState):
     # a region) search every city and keep chunks that mention the place by name,
     # which finds Ubud and Kuta for Bali.
     city_filter = destination if await city_in_knowledge_base(destination) else None
+    if city_filter:
+        report(f"Searching the Wikivoyage guide for {destination}")
+    else:
+        report(f"{destination} has no guide of its own; searching guides that mention it")
 
     searches = [
         search_knowledge_base(question.format(place=destination), city=city_filter, limit=RESULTS_PER_SEARCH * 2)
@@ -310,6 +352,8 @@ async def guide_agent(state: TravelState):
             kept += 1
             if kept == RESULTS_PER_SEARCH:
                 break
+
+    report(f"Found {len(chunks)} guide excerpts")
 
     excerpts, sources = [], []
     for number, chunk in enumerate(chunks, start=1):
@@ -384,7 +428,7 @@ def strip_sources(plan: str) -> str:
 
 # One call writes the whole plan. It used to be two (draft itinerary, then a
 # rewrite into sections), which doubled the run time on a local model.
-def final_agent(state: TravelState):
+async def final_agent(state: TravelState):
     final_prompt = f"""
 Create the complete travel plan for the user.
 
@@ -414,7 +458,11 @@ Important:
 - Do not add a sources or references section; it is added automatically.
 """
 
-    response = llm.invoke([
+    # The model reads the whole prompt before writing; on a laptop that takes
+    # 1-2 minutes, so say so instead of looking stuck.
+    report("Reading the search results")
+    # Async, so stopping the stream cancels the request to the model.
+    response = await llm.ainvoke([
         SystemMessage(content="You are an expert travel planner and booking assistant."),
         HumanMessage(content=final_prompt)
     ])
@@ -431,7 +479,7 @@ Important:
 # Revise Agent
 # =========================
 
-def revise_agent(state: TravelState):
+async def revise_agent(state: TravelState):
     revise_prompt = f"""
 Revise the user's existing travel plan based on their feedback.
 
@@ -456,7 +504,8 @@ Important:
 - Return the full revised plan, not just the changes.
 """
 
-    response = llm.invoke([
+    report("Reading your plan and the search results")
+    response = await llm.ainvoke([
         SystemMessage(content="You are a professional AI travel booking assistant."),
         HumanMessage(content=revise_prompt)
     ])
@@ -527,31 +576,40 @@ class LLMCallCounter(BaseCallbackHandler):
         self.count += 1
 
 
-async def run_travel_agent(user_input: str, thread_id: str | None = None):
-    if travel_graph is None:
-        raise RuntimeError("Travel graph is not open. Call open_travel_graph() first.")
+def new_thread_id() -> str:
+    return f"user_{uuid.uuid4().hex}"
 
-    if not thread_id:
-        thread_id = f"user_{uuid.uuid4().hex}"
 
-    llm_counter = LLMCallCounter()
-    config = {
+def run_config(thread_id: str, llm_counter: LLMCallCounter) -> dict:
+    return {
         "configurable": {
             "thread_id": thread_id
         },
         "callbacks": [llm_counter],
     }
 
+
+def run_input(user_input: str) -> dict:
     # Only send the new input. Earlier results in this thread are loaded from the
     # checkpoint, so feedback can revise the existing plan.
+    return {
+        "messages": [
+            HumanMessage(content=user_input)
+        ],
+        "latest_input": user_input,
+    }
+
+
+async def run_travel_agent(user_input: str, thread_id: str | None = None):
+    if travel_graph is None:
+        raise RuntimeError("Travel graph is not open. Call open_travel_graph() first.")
+
+    thread_id = thread_id or new_thread_id()
+    llm_counter = LLMCallCounter()
+
     result = await travel_graph.ainvoke(
-        {
-            "messages": [
-                HumanMessage(content=user_input)
-            ],
-            "latest_input": user_input,
-        },
-        config=config
+        run_input(user_input),
+        config=run_config(thread_id, llm_counter)
     )
 
     return {
@@ -561,6 +619,86 @@ async def run_travel_agent(user_input: str, thread_id: str | None = None):
         "flight_results": result.get("flight_results", ""),
         "hotel_results": result.get("hotel_results", ""),
         "guide_sources": result.get("guide_sources", []),
+        "llm_calls": llm_counter.count,
+    }
+
+
+# What the UI shows for each node in the progress list.
+STEP_LABELS = {
+    "router_agent": "Understanding your request",
+    "plan_trip": "Working out the trip details",
+    "flight_agent": "Searching flights",
+    "hotel_agent": "Searching hotels",
+    "guide_agent": "Searching the travel guide",
+    "final_agent": "Writing your plan",
+    "revise_agent": "Revising your plan",
+}
+
+ROUTE_STEPS = {
+    "plan": ["plan_trip", "flight_agent", "hotel_agent", "guide_agent", "final_agent"],
+    "new_search": ["plan_trip", "flight_agent", "hotel_agent", "guide_agent", "final_agent"],
+    "revise": ["revise_agent"],
+}
+
+# Only these nodes' tokens are shown live; the router and trip parser return JSON.
+WRITING_NODES = {"final_agent", "revise_agent"}
+
+
+def step_list(nodes: list[str]) -> list[dict]:
+    return [{"node": node, "label": STEP_LABELS[node]} for node in nodes]
+
+
+async def stream_travel_agent(user_input: str, thread_id: str):
+    """
+    Runs the graph like run_travel_agent, but yields progress events as it goes:
+      steps  - the list of steps this run will take (sent again once the route is known)
+      step   - a node started, finished or failed
+      status - a status line from a node, e.g. "Found 5 options from AUD 1,354"
+      token  - a piece of the plan as the model writes it
+      done   - the finished plan
+    An exception from the graph is raised to the caller.
+    """
+    if travel_graph is None:
+        raise RuntimeError("Travel graph is not open. Call open_travel_graph() first.")
+
+    llm_counter = LLMCallCounter()
+    config = run_config(thread_id, llm_counter)
+
+    yield {"type": "steps", "steps": step_list(["router_agent"])}
+
+    async for mode, chunk in travel_graph.astream(
+        run_input(user_input),
+        config=config,
+        stream_mode=["tasks", "custom", "messages"],
+    ):
+        if mode == "tasks":
+            node = chunk["name"]
+            if node not in STEP_LABELS:
+                continue
+            if "result" not in chunk:
+                yield {"type": "step", "node": node, "status": "running"}
+            elif chunk["error"] is not None:
+                yield {"type": "step", "node": node, "status": "failed"}
+            else:
+                yield {"type": "step", "node": node, "status": "done"}
+                if node == "router_agent":
+                    route = chunk["result"].get("route", "plan")
+                    yield {"type": "steps", "steps": step_list(["router_agent", *ROUTE_STEPS[route]])}
+
+        elif mode == "custom":
+            yield {"type": "status", "node": chunk["node"], "message": chunk["message"]}
+
+        elif mode == "messages":
+            message, metadata = chunk
+            if metadata.get("langgraph_node") in WRITING_NODES and message.content:
+                yield {"type": "token", "text": message.content}
+
+    snapshot = await travel_graph.aget_state(config)
+    yield {
+        "type": "done",
+        "thread_id": thread_id,
+        "answer": snapshot.values.get("final_plan", ""),
+        "route": snapshot.values.get("route", ""),
         "llm_calls": llm_counter.count,
     }
 

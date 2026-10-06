@@ -442,6 +442,102 @@ footer {
     }
 }
 
+/* Live progress */
+
+.progress-panel {
+    margin-top: 18px;
+    padding: 18px 20px;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    border-radius: 18px;
+    background: rgba(2, 6, 23, 0.5);
+}
+
+.progress-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.progress-title {
+    font-weight: 800;
+    flex: 1;
+}
+
+.stop-btn {
+    padding: 6px 14px;
+}
+
+.step-list {
+    list-style: none;
+    display: grid;
+    gap: 10px;
+}
+
+.step {
+    display: grid;
+    grid-template-columns: 22px 1fr;
+    gap: 4px 10px;
+    align-items: baseline;
+    color: #64748b;
+}
+
+.step-icon {
+    text-align: center;
+}
+
+.step-message {
+    grid-column: 2;
+    font-size: 0.88rem;
+    color: #94a3b8;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.step.running {
+    color: #ffffff;
+}
+
+.step.running .step-icon {
+    color: #60a5fa;
+    animation: pulse 1.2s ease-in-out infinite;
+}
+
+.step.done {
+    color: #cbd5e1;
+}
+
+.step.done .step-icon {
+    color: #22c55e;
+}
+
+.step.failed,
+.step.failed .step-icon {
+    color: #fca5a5;
+}
+
+.progress-warning {
+    margin-top: 14px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: rgba(234, 179, 8, 0.12);
+    border: 1px solid rgba(234, 179, 8, 0.35);
+    color: #fde68a;
+    line-height: 1.5;
+}
+
+@keyframes pulse {
+    50% {
+        opacity: 0.35;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .step.running .step-icon {
+        animation: none;
+    }
+}
+
 /* Account and login */
 
 .account-bar {

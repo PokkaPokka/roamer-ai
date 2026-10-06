@@ -99,19 +99,28 @@ Measured (Tokyo, local `qwen3:8b` on an M2):
 - Tokyo 622 s → 373 s, Bali 741 s → 432 s; all six sections present; LLM calls per plan 3 → 2
 - Known issue (both before and after): the 8B model mishandles the flight budget, e.g. counts a round-trip fare twice or leaves it out, and invents return-leg flight numbers. The Stage E critic should catch this
 
+Stage B (done): live progress instead of a spinner
+
+- [x] Graph: `stream_travel_agent()` runs `astream()` with three modes:
+  - `tasks`: a node started or finished, which drives the ○ / ● / ✓ / ✗ step list
+  - `custom`: status lines sent by the agents with `get_stream_writer()`, e.g. "Searching Google Flights MEL → NRT", "Found 5 options from AUD 1,174"
+  - `messages`: the plan as the model writes it, from `final_agent` and `revise_agent` only; the router's and trip parser's JSON stays hidden
+- [x] `final_agent` and `revise_agent` use `await llm.ainvoke()`, so cancelling the run also cancels the request to Ollama (its log shows `cancel task`)
+- [x] Backend: `POST /api/travel/stream` sends Server-Sent Events (`steps`, `step`, `status`, `token`, `done`, `error`). It uses the same login and ownership checks, saves the trip only on `done`, and sends a `: ping` heartbeat every 10 s from a queue, so the connection stays open during the model's silent reading phase. Closing the connection cancels the graph run. `POST /api/travel` stays for curl and scripts
+- [x] Frontend: `fetch()` + `response.body.getReader()` (`EventSource` can't send the login token); step list with the latest status line for each step; the plan renders live, at most every 200 ms; Markdown is cleaned with DOMPurify, which closes the old `marked` → `innerHTML` XSS hole
+- [x] Stuck warnings: "connection may have dropped" after 30 s with no data (heartbeats included), and "slower than usual" after 4 min without a progress event. The plan's original "90 s with no events" rule was dropped because the model spends 60–120 s reading the prompt before its first token
+- [x] Stop button: aborts the fetch, the server cancels the run, nothing is saved, and the previous plan is shown again
+
+Measured: first token after about 60 s of reading; a 2-day Rome plan took 5:18 in the browser. Timers and token/word counts were tried and removed to keep the panel simple.
+
+Known issue found while testing: a revision ("add more food spots on day 2") ran away. The model copied the raw hotel and guide text into the plan until it hit the 16K context limit (7,900 tokens, 26 min). Capped responses at 3,000 tokens (`OLLAMA_NUM_PREDICT`, about twice a normal plan); the Stage E critic is the real fix.
+
 ### Still to do
 
 - [ ] **Supervisor/router** node with conditional edges (e.g. skip flights when the user says "I'm driving")
 - [ ] Turn the agents into **tool-calling ReAct agents** that choose their own tools
 - [ ] **Human-in-the-loop:** LangGraph `interrupt()` so the user approves the flight before the itinerary is built
 - [ ] **Reflection loop:** a critic node checks the plan against budget and dates, and the graph replans if it fails
-- [ ] **Live progress streaming** (the UI currently shows only a spinner, so the user can't tell progress from a stuck run):
-  - Graph: `astream()` with `custom` mode (agents send status lines via `get_stream_writer()`, e.g. "Searching Google Flights MEL → NRT", "Found 5 options from AUD 1,042") and `messages` mode (stream tokens from `itinerary_agent`, `final_agent`, `revise_agent` only; structured-output calls stay silent)
-  - Backend: `POST /api/travel/stream` sends Server-Sent Events (`step`, `status`, `token`, `done`, `error`), same auth and ownership checks, trip row saved only on success, heartbeat every 10 s. Keep `POST /api/travel` for curl and scripts
-  - Frontend: read the stream with `fetch()` + a stream reader (`EventSource` can't send the login token); step list with ○ waiting / ● running / ✓ done / ✗ failed and a timer per step; the plan renders live as Markdown
-  - Stuck warning after 90 s with no events, and a clear error if the connection drops
-  - Stop button: closing the stream cancels the graph run on the server
-  - No percentage progress bar: run time varies too much (80–400 s) for it to be honest
 - [ ] **Trip dates with flexibility:** the user picks a start and end date, and can mark each as flexible
   - UI: start and end date pickers, plus a flexibility option for each date:
     - Exact: only that date

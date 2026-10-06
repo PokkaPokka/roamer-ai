@@ -88,6 +88,7 @@ JWT_SECRET=your_long_random_secret
 LLM_PROVIDER=ollama
 OLLAMA_MODEL=qwen3:8b
 OLLAMA_NUM_CTX=16384   # context window; guide excerpts need about 8K tokens
+OLLAMA_NUM_PREDICT=3000 # max tokens per response; stops a runaway answer
 ```
 
 For local development, install [Ollama](https://ollama.com), then run `ollama pull qwen3:8b` and `ollama pull bge-m3` (the embedding model for the travel guide search).
@@ -139,6 +140,7 @@ Every stage can be stopped and re-run; finished work is skipped. The full knowle
 - GET /api/auth/me - The logged-in user
 - GET /api/trips - Your saved trips
 - POST /api/travel - Submit a travel request, or feedback on an existing trip (`thread_id`)
+- POST /api/travel/stream - Same as above, but streams progress as Server-Sent Events (`steps`, `step`, `status`, `token`, `done`, `error`); the web UI uses this
 - GET /api/travel/{thread_id} - Get the latest plan for one of your trips
 
 All `/api/trips` and `/api/travel` routes need an `Authorization: Bearer <token>` header.

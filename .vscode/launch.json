@@ -1,0 +1,29 @@
+{
+  // Run and Debug configurations. The backend imports `app.*`, so everything
+  // runs as a module from the backend folder.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Roamer API (port 8000)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      // No --reload: the reloader starts a child process the debugger can't stop in.
+      "args": ["app.main:app", "--port", "8000"],
+      "cwd": "${workspaceFolder}/backend",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Run one travel request (terminal)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "scripts.run_agent",
+      "cwd": "${workspaceFolder}/backend",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    }
+  ]
+}

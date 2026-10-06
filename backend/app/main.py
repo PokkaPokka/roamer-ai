@@ -1,15 +1,17 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
+import asyncio
+import json
 import traceback
 import uvicorn
 
 from fastapi import Depends, FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
-from app.graph import run_travel_agent, get_trip_plan, open_travel_graph
+from app.graph import run_travel_agent, stream_travel_agent, new_thread_id, get_trip_plan, open_travel_graph
 from app.db import open_db, close_db
 from app.auth import authenticate_user, create_access_token, create_user, get_current_user
 from app.trips import create_trip, list_trips, touch_trip, user_owns_trip
@@ -193,6 +195,93 @@ async def travel_planner(request_data: TravelRequest, user: dict = Depends(get_c
             }
         )
 
+
+
+# =========================
+# Streaming planner
+# =========================
+
+# A comment line sent while nothing else happens, so the browser and any proxy
+# know the connection is alive during the model's long silent reading phase.
+HEARTBEAT_SECONDS = 10
+
+
+def sse(event: dict) -> str:
+    """One Server-Sent Event: `event: <type>` plus the JSON payload."""
+    return f"event: {event['type']}\ndata: {json.dumps(event)}\n\n"
+
+
+def friendly_error(error: Exception) -> str:
+    text = str(error)
+    if "Connection refused" in text or "ConnectError" in type(error).__name__:
+        return "The AI model is not running. Start Ollama (brew services start ollama) and try again."
+    return f"Planning failed: {text}"
+
+
+@app.post("/api/travel/stream")
+async def travel_planner_stream(request_data: TravelRequest, user: dict = Depends(get_current_user)):
+    user_message = request_data.message.strip()
+
+    if not user_message:
+        return JSONResponse(status_code=400, content={"success": False, "error": "Message cannot be empty."})
+
+    # Same ownership rule as /api/travel; checked before the stream starts so
+    # errors are plain JSON responses.
+    thread_id = request_data.thread_id
+    if thread_id and not await user_owns_trip(user["id"], thread_id):
+        return JSONResponse(status_code=404, content=TRIP_NOT_FOUND)
+
+    is_new_trip = not thread_id
+    thread_id = thread_id or new_thread_id()
+
+    async def events():
+        # The graph runs in its own task and hands events over through a queue,
+        # so a heartbeat can be sent while the graph is quiet.
+        queue: asyncio.Queue = asyncio.Queue()
+
+        async def run_graph():
+            try:
+                async for event in stream_travel_agent(user_message, thread_id):
+                    if event["type"] == "done":
+                        # Save the trip only when the plan is finished.
+                        if is_new_trip:
+                            await create_trip(user["id"], thread_id, user_message)
+                        else:
+                            await touch_trip(user["id"], thread_id)
+                    await queue.put(event)
+            except Exception as e:
+                traceback.print_exc()
+                await queue.put({"type": "error", "message": friendly_error(e)})
+            finally:
+                await queue.put(None)
+
+        graph_task = asyncio.create_task(run_graph())
+
+        try:
+            while True:
+                try:
+                    event = await asyncio.wait_for(queue.get(), timeout=HEARTBEAT_SECONDS)
+                except asyncio.TimeoutError:
+                    yield ": ping\n\n"
+                    continue
+                if event is None:
+                    break
+                yield sse(event)
+        finally:
+            # The browser closed the connection (Stop button, closed tab): stop the
+            # graph, which also cancels the request to the model.
+            if not graph_task.done():
+                graph_task.cancel()
+                print(f"Stream closed early, cancelled run for {thread_id}")
+
+    return StreamingResponse(
+        events(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",   # don't let a proxy hold events back
+        },
+    )
 
 
 @app.get("/api/travel/{thread_id}")
