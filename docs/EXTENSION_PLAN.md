@@ -36,11 +36,35 @@ How it's built:
 
 ## Phase 2 — RAG implementation
 
-- [ ] Download Wikivoyage dumps (free, CC-BY-SA); pick about 50–100 destinations to stay under the 1 GB limit
-- [ ] Chunk and embed them into a pgvector table
-- [ ] Add a `tsvector` column for full-text search
-- [ ] Hybrid retrieval: vector + full-text results merged with reciprocal rank fusion (RRF)
-- [ ] Itinerary output cites its sources
+- [x] Download Wikivoyage guides (free, CC BY-SA) for the 500 most-read city articles, through the API instead of the full dumps
+- [x] Chunk and embed them into a pgvector table
+- [x] Add a `tsvector` column for full-text search
+- [x] Hybrid retrieval: vector + full-text results merged with reciprocal rank fusion (RRF)
+- [x] Itinerary output cites its sources
+
+How it's built:
+
+- `backend/scripts/rank_cities.py`: sums 12 months of Wikimedia "top 1000" page views, keeps `Category:City articles`, takes the top 500, looks up each city's current country on Wikidata → `backend/data/kb_cities.json`
+- `backend/scripts/build_kb.py`, three resumable stages:
+  - `fetch`: plain-text guides with section headings, cached in `backend/data/cache/` (not committed)
+  - `chunk`: split by top-level section, ~350 words, 40-word overlap, each chunk starts with `City, Country — Section`
+  - `embed`: `bge-m3` (1024 dims) via Ollama, one transaction per city, `COPY` for speed, skips cities already loaded from the same revision
+- Tables `kb_cities` and `kb_chunks` (HNSW cosine index on `embedding`, GIN index on the generated `tsv` column)
+- `backend/app/knowledge_base.py`: one SQL query runs both searches (40 candidates each), ranks keyword matches containing all the words first, and fuses with `1 / (60 + rank)`; the optional city filter uses pgvector 0.8 iterative index scans
+- `guide_agent` node (flight → hotel → **guide** → itinerary → final): 4 searches (sights, things to do, food, transport), 3 results each, deduplicated, numbered. Destinations not in the knowledge base (e.g. Bali) fall back to all cities and keep chunks that mention the place (finds Ubud, Kuta, Nusa Lembongan)
+- The itinerary cites excerpts as `[n]`; the Sources list and CC BY-SA attribution are added by code, not the LLM; `num_ctx` raised to 16K so the excerpts aren't cut off
+
+Measured:
+
+- 500 cities, 20,963 chunks, 377 MB of the 1 GB Render limit (HNSW index 164 MB); embedding took 107 min on a laptop
+- Tokyo and Bali test plans cited 7 sources each; full runs took about 10–12 min on `qwen3:8b` (the larger prompt made them slower)
+- HNSW vs exact search at 21K vectors: same recall and same speed, because the free-tier database reads the index from disk on every search
+
+Known issues:
+
+- Some citations are wrong: the Tokyo test plan cited a guide excerpt for a hotel that came from the Tavily search. Measure citation accuracy in Phase 5
+- Fallback searches (destination not in the knowledge base) take about 16 s because common words match thousands of chunks
+- Singapore, Bali and Macau are not city articles on Wikivoyage, so they aren't in the list (Bali works through the fallback)
 
 Why it matters: hybrid search with citations stands out from the usual "I called a vector DB" project.
 
@@ -76,6 +100,17 @@ START → router_agent ─┬─ "plan" / "new_search" → flight → hotel → 
   - Stuck warning after 90 s with no events, and a clear error if the connection drops
   - Stop button: closing the stream cancels the graph run on the server
   - No percentage progress bar: run time varies too much (80–400 s) for it to be honest
+- [ ] **Trip dates with flexibility:** the user picks a start and end date, and can mark each as flexible
+  - UI: start and end date pickers, plus a flexibility option for each date:
+    - Exact: only that date
+    - ± 1 / 2 / 3 days around the date
+    - Whole month: "anytime in November"
+  - Optional trip length (e.g. 5–7 nights) when the dates are loose
+  - Backend: add `start_date`, `end_date`, `flex_days` and `trip_length` to `TripRequest`. The LLM parser fills them from free text ("around mid-Nov for a week"), and the form values override it
+  - Flights: search each date in the flexible window and show the cheapest combinations (SerpApi Google Flights price insights). Cap the number of searches so the API quota isn't burned
+  - Hotels and itinerary: use the date range chosen by the user. Say in the plan which dates were picked and why (e.g. "cheapest fares")
+  - Router: feedback like "make the dates flexible" or "go a week later" counts as `new_search`
+  - Validation: end date must be after the start date, and neither can be in the past
 
 ## Phase 4 — MCP in both directions
 

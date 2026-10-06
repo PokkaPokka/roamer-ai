@@ -19,6 +19,7 @@ all coordinated through a LangGraph workflow.
 - 🏨 Hotel suggestions using Tavily search
 - 🧠 Multi-agent orchestration with LangGraph
 - 📝 Structured travel itinerary generation
+- 📚 RAG over Wikivoyage guides for 500 popular cities: hybrid search (pgvector + Postgres full-text, merged with RRF) and itineraries that cite their sources
 - 🌐 FastAPI backend with a simple web interface
 - 💬 Give feedback on a plan and the agents revise it
 - 🔐 User accounts (JWT); each user only sees their own trips
@@ -87,9 +88,10 @@ JWT_SECRET=your_long_random_secret
 # LLM provider: "ollama" (local, free) or "groq" (hosted, needs GROQ_API_KEY)
 LLM_PROVIDER=ollama
 OLLAMA_MODEL=qwen3:8b
+OLLAMA_NUM_CTX=16384   # context window; guide excerpts need about 8K tokens
 ```
 
-For local development, install [Ollama](https://ollama.com), then run `ollama pull qwen3:8b`.
+For local development, install [Ollama](https://ollama.com), then run `ollama pull qwen3:8b` and `ollama pull bge-m3` (the embedding model for the travel guide search).
 
 ## Installation
 
@@ -115,6 +117,20 @@ http://127.0.0.1:8000/
 ```
 
 To run one request in the terminal instead: `python -m scripts.run_agent` (also from `backend`).
+
+## Building the Travel Guide Knowledge Base
+
+The itinerary agent searches Wikivoyage guides stored in PostgreSQL (pgvector). Build them once, from the `backend` folder:
+
+```bash
+python -m scripts.rank_cities          # pick the 500 most-read Wikivoyage city guides -> data/kb_cities.json (already committed)
+python -m scripts.build_kb fetch       # download the guides to data/cache/ (about 30 min, rate limited)
+python -m scripts.build_kb chunk       # split them into ~350-word chunks
+python -m scripts.build_kb embed       # embed with bge-m3 and load into Postgres (about 2 hours on a laptop)
+python -m scripts.search_kb "cheap places to eat" --city Ubud   # try the hybrid search
+```
+
+Every stage can be stopped and re-run; finished work is skipped. The full knowledge base is about 21,000 chunks and 370 MB.
 
 ## API Endpoints
 
@@ -143,11 +159,12 @@ curl -X POST http://127.0.0.1:8000/api/travel \
 
 ## How the Workflow Works
 
-1. The user submits a travel request.
-2. The flight agent gathers flight-related information.
+1. The user submits a travel request (or feedback on an existing plan, which the router sends to a revise step or a new search).
+2. The flight agent extracts the trip details and searches Google Flights.
 3. The hotel agent searches for accommodation suggestions.
-4. The itinerary agent creates a practical travel plan.
-5. The final agent formats the result into a polished response.
+4. The guide agent retrieves numbered excerpts from the Wikivoyage knowledge base with hybrid search.
+5. The itinerary agent creates the day-by-day plan and cites the excerpts it used, like `[2]`.
+6. The final agent formats the result; the code appends a Sources list with links for the cited excerpts.
 
 ## Contributing
 
@@ -161,3 +178,5 @@ Contributions are welcome. If you want to improve the app, add new travel featur
 ## Acknowledgments
 
 This project is built with the help of modern LLM tooling and travel APIs, and it is intended as a practical example of combining LangGraph agents with real-world applications.
+
+Travel guide content comes from [Wikivoyage](https://en.wikivoyage.org) and is used under the [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) licence. Plans link to the Wikivoyage articles they cite.
