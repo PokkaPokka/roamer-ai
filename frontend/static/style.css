@@ -510,24 +510,12 @@ textarea.input {
     min-height: 42px;
 }
 
-/* Optional dates */
-
-.dates-box summary {
-    cursor: pointer;
-    font-weight: 600;
-    width: fit-content;
-}
-
-.dates-box summary .muted {
-    font-weight: 400;
-    font-size: 0.85rem;
-}
+/* Dates (filled in before the text box unlocks) */
 
 .dates-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
     gap: 12px;
-    margin-top: 12px;
 }
 
 .dates-grid .field-label {
@@ -541,9 +529,9 @@ textarea.input {
     min-height: 44px;
 }
 
-.dates-note {
-    font-size: 0.82rem;
-    margin-top: 10px;
+.input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .flight-dates {

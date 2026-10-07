@@ -73,10 +73,12 @@ Why it matters: hybrid search with citations stands out from the usual "I called
 The planner used to be one-off: each message started from scratch and ignored the saved thread.
 
 ```
-START → router_agent ─┬─ "plan" / "new_search" → plan_trip ─┬─ flight? ─┬─→ choose_flight ──→ final_agent → END
-                      │                     (supervisor)    ├─ hotel? ──┤   (interrupt:
-                      │                                     └─ guide ───┘    user picks)
-                      └─ "revise" ─────────────→ revise_agent ─────────────────────────────→ END
+START → router_agent ─┬─ "plan" / "new_search" → plan_trip ─┬─ flight? ─┬─→ choose_flight ──→ final_agent ─┐
+                      │                     (supervisor)    ├─ hotel? ──┤   (interrupt:                      │
+                      │                                     └─ guide ───┘    user picks)                     ▼
+                      │                                      (ReAct)                       critic ─→ END
+                      └─ "revise" ─────────────→ revise_agent ─────────────────────────────→  ▲ │
+                                                                                   fix_plan ──┘ ◀┘ (once)
 ```
 
 - `router_agent`: first message in a thread → `plan`. Later messages are feedback; the LLM (structured output `FeedbackDecision`) picks:
@@ -144,18 +146,37 @@ UI pass after Stage C:
 Stage D (done): flexible dates
 
 - [x] `TripRequest` gained `flex_days` (0–3) and `month` (YYYY-MM); the parser fills them from text ("around 2026-12-10, flexible by a couple of days" → ±2). The model wrote "January" once, so a month that isn't YYYY-MM falls back to the departure date's month
-- [x] Optional Dates form (depart, return or trip length, flexibility: exact / ±1–3 days / any time that month), checked in the browser and again by the server (400). Form dates win over the text and are written into the request text, so later feedback keeps them
+- [x] Dates form above the text box: start date and end date are required, flexibility is an optional dropdown (exact / ±1–3 days / any time that month). The text box stays locked until both dates are set. Checked in the browser and again by the server (400 for a new trip without dates). Form dates win over the text and are written into the request text, so later feedback keeps them. The form is hidden once a trip has a plan; "go a week later" is feedback text. `POST /api/travel` (curl) stays text-only
+- [x] The trip length is end date minus start date; "any time that month" keeps that length and moves the start anywhere in the start date's month
 - [x] One flexibility for the whole trip: ±N days moves departure and return together (2N+1 searches); a whole month is sampled at 7 departure dates. Capped by `FLEX_MAX_SEARCHES` (default 7) to protect the SerpApi quota; the searches run in parallel threads
 - [x] The flight cards show the cheapest 5 options across all dates, each with its dates; the prompt gets the cheapest fare per date pair and the chosen flight's dates for the whole plan
 - [x] Router example: "go a week later, my dates are flexible" → `new_search`
 - Tested: stubbed windows (±2, near today, whole month, current month), validation rules, parser on 3 requests, and a browser run (Tokyo ±2 days: 5 searches, cheapest AUD 1,054 two days after the date entered; the plan said it picked the cheapest fare in the ±2-day window)
-- Known issue: "3 days" still means return = departure + 2 days, so with a long flight there's little time at the destination
+- Fixed later: "N days" now means N days there (3 days from 20 Nov returns on 23 Nov, matching the date form), and the plan is built around the flight's landing time (see the arrival-day check in Stage E)
 - Separate flexibility for departure and return (up to 49 searches) and a minimum–maximum trip length were left out to keep the search count small
 
-### Still to do
+Stage E (done): the agents check their work and choose their own searches
 
-- [ ] Turn the agents into **tool-calling ReAct agents** that choose their own tools
-- [ ] **Reflection loop:** a critic node checks the plan against budget and dates, and the graph replans if it fails
+- [x] **Critic written in code** (`backend/app/critic.py`, no LLM, because the 8B model can't proofread itself). Runs after `final_agent` and `revise_agent`:
+  - Fixed in code: the budget total (rows must add up exactly), the flight row (the chosen fare, counted once), and citations whose claim names a place that isn't in the cited excerpt (or cites an excerpt that doesn't exist)
+  - Sent back for a rewrite: missing sections, travel dates not mentioned, copied prompt text
+- [x] **Reflection loop:** `critic → fix_plan → critic`, at most one rewrite (one costs about 4 minutes on an M2). If problems remain, the plan ends with a note listing them. The UI shows "Checking the plan" with what was fixed; a rewrite adds a "Fixing problems" step and the live text starts over
+- [x] **ReAct guide agent:** `guide_agent` uses LangChain's `create_agent` (the v1 successor of `create_react_agent`) with one tool, `search_guide(topic)`. The model picks 3–5 topics from the request, sees the results and decides whether to search again; at most 5 searches. The free slots are topped up from the fixed searches (sights, food, transport first), and it falls back to them if tool calling fails. `GUIDE_MODE=fixed` switches it off
+- [x] 16 unit tests built from real failures: `python -m unittest tests.test_critic`
+
+Measured:
+
+- The critic on 4 saved plans from earlier runs: 3 had wrong budgets (a fare counted twice: 5,308 should be 3,954; totals of 2,405 and 2,954 that should be 2,705 and 3,154); no false alarms on sections or dates
+- ReAct vs fixed searches, 3 requests: the agent's topics follow the interests ("street food and anime" → found Akihabara's anime shops; "two kids, museums and parks" → the Luxembourg puppet theatre; "surfing and yoga" → Kuta surf and Ubud yoga), but it took 13–43 s against 2–15 s, stopped after 3 searches, and on its own missed food and transport for Bali, hence the top-up
+- Browser run (Tokyo, "street food and anime", pick a flight): plan done with no rewrite needed. The first version of the citation check removed 8 correct citations because the model wrote them as "**Excerpt Reference:** [4]" lines; label words are now ignored (regression test added). The budget total 9,600 should have been 9,551; the 1% rounding allowance hid it, so totals now must match exactly
+
+Arrival day (the "3 days" fix):
+
+- The chosen flight's landing time goes into the prompt: Day 1 starts after landing and check-in, and the last day stays light ("leave 3 hours for the airport"; SerpApi doesn't give the return flight's time)
+- The critic flags Day 1 morning plans when the flight lands after 12:00, and afternoon plans after 17:00; parts that are only about getting to the hotel don't count
+- Two false alarms from the first real run were fixed, with tests: "Afternoon: head to Asakusa and check into your hotel" (only logistics) and "copied prompt text" set off by quoted search facts like "Price insight:" (now only the excerpt block and instructions count). Re-run (Tokyo, landing 18:10): Day 1 has arrival, transfer, check-in and an evening plan; Day 4 is the return day; no rewrite needed; 4:51 in total
+
+Known issues: the critic can't check things it has no data for, e.g. the plan converted ¥10,000–15,000 a night into AUD 1,200–1,800 a night (should be about AUD 100–150). The ReAct guide makes the flight cards appear 10–40 s later, because the choice waits for all searches.
 ## Phase 4 — MCP in both directions
 
 - [ ] **MCP server:** expose `search_flights`, `search_hotels`, `query_travel_kb` and `get_my_trips`

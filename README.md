@@ -90,6 +90,7 @@ OLLAMA_MODEL=qwen3:8b
 OLLAMA_NUM_CTX=16384   # context window; guide excerpts need about 8K tokens
 OLLAMA_NUM_PREDICT=3000 # max tokens per response; stops a runaway answer
 FLEX_MAX_SEARCHES=7       # max Google Flights searches for one flexible-date trip
+GUIDE_MODE=react          # "react": the guide agent picks its own searches; "fixed": 4 set searches
 ```
 
 For local development, install [Ollama](https://ollama.com), then run `ollama pull qwen3:8b` and `ollama pull bge-m3` (the embedding model for the travel guide search).
@@ -165,10 +166,13 @@ curl -X POST http://127.0.0.1:8000/api/travel \
 
 1. The user submits a travel request (or feedback on an existing plan, which the router sends to a revise step or a new search).
 2. The plan step (the supervisor) extracts the trip details once and decides which searches are needed, e.g. no flight search for "I'm driving".
-3. The needed agents run in parallel: flights (Google Flights), hotels (Tavily), and the guide agent, which retrieves numbered Wikivoyage excerpts with hybrid search.
+3. The needed agents run in parallel: flights (Google Flights), hotels (Tavily), and the guide agent, a small ReAct agent that chooses its own searches of the Wikivoyage knowledge base (hybrid search) from the traveller's interests.
 4. The graph pauses (LangGraph `interrupt()`) so the user can pick a flight; the paused state is saved in Postgres.
 5. The final agent writes the plan around the chosen flight in one LLM call and cites the excerpts it used, like `[2]`.
-6. The code appends a Sources list with links for the cited excerpts.
+6. A critic checks the plan with code: it fixes the budget total, the flight cost and mismatched citations itself, and sends missing sections or wrong dates back for one rewrite.
+7. The code appends a Sources list with links for the cited excerpts.
+
+Run the critic's tests from the `backend` folder: `python -m unittest tests.test_critic`.
 
 ## Contributing
 

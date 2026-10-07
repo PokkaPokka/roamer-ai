@@ -67,11 +67,11 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 
 class TripDates(BaseModel):
-    """Dates picked in the form; they override what the planner reads from the text."""
+    """Dates picked in the form. A new trip needs a start and an end date."""
     departure_date: date | None = None
     return_date: date | None = None
-    trip_days: int | None = None
-    # "exact", "1"/"2"/"3" for ± days around the departure date, or "month" for any day that month.
+    # "exact", "1"/"2"/"3" for ± days around the start date, or "month" for any day
+    # in the start date's month (the trip keeps the length of start to end).
     flexibility: Literal["exact", "1", "2", "3", "month"] = "exact"
 
 
@@ -84,22 +84,14 @@ class TravelRequest(BaseModel):
     dates: TripDates | None = None
 
 
-MAX_TRIP_DAYS = 60
-
-
-def check_dates(dates: TripDates) -> str | None:
+def check_dates(dates: TripDates | None) -> str | None:
     """An error message for dates that can't be searched, or None if they're fine."""
-    today = date.today()
-    if dates.departure_date and dates.departure_date <= today:
-        return "The departure date must be after today."
-    if dates.return_date and not dates.departure_date:
-        return "Pick a departure date as well as a return date."
-    if dates.return_date and dates.return_date <= dates.departure_date:
-        return "The return date must be after the departure date."
-    if dates.trip_days is not None and not 1 <= dates.trip_days <= MAX_TRIP_DAYS:
-        return f"The trip length must be 1 to {MAX_TRIP_DAYS} days."
-    if dates.flexibility != "exact" and not dates.departure_date:
-        return "Pick a departure date to search around."
+    if not dates or not dates.departure_date or not dates.return_date:
+        return "Pick a start date and an end date."
+    if dates.departure_date <= date.today():
+        return "The start date must be after today."
+    if dates.return_date <= dates.departure_date:
+        return "The end date must be after the start date."
     return None
 
 
@@ -109,7 +101,6 @@ def dates_for_graph(dates: TripDates | None) -> dict:
     return {
         "departure_date": dates.departure_date.isoformat() if dates.departure_date else None,
         "return_date": dates.return_date.isoformat() if dates.return_date else None,
-        "trip_days": dates.trip_days,
         "flexibility": dates.flexibility,
     }
 
@@ -357,7 +348,10 @@ async def travel_planner_stream(request_data: TravelRequest, user: dict = Depend
     if not user_message and flight_choice is None:
         return JSONResponse(status_code=400, content={"success": False, "error": "Message cannot be empty."})
 
-    if request_data.dates:
+    # A new trip needs dates. Feedback on a plan and a flight choice don't (feedback
+    # like "go a week later" changes them in words).
+    starts_new_trip = not request_data.thread_id and flight_choice is None
+    if starts_new_trip or request_data.dates:
         date_error = check_dates(request_data.dates)
         if date_error:
             return JSONResponse(status_code=400, content={"success": False, "error": date_error})

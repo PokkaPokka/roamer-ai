@@ -20,6 +20,9 @@ from pydantic import BaseModel, Field
 from langgraph.graph import StateGraph, START, END
 from langgraph.config import get_config, get_stream_writer
 from langgraph.types import Command, interrupt
+from langgraph.errors import GraphRecursionError
+from langchain.agents import create_agent
+from langchain_core.tools import tool
 from langchain_core.callbacks import BaseCallbackHandler
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from langchain_core.messages import (
@@ -35,6 +38,7 @@ from app.tools.flight_tool import resolve_location_to_iata, parse_route, DEFAULT
 from app.tools.google_flights_tool import search_google_flights_with_options
 from app.db import get_pool
 from app.knowledge_base import search_knowledge_base, city_in_knowledge_base
+from app.critic import review_plan
 
 
 # =========================
@@ -103,10 +107,13 @@ class TravelState(TypedDict):
     flight_results: str
     flight_options: list[dict]   # the same flights as data, for the UI's flight cards
     chosen_flight: str     # the flight the user picked, as text for the plan prompt
+    chosen_option: dict    # the same flight as data (price, dates) for the critic
     hotel_results: str
     guide_context: str     # numbered Wikivoyage excerpts for the plan prompt
     guide_sources: list[dict]
     final_plan: str
+    critic_problems: list[str]   # problems the critic wants an LLM rewrite for
+    fix_attempts: int            # rewrites so far in this run (at most MAX_FIX_ATTEMPTS)
 
 
 # =========================
@@ -294,11 +301,18 @@ def plan_trip(state: TravelState):
     if overrides:
         trip.departure_date = overrides.get("departure_date") or trip.departure_date
         trip.return_date = overrides.get("return_date") or trip.return_date
-        trip.trip_days = overrides.get("trip_days") or trip.trip_days
         flexibility = overrides.get("flexibility", "exact")
-        trip.month = trip.departure_date[:7] if flexibility == "month" and trip.departure_date else None
         trip.flex_days = int(flexibility) if flexibility.isdigit() else 0
-        query = f"{query} (dates picked in the form, these win: {describe_dates(trip)})"
+        trip.month = None
+
+        if trip.departure_date and trip.return_date:
+            # "N days" means N days there: 20 -> 23 Nov is 3 days.
+            trip.trip_days = (date.fromisoformat(trip.return_date) - date.fromisoformat(trip.departure_date)).days
+            if flexibility == "month":
+                # Any day that month: the end date no longer applies, only the trip length.
+                trip.month = trip.departure_date[:7]
+                trip.return_date = None
+        query = f"{query} (travel dates: {describe_dates(trip)})"
 
     if not trip.needs_flights and not NO_FLIGHT_HINTS.search(state["user_query"]):
         trip.needs_flights = True
@@ -319,6 +333,7 @@ def plan_trip(state: TravelState):
         # Clear the previous run's flight choice; a new search asks again.
         "flight_options": [],
         "chosen_flight": "",
+        "chosen_option": {},
     }
 
     # A skipped search still writes its results, so a new search in the same
@@ -406,7 +421,9 @@ def flight_agent(state: TravelState):
 
     return_day = parse_future_date(trip.return_date, departure)
     if not return_day and trip.trip_days:
-        return_day = departure + timedelta(days=max(trip.trip_days - 1, 1))
+        # "3 days in Tokyo" leaving the 20th returns on the 23rd, not the 22nd: a
+        # long flight shouldn't eat one of the days.
+        return_day = departure + timedelta(days=max(trip.trip_days, 1))
     # Flexible dates move the whole trip, so the length stays the same.
     trip_length = (return_day - departure).days if return_day else None
 
@@ -529,10 +546,19 @@ def chosen_flight_text(option: dict, adults: int) -> str:
             f"Travel dates for the whole plan: leave {option['outbound_date']}"
             + (f", return {option['return_date']}." if option.get("return_date") else ".")
         )
+    arrival = option.get("arrival_time") or ""
+    if " " in arrival:
+        arrival_date, arrival_clock = arrival.split(" ", 1)
+        lines.append(
+            f"The flight lands at {option.get('arrival_airport', 'the destination')} on {arrival_date} at "
+            f"{arrival_clock}. Day 1 of the itinerary is {arrival_date} and starts after landing and "
+            f"getting to the hotel; schedule nothing before {arrival_clock} that day."
+        )
     if option["round_trip"]:
         lines.append(
             "Only the outbound flights are listed; the return flight is picked when booking, "
-            "so don't invent return flight numbers or times."
+            "so don't invent return flight numbers or times. Keep the last day light and tell "
+            "the traveller to leave 3 hours to get to the airport."
         )
     return "\n".join(lines)
 
@@ -567,12 +593,15 @@ def choose_flight(state: TravelState):
     chosen = next((option for option in options if option["number"] == choice), None)
     if chosen is None:
         report("No flight chosen")
-        return {"chosen_flight": NO_FLIGHT_CHOSEN}
+        return {"chosen_flight": NO_FLIGHT_CHOSEN, "chosen_option": {}}
 
     adults = max(state.get("trip_request", {}).get("adults") or 1, 1)
     report(f"Using option {chosen['number']}: {', '.join(chosen['airlines'])}, "
            f"{chosen['currency']} {chosen['price']:,}")
-    return {"chosen_flight": chosen_flight_text(chosen, adults)}
+    return {
+        "chosen_flight": chosen_flight_text(chosen, adults),
+        "chosen_option": {key: value for key, value in chosen.items() if key != "text"},
+    }
 
 
 def flight_section(state: TravelState) -> str:
@@ -624,6 +653,101 @@ RESULTS_PER_SEARCH = 3
 SOURCES_HEADING = "## Sources"
 
 
+# "react": the model picks its own searches with a tool; "fixed": the 4 searches above.
+GUIDE_MODE = os.getenv("GUIDE_MODE", "react").lower()
+MAX_GUIDE_SEARCHES = 5
+MAX_EXCERPTS = 12
+
+GUIDE_AGENT_PROMPT = (
+    "You decide what to look up in a travel guide before a trip plan is written. "
+    "Call search_guide 3 to 5 times, one short topic per call, covering the main sights, "
+    "food, getting around, and anything the traveller asked for (interests, budget, kids, "
+    "nightlife, day trips...). Don't repeat a topic. When you have searched enough, "
+    "reply with the single word DONE."
+)
+
+
+def keep_result(result: dict, destination: str, city_filter: str | None, seen: set) -> bool:
+    """Skips duplicates, and for places without their own guide, chunks that don't name them."""
+    key = (result["city"], result["content"][:200])
+    mentions_place = destination.lower() in result["content"].lower()
+    if key in seen or (city_filter is None and not mentions_place):
+        return False
+    seen.add(key)
+    return True
+
+
+async def fixed_guide_search(destination: str, city_filter: str | None) -> list[dict]:
+    searches = [
+        search_knowledge_base(question.format(place=destination), city=city_filter, limit=RESULTS_PER_SEARCH * 2)
+        for question, _ in GUIDE_SEARCHES
+    ]
+    chunks, seen = [], set()
+    for results in await asyncio.gather(*searches):
+        kept = [result for result in results if keep_result(result, destination, city_filter, seen)]
+        chunks += kept[:RESULTS_PER_SEARCH]
+    return chunks
+
+
+async def react_guide_search(request: str, destination: str, city_filter: str | None, write) -> tuple[list[dict], list[str]]:
+    """
+    A small ReAct agent: the model calls search_guide with topics it picks from the
+    request, sees what came back, and decides whether to search again.
+    Returns the excerpts found and the queries it used.
+    """
+    chunks, seen, queries = [], set(), []
+
+    @tool
+    async def search_guide(topic: str) -> str:
+        """Search the Wikivoyage travel guide for this trip's destination. Use a short topic, e.g. "street food markets" or "day hikes"."""
+        if len(queries) >= MAX_GUIDE_SEARCHES:
+            return "Search limit reached. Reply DONE."
+        queries.append(topic)
+        write({"node": "guide_agent", "message": f'Searching the guide for "{topic}"'})
+
+        results = await search_knowledge_base(f"{topic} in {destination}", city=city_filter, limit=RESULTS_PER_SEARCH * 2)
+        new = [result for result in results if keep_result(result, destination, city_filter, seen)][:RESULTS_PER_SEARCH]
+        chunks.extend(new)
+        if not new:
+            return "Nothing new for that topic."
+        return "\n".join(
+            f"- {result['city']}, {result['section']}: {result['content'].split(chr(10), 1)[-1][:300]}"
+            for result in new
+        )
+
+    agent = create_agent(llm, [search_guide], system_prompt=GUIDE_AGENT_PROMPT)
+    try:
+        # Each search is two steps (model, tool), plus the final answer.
+        await agent.ainvoke(
+            {"messages": [HumanMessage(content=f"Trip request: {request}\nDestination: {destination}")]},
+            config={"recursion_limit": 2 * MAX_GUIDE_SEARCHES + 3},
+        )
+    except GraphRecursionError:
+        pass  # it kept searching; keep what it found
+
+    # Leave room for the core sections top_up() adds.
+    return chunks[:MAX_EXCERPTS - len(CORE_SECTIONS)], queries
+
+
+CORE_SECTIONS = ["See", "Eat", "Get around"]
+
+
+def top_up(chunks: list[dict], extra: list[dict]) -> list[dict]:
+    """Adds extra chunks up to MAX_EXCERPTS, first ones from core sections not covered yet."""
+    keys = {(chunk["city"], chunk["content"][:200]) for chunk in chunks}
+    extra = [chunk for chunk in extra if (chunk["city"], chunk["content"][:200]) not in keys]
+    covered = {chunk["section"] for chunk in chunks}
+    missing_first = sorted(extra, key=lambda chunk: (chunk["section"] in covered or chunk["section"] not in CORE_SECTIONS))
+
+    result = list(chunks)
+    for chunk in missing_first:
+        if len(result) >= MAX_EXCERPTS:
+            break
+        result.append(chunk)
+        covered.add(chunk["section"])
+    return result
+
+
 async def guide_agent(state: TravelState):
     destination = (state.get("destination") or "").strip()
 
@@ -639,25 +763,23 @@ async def guide_agent(state: TravelState):
     else:
         report(f"{destination} has no guide of its own; searching guides that mention it")
 
-    searches = [
-        search_knowledge_base(question.format(place=destination), city=city_filter, limit=RESULTS_PER_SEARCH * 2)
-        for question, _ in GUIDE_SEARCHES
-    ]
-    result_lists = await asyncio.gather(*searches)
+    chunks = []
+    if GUIDE_MODE == "react":
+        try:
+            # The tool runs inside the agent's own graph, so hand it this node's
+            # stream writer for its status lines.
+            chunks, queries = await react_guide_search(state["user_query"], destination, city_filter, get_stream_writer())
+            print(f"Guide agent searched: {queries}")
+        except Exception as e:
+            print("Guide agent failed, using the fixed searches:", e)
+        if not chunks:
+            report("Using the standard guide searches")
 
-    chunks, seen = [], set()
-    for results in result_lists:
-        kept = 0
-        for result in results:
-            key = (result["city"], result["content"][:200])
-            mentions_place = destination.lower() in result["content"].lower()
-            if key in seen or (city_filter is None and not mentions_place):
-                continue
-            seen.add(key)
-            chunks.append(result)
-            kept += 1
-            if kept == RESULTS_PER_SEARCH:
-                break
+    # The agent follows the traveller's interests but often stops after 3 searches
+    # and can miss the basics (Bali: no food or transport). Fill the free slots from
+    # the fixed searches, sections the plan always needs first.
+    fixed = await fixed_guide_search(destination, city_filter)
+    chunks = top_up(chunks, fixed)
 
     report(f"Found {len(chunks)} guide excerpts")
 
@@ -762,6 +884,7 @@ Important:
 - Mention any search assumptions listed in the Flights section, such as assumed travel dates.
 - If the flight search failed, say so and do not invent flight prices.
 - If flights or hotels were not needed, say so briefly in that section instead of suggesting any.
+- If the Flights section says when the flight lands, start Day 1 after that time (an evening arrival gets only an evening plan) and keep the last day light for the flight home.
 - If the Flights section is a flexible-date search, build the plan on the chosen flight's travel dates and say in the Trip Summary which dates were picked and why (for example the cheapest fare in the window).
 - Do not add a sources or references section; it is added automatically.
 """
@@ -827,6 +950,104 @@ Important:
 
 
 # =========================
+# Critic and fix (reflection loop)
+# =========================
+
+# A rewrite takes minutes on a laptop, so allow one.
+MAX_FIX_ATTEMPTS = 1
+
+
+def travel_dates(state: TravelState) -> list[str]:
+    """The dates the plan must use: the chosen flight's, or exact dates from the request."""
+    option = state.get("chosen_option") or {}
+    if option.get("outbound_date"):
+        return [day for day in (option["outbound_date"], option.get("return_date")) if day]
+    trip = state.get("trip_request") or {}
+    if trip.get("flex_days") or trip.get("month"):
+        return []  # no flight picked from a flexible search: any date in the window is fine
+    return [day for day in (trip.get("departure_date"), trip.get("return_date")) if day]
+
+
+def critic(state: TravelState):
+    """
+    Checks the plan with code (app/critic.py). Mechanical problems are fixed here;
+    content problems go to fix_plan once. What still fails after that is shown in
+    a note at the end of the plan.
+    """
+    report("Checking the budget, dates and citations")
+    option = state.get("chosen_option") or {}
+    review = review_plan(
+        strip_sources(state.get("final_plan", "")),
+        guide_context=state.get("guide_context", ""),
+        flight_price=option.get("price"),
+        travel_dates=travel_dates(state),
+        arrival_time=option.get("arrival_time"),
+    )
+
+    plan = review.plan
+    attempts = state.get("fix_attempts", 0)
+    problems = review.problems
+
+    if review.fixes:
+        report("Fixed: " + "; ".join(review.fixes))
+    if problems and attempts < MAX_FIX_ATTEMPTS:
+        report(f"Found {len(problems)} problem{'s' if len(problems) > 1 else ''} to rewrite: " + " ".join(problems))
+    elif problems:
+        plan += ("\n\n> **Automatic check:** " + " ".join(problems) +
+                 " A rewrite didn't fix this, so please double-check these parts.")
+        report("Some problems remain; added a note to the plan")
+        problems = []
+    elif not review.fixes:
+        report("No problems found")
+
+    return {
+        "final_plan": plan + format_sources(plan, state.get("guide_sources", [])),
+        "critic_problems": problems,
+    }
+
+
+def route_after_critic(state: TravelState):
+    return "fix_plan" if state.get("critic_problems") else END
+
+
+async def fix_plan(state: TravelState):
+    problems = "\n".join(f"- {problem}" for problem in state["critic_problems"])
+    fix_prompt = f"""
+Rewrite this travel plan to fix the problems listed. Keep everything else the same.
+
+Problems found by an automatic check:
+{problems}
+
+Current plan:
+{strip_sources(state['final_plan'])}
+
+Flights (real search results):
+{flight_section(state)}
+
+Important:
+- Keep the same six sections: Trip Summary, Flight Information, Hotel Suggestions,
+  Day-by-Day Itinerary, Estimated Budget, Final Recommendations.
+- Keep existing citation numbers like [2] next to the same facts. Don't add new ones.
+- Do not add a sources or references section; it is added automatically.
+- Return the full plan, not just the changes.
+"""
+
+    report("Rewriting the plan")
+    response = await llm.ainvoke([
+        SystemMessage(content="You are a careful editor of travel plans."),
+        HumanMessage(content=fix_prompt)
+    ])
+
+    plan = strip_sources(response.content)
+
+    return {
+        "final_plan": plan + format_sources(plan, state.get("guide_sources", [])),
+        "fix_attempts": state.get("fix_attempts", 0) + 1,
+        "messages": [response],
+    }
+
+
+# =========================
 # Build Graph
 # =========================
 
@@ -840,6 +1061,8 @@ graph.add_node("guide_agent", guide_agent)
 graph.add_node("choose_flight", choose_flight)
 graph.add_node("final_agent", final_agent)
 graph.add_node("revise_agent", revise_agent)
+graph.add_node("critic", critic)
+graph.add_node("fix_plan", fix_plan)
 
 graph.add_edge(START, "router_agent")
 graph.add_conditional_edges("router_agent", route_after_router, ["plan_trip", "revise_agent"])
@@ -851,8 +1074,11 @@ graph.add_edge("flight_agent", "choose_flight")
 graph.add_edge("hotel_agent", "choose_flight")
 graph.add_edge("guide_agent", "choose_flight")
 graph.add_edge("choose_flight", "final_agent")
-graph.add_edge("final_agent", END)
-graph.add_edge("revise_agent", END)
+# Reflection: every plan is checked; a failed check gets one rewrite, then is checked again.
+graph.add_edge("final_agent", "critic")
+graph.add_edge("revise_agent", "critic")
+graph.add_conditional_edges("critic", route_after_critic, ["fix_plan", END])
+graph.add_edge("fix_plan", "critic")
 
 
 # =========================
@@ -912,6 +1138,8 @@ def run_input(user_input: str, dates: dict | None = None) -> dict:
         ],
         "latest_input": user_input,
         "date_overrides": dates or {},
+        "fix_attempts": 0,
+        "critic_problems": [],
     }
 
 
@@ -948,16 +1176,18 @@ STEP_LABELS = {
     "choose_flight": "Choosing your flight",
     "final_agent": "Writing your plan",
     "revise_agent": "Revising your plan",
+    "critic": "Checking the plan",
+    "fix_plan": "Fixing problems",
 }
 
 ROUTE_STEPS = {
-    "plan": ["plan_trip", "flight_agent", "hotel_agent", "guide_agent", "choose_flight", "final_agent"],
-    "new_search": ["plan_trip", "flight_agent", "hotel_agent", "guide_agent", "choose_flight", "final_agent"],
-    "revise": ["revise_agent"],
+    "plan": ["plan_trip", "flight_agent", "hotel_agent", "guide_agent", "choose_flight", "final_agent", "critic"],
+    "new_search": ["plan_trip", "flight_agent", "hotel_agent", "guide_agent", "choose_flight", "final_agent", "critic"],
+    "revise": ["revise_agent", "critic"],
 }
 
 # Only these nodes' tokens are shown live; the router and trip parser return JSON.
-WRITING_NODES = {"final_agent", "revise_agent"}
+WRITING_NODES = {"final_agent", "revise_agent", "fix_plan"}
 
 
 def step_list(nodes: list[str]) -> list[dict]:
@@ -995,6 +1225,7 @@ async def stream_travel_agent(
       status - a status line from a node, e.g. "Found 5 options from AUD 1,354"
       token  - a piece of the plan as the model writes it
       choose - the run paused for the user to pick a flight
+      rewrite - the critic sent the plan back; the text written so far will be replaced
       done   - the finished plan
     Pass user_input to start a run, or flight_choice (an option number, 0 to skip
     flights) to resume a paused one. An exception from the graph is raised to the caller.
@@ -1007,10 +1238,11 @@ async def stream_travel_agent(
 
     if flight_choice is not None:
         graph_input = Command(resume=flight_choice)
-        yield {"type": "steps", "steps": step_list(["choose_flight", "final_agent"])}
+        shown_steps = ["choose_flight", "final_agent", "critic"]
     else:
         graph_input = run_input(user_input, dates)
-        yield {"type": "steps", "steps": step_list(["router_agent"])}
+        shown_steps = ["router_agent"]
+    yield {"type": "steps", "steps": step_list(shown_steps)}
 
     # choose_flight still runs (and passes straight through) when flights were
     # skipped; keep it shown as skipped.
@@ -1026,6 +1258,13 @@ async def stream_travel_agent(
             if node not in STEP_LABELS or node in skipped_nodes:
                 continue
             if "result" not in chunk:
+                if node == "fix_plan" and node not in shown_steps:
+                    # Only shown when the critic asks for a rewrite.
+                    shown_steps.append(node)
+                    yield {"type": "steps", "steps": step_list(shown_steps)}
+                if node == "fix_plan":
+                    # The rewrite replaces the text written so far.
+                    yield {"type": "rewrite"}
                 yield {"type": "step", "node": node, "status": "running"}
             elif chunk.get("interrupts"):
                 yield {"type": "step", "node": node, "status": "paused"}
@@ -1035,7 +1274,8 @@ async def stream_travel_agent(
                 yield {"type": "step", "node": node, "status": "done"}
                 if node == "router_agent":
                     route = chunk["result"].get("route", "plan")
-                    yield {"type": "steps", "steps": step_list(["router_agent", *ROUTE_STEPS[route]])}
+                    shown_steps = ["router_agent", *ROUTE_STEPS[route]]
+                    yield {"type": "steps", "steps": step_list(shown_steps)}
                 if node == "plan_trip":
                     for skipped, reason in skipped_steps(chunk["result"].get("trip_request", {})):
                         skipped_nodes.add(skipped)

@@ -415,8 +415,8 @@ async function deleteTrip(threadId) {
 
 const NEW_TRIP_TEXT = {
   title: "Where do you want to go?",
-  hint: "Example: Plan a 3 day trip from Melbourne to Tokyo leaving 20 November.",
-  placeholder: "Where from, where to, when, and for how long...",
+  hint: "Pick your dates first, then tell the planner where from, where to, and anything else.",
+  placeholder: "Example: From Melbourne to Tokyo, mid-range hotels, lots of food...",
   button: "Generate plan",
 };
 
@@ -442,6 +442,7 @@ function setMode(hasPlan) {
   document.getElementById("btnText").textContent = text.button;
   // Dates are for new trips; feedback like "go a week later" changes them on a plan.
   document.getElementById("datesBox").classList.toggle("hidden", hasPlan);
+  updateTextLock();
 }
 
 // Takes the running plan off screen; it keeps going in the background.
@@ -919,43 +920,64 @@ function setDateLimits() {
 }
 
 function clearDates() {
-  ["departDate", "returnDate", "tripDays"].forEach((id) => (document.getElementById(id).value = ""));
+  ["departDate", "returnDate"].forEach((id) => (document.getElementById(id).value = ""));
   document.getElementById("flexibility").value = "exact";
+  updateTextLock();
 }
 
-// The dates from the form, or null if none were set. Throws with a message the
-// user can act on; the server checks the same rules.
+// A new trip can't be described until both dates are set. Feedback on a plan
+// has no dates, so its box is always open.
+function updateTextLock() {
+  const box = document.getElementById("userInput");
+  const hasPlan = document.getElementById("datesBox").classList.contains("hidden");
+  const datesSet =
+    document.getElementById("departDate").value && document.getElementById("returnDate").value;
+
+  box.disabled = !hasPlan && !datesSet;
+  if (box.disabled) {
+    box.placeholder = "Pick your start and end date first";
+  } else {
+    box.placeholder = (hasPlan ? FEEDBACK_TEXT : NEW_TRIP_TEXT).placeholder;
+  }
+}
+
+// The end date can't be on or before the start date.
+function onDateChange() {
+  const start = document.getElementById("departDate").value;
+  const end = document.getElementById("returnDate");
+
+  if (start) {
+    const next = new Date(`${start}T00:00:00`);
+    next.setDate(next.getDate() + 1);
+    end.min = isoDay(next);
+  }
+  updateTextLock();
+}
+
+// The dates from the form. Throws with a message the user can act on; the
+// server checks the same rules.
 function readDates() {
   const departure = document.getElementById("departDate").value;
   const returnDate = document.getElementById("returnDate").value;
-  const tripDays = document.getElementById("tripDays").value;
-  const flexibility = document.getElementById("flexibility").value;
 
-  if (!departure && !returnDate && !tripDays && flexibility === "exact") {
-    return null;
+  if (!departure || !returnDate) {
+    throw new Error("Pick a start date and an end date.");
   }
 
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
 
-  if (!departure) {
-    throw new Error("Pick a departure date.");
-  }
   if (departure < isoDay(tomorrow)) {
-    throw new Error("The departure date must be after today.");
+    throw new Error("The start date must be after today.");
   }
-  if (returnDate && returnDate <= departure) {
-    throw new Error("The return date must be after the departure date.");
-  }
-  if (tripDays && !(Number.isInteger(Number(tripDays)) && tripDays >= 1 && tripDays <= 60)) {
-    throw new Error("The trip length must be 1 to 60 days.");
+  if (returnDate <= departure) {
+    throw new Error("The end date must be after the start date.");
   }
 
   return {
     departure_date: departure,
-    return_date: returnDate || null,
-    trip_days: tripDays ? Number(tripDays) : null,
-    flexibility: flexibility,
+    return_date: returnDate,
+    flexibility: document.getElementById("flexibility").value,
   };
 }
 
@@ -972,13 +994,10 @@ async function sendMessage() {
 
   const body = { message: message, thread_id: currentThreadId };
 
-  // Dates only apply to a new trip (the form is hidden for feedback).
-  if (!currentThreadId) {
+  // Dates are required whenever the form shows them (a trip without a plan yet).
+  if (!document.getElementById("datesBox").classList.contains("hidden")) {
     try {
-      const dates = readDates();
-      if (dates) {
-        body.dates = dates;
-      }
+      body.dates = readDates();
     } catch (error) {
       showError(error.message);
       return;
@@ -1078,6 +1097,11 @@ async function runPlan(body, onAccepted = () => {}) {
           }
           run.liveText += event.text;
           scheduleLiveRender();
+          break;
+        case "rewrite":
+          // The critic sent the plan back. The old text stays on screen until
+          // the rewrite's first words arrive and replace it.
+          run.liveText = "";
           break;
         case "choose":
           // The run is paused and saved; it continues when a flight is picked.
@@ -1229,6 +1253,9 @@ document.addEventListener("keydown", function (event) {
 });
 
 setDateLimits();
+["departDate", "returnDate"].forEach((id) =>
+  document.getElementById(id).addEventListener("input", onDateChange),
+);
 
 if (authToken) {
   showApp();
