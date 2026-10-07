@@ -38,7 +38,8 @@ from app.tools.flight_tool import resolve_location_to_iata, parse_route, DEFAULT
 from app.tools.google_flights_tool import search_google_flights_with_options
 from app.db import get_pool
 from app.knowledge_base import search_knowledge_base, city_in_knowledge_base
-from app.critic import review_plan
+from app.critic import review_plan, section_lines
+from app.map_agent import build_trip_map
 
 
 # =========================
@@ -114,6 +115,7 @@ class TravelState(TypedDict):
     final_plan: str
     critic_problems: list[str]   # problems the critic wants an LLM rewrite for
     fix_attempts: int            # rewrites so far in this run (at most MAX_FIX_ATTEMPTS)
+    map_data: dict               # the itinerary's places and travel times, for the web map
 
 
 # =========================
@@ -124,7 +126,8 @@ class FeedbackDecision(BaseModel):
     action: Literal["revise", "new_search"] = Field(
         description=(
             "'new_search' if the feedback changes the destination, origin, travel dates, "
-            "number of travellers, or asks for different flights or hotels. "
+            "number of travellers, asks for different flights or hotels, or says flights "
+            "or hotels aren't needed (e.g. going by train instead). "
             "'revise' if the plan can be edited without new search results."
         )
     )
@@ -153,6 +156,8 @@ def router_agent(state: TravelState):
                 '{"action": "new_search", "updated_request": "5 days in Tokyo from Melbourne"}\n'
                 'Example: request "3 days in Tokyo from Melbourne leaving 2026-11-20", feedback "go a week later, my dates are flexible" -> '
                 '{"action": "new_search", "updated_request": "3 days in Tokyo from Melbourne leaving 2026-11-27, dates flexible by a few days"}\n'
+                'Example: request "3 days in Tokyo from Kyoto", feedback "flight is not needed, go with train" -> '
+                '{"action": "new_search", "updated_request": "3 days in Tokyo from Kyoto, travelling by train, no flights needed"}\n'
                 'Example: request "3 days in Tokyo from Melbourne", feedback "add more food spots on day 2" -> '
                 '{"action": "revise", "updated_request": "3 days in Tokyo from Melbourne, with more food spots on day 2"}'
             )),
@@ -250,7 +255,8 @@ def extract_trip_request(query: str) -> TripRequest:
 # The small model sometimes skips a search the user never mentioned, so a skip
 # only counts when the request says something related.
 NO_FLIGHT_HINTS = re.compile(
-    r"\b(driv\w*|road ?trip|by (car|train|bus|ferry)|take the (train|bus)"
+    r"\b(driv\w*|road ?trip|cars?|trains?|rail\w*|shinkansen|bus|buses|coach|ferry|ferries"
+    r"|no flights?|not flying|flights? (is |are )?not needed"
     r"|already (have|booked) (my |our )?(flights?|tickets?)|flights? (are |is )?(already )?booked)\b",
     re.I,
 )
@@ -758,6 +764,12 @@ async def guide_agent(state: TravelState):
     # a region) search every city and keep chunks that mention the place by name,
     # which finds Ubud and Kuta for Bali.
     city_filter = destination if await city_in_knowledge_base(destination) else None
+    if not city_filter and "," in destination:
+        # "Shibuya, Tokyo": no guide for the neighbourhood, so use the city's guide.
+        for part in reversed([part.strip() for part in destination.split(",") if part.strip()]):
+            if await city_in_knowledge_base(part):
+                city_filter = destination = part
+                break
     if city_filter:
         report(f"Searching the Wikivoyage guide for {destination}")
     else:
@@ -1007,7 +1019,48 @@ def critic(state: TravelState):
 
 
 def route_after_critic(state: TravelState):
-    return "fix_plan" if state.get("critic_problems") else END
+    return "fix_plan" if state.get("critic_problems") else "map_agent"
+
+
+# =========================
+# Map Agent (MCP client: the Mapbox MCP server)
+# =========================
+
+GETTING_AROUND = re.compile(r"\n## Getting around\b.*?(?=\n## |\Z)", re.S)
+
+
+async def map_agent(state: TravelState):
+    """
+    Runs last, after the critic, so a rewrite can't drop its section. Places each
+    day's stops on a map through the Mapbox MCP server and adds travel times.
+    The plan is finished without a map if Mapbox isn't available.
+    """
+    plan = strip_sources(state.get("final_plan", ""))
+    start, end = section_lines(plan, ["itinerary", "day-by-day", "day by day"])
+    itinerary = "\n".join(plan.splitlines()[start:end])
+    destination = state.get("destination") or ""
+
+    if not itinerary.strip() or not destination:
+        return {"map_data": {}}
+
+    try:
+        trip_map = await build_trip_map(llm, itinerary, destination, report=report)
+    except Exception as e:
+        print("Map agent failed:", repr(e))
+        report("The map isn't available right now")
+        return {"map_data": {}}
+
+    for note in trip_map.notes:
+        report(note)
+    if not trip_map.section:
+        return {"map_data": trip_map.data or {}}
+
+    # A revision already has a Getting around section; replace it.
+    plan = GETTING_AROUND.sub("", plan).rstrip() + "\n\n" + trip_map.section
+    return {
+        "final_plan": plan + format_sources(plan, state.get("guide_sources", [])),
+        "map_data": trip_map.data,
+    }
 
 
 async def fix_plan(state: TravelState):
@@ -1063,6 +1116,7 @@ graph.add_node("final_agent", final_agent)
 graph.add_node("revise_agent", revise_agent)
 graph.add_node("critic", critic)
 graph.add_node("fix_plan", fix_plan)
+graph.add_node("map_agent", map_agent)
 
 graph.add_edge(START, "router_agent")
 graph.add_conditional_edges("router_agent", route_after_router, ["plan_trip", "revise_agent"])
@@ -1077,8 +1131,9 @@ graph.add_edge("choose_flight", "final_agent")
 # Reflection: every plan is checked; a failed check gets one rewrite, then is checked again.
 graph.add_edge("final_agent", "critic")
 graph.add_edge("revise_agent", "critic")
-graph.add_conditional_edges("critic", route_after_critic, ["fix_plan", END])
+graph.add_conditional_edges("critic", route_after_critic, ["fix_plan", "map_agent"])
 graph.add_edge("fix_plan", "critic")
+graph.add_edge("map_agent", END)
 
 
 # =========================
@@ -1178,12 +1233,13 @@ STEP_LABELS = {
     "revise_agent": "Revising your plan",
     "critic": "Checking the plan",
     "fix_plan": "Fixing problems",
+    "map_agent": "Mapping the itinerary",
 }
 
 ROUTE_STEPS = {
-    "plan": ["plan_trip", "flight_agent", "hotel_agent", "guide_agent", "choose_flight", "final_agent", "critic"],
-    "new_search": ["plan_trip", "flight_agent", "hotel_agent", "guide_agent", "choose_flight", "final_agent", "critic"],
-    "revise": ["revise_agent", "critic"],
+    "plan": ["plan_trip", "flight_agent", "hotel_agent", "guide_agent", "choose_flight", "final_agent", "critic", "map_agent"],
+    "new_search": ["plan_trip", "flight_agent", "hotel_agent", "guide_agent", "choose_flight", "final_agent", "critic", "map_agent"],
+    "revise": ["revise_agent", "critic", "map_agent"],
 }
 
 # Only these nodes' tokens are shown live; the router and trip parser return JSON.
@@ -1238,7 +1294,7 @@ async def stream_travel_agent(
 
     if flight_choice is not None:
         graph_input = Command(resume=flight_choice)
-        shown_steps = ["choose_flight", "final_agent", "critic"]
+        shown_steps = ["choose_flight", "final_agent", "critic", "map_agent"]
     else:
         graph_input = run_input(user_input, dates)
         shown_steps = ["router_agent"]
@@ -1259,8 +1315,8 @@ async def stream_travel_agent(
                 continue
             if "result" not in chunk:
                 if node == "fix_plan" and node not in shown_steps:
-                    # Only shown when the critic asks for a rewrite.
-                    shown_steps.append(node)
+                    # Only shown when the critic asks for a rewrite, before the map step.
+                    shown_steps.insert(shown_steps.index("map_agent") if "map_agent" in shown_steps else len(shown_steps), node)
                     yield {"type": "steps", "steps": step_list(shown_steps)}
                 if node == "fix_plan":
                     # The rewrite replaces the text written so far.
@@ -1302,6 +1358,7 @@ async def stream_travel_agent(
         "thread_id": thread_id,
         "answer": snapshot.values.get("final_plan", ""),
         "route": snapshot.values.get("route", ""),
+        "map": snapshot.values.get("map_data") or None,
         "llm_calls": llm_counter.count,
     }
 
@@ -1316,6 +1373,7 @@ async def get_trip_plan(thread_id: str) -> dict:
     return {
         "answer": snapshot.values.get("final_plan", ""),
         "flight_options": choice["options"] if choice else None,
+        "map": snapshot.values.get("map_data") or None,
     }
 
 

@@ -474,6 +474,7 @@ function openTrip(threadId) {
 function newTrip() {
   leaveRunScreen();
   hideFlightChoice();
+  hideTripMap();
   currentThreadId = null;
   latestAnswerMarkdown = "";
   localStorage.removeItem("travel_thread_id");
@@ -517,7 +518,7 @@ async function showSavedPlanOnly(threadId) {
     const response = await apiFetch(`/api/travel/${encodeURIComponent(threadId)}`);
     const data = await response.json();
     if (response.ok && data.answer && currentThreadId === threadId && !activeRun?.liveText) {
-      showResult(data.answer, threadId, undefined, false);
+      showResult(data.answer, threadId, undefined, false, data.map);
     }
   } catch (error) {
     // Not critical: the plan appears once the model starts writing.
@@ -550,7 +551,7 @@ async function restorePlan() {
       }
 
       if (data.answer) {
-        showResult(data.answer, threadId);
+        showResult(data.answer, threadId, undefined, true, data.map);
       } else {
         document.getElementById("resultSection").classList.add("hidden");
       }
@@ -580,8 +581,9 @@ function renderMarkdown(element, markdown) {
   }
 }
 
-function showResult(answer, threadId, route, scroll = true) {
+function showResult(answer, threadId, route, scroll = true, mapData = null) {
   latestAnswerMarkdown = answer;
+  renderTripMap(mapData);
 
   const resultSection = document.getElementById("resultSection");
   renderMarkdown(document.getElementById("resultBox"), answer);
@@ -594,6 +596,86 @@ function showResult(answer, threadId, route, scroll = true) {
   if (scroll) {
     resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
   }
+}
+
+// =========================
+// Map of the itinerary
+// =========================
+
+// Muted colours that sit on the cream page; one per day.
+const DAY_COLOURS = ["#1f4d4c", "#9a3b2d", "#7a5c18", "#4a5d8a", "#6b4e71", "#3f6f45", "#8a5a3c"];
+
+let tripMap = null;
+let tripMapLayer = null;
+
+function hideTripMap() {
+  document.getElementById("tripMapBox").classList.add("hidden");
+}
+
+// Draws each day's stops as numbered pins joined in visiting order. Text goes in
+// with textContent (Leaflet treats strings as HTML), so place names can't inject HTML.
+function renderTripMap(mapData) {
+  const days = (mapData?.days || []).filter((day) => day.stops.length);
+  if (!days.length || typeof L === "undefined") {
+    hideTripMap();
+    return;
+  }
+
+  const box = document.getElementById("tripMapBox");
+  box.classList.remove("hidden");
+
+  if (!tripMap) {
+    tripMap = L.map("tripMap", { scrollWheelZoom: false });
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: "© OpenStreetMap contributors · places from Mapbox",
+    }).addTo(tripMap);
+  }
+  if (tripMapLayer) {
+    tripMapLayer.remove();
+  }
+  tripMapLayer = L.layerGroup().addTo(tripMap);
+
+  const legend = document.getElementById("mapLegend");
+  legend.replaceChildren();
+  const points = [];
+
+  days.forEach((day, index) => {
+    const colour = DAY_COLOURS[index % DAY_COLOURS.length];
+    const line = day.stops.map((stop) => [stop.lat, stop.lon]);
+    points.push(...line);
+
+    if (line.length > 1) {
+      L.polyline(line, { color: colour, weight: 3, opacity: 0.7, dashArray: "6 6" }).addTo(tripMapLayer);
+    }
+
+    day.stops.forEach((stop, number) => {
+      const pin = document.createElement("span");
+      pin.className = "map-pin";
+      pin.style.background = colour;
+      pin.textContent = number + 1;
+
+      const label = document.createElement("span");
+      label.textContent = `Day ${day.day} · ${number + 1}. ${stop.name}`;
+
+      L.marker([stop.lat, stop.lon], {
+        icon: L.divIcon({ html: pin, className: "", iconSize: [22, 22] }),
+        title: label.textContent,
+      })
+        .bindTooltip(label)
+        .addTo(tripMapLayer);
+    });
+
+    const key = document.createElement("span");
+    const swatch = document.createElement("i");
+    swatch.style.background = colour;
+    key.append(swatch, `Day ${day.day}`);
+    legend.append(key);
+  });
+
+  // The box was hidden, so Leaflet has to measure it again before fitting.
+  tripMap.invalidateSize();
+  tripMap.fitBounds(points, { padding: [30, 30], maxZoom: 15 });
 }
 
 // =========================
@@ -737,6 +819,7 @@ function renderLivePlan(markdown) {
 
   renderMarkdown(document.getElementById("resultBox"), markdown);
   document.getElementById("threadInfo").textContent = "Writing...";
+  hideTripMap(); // the old map belongs to the old plan
   resultSection.classList.remove("hidden");
 
   if (firstRender) {
@@ -1123,7 +1206,7 @@ async function runPlan(body, onAccepted = () => {}) {
 
           if (run.onScreen) {
             localStorage.setItem("travel_thread_id", event.thread_id);
-            showResult(event.answer, event.thread_id, event.route, false);
+            showResult(event.answer, event.thread_id, event.route, false, event.map);
             onAccepted();
             setMode(true);
           } else {

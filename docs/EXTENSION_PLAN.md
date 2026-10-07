@@ -179,9 +179,26 @@ Arrival day (the "3 days" fix):
 Known issues: the critic can't check things it has no data for, e.g. the plan converted ¥10,000–15,000 a night into AUD 1,200–1,800 a night (should be about AUD 100–150). The ReAct guide makes the flight cards appear 10–40 s later, because the choice waits for all searches.
 ## Phase 4 — MCP in both directions
 
-- [ ] **MCP server:** expose `search_flights`, `search_hotels`, `query_travel_kb` and `get_my_trips`
-- [ ] Demo the server working inside Claude Desktop or Cursor (record a GIF for the README)
-- [ ] **MCP client:** the graph uses external MCP servers (weather, maps) through `langchain-mcp-adapters`
+- [x] **MCP server** (`backend/app/mcp_server.py`, official Python SDK `FastMCP`, stdio): `search_flights`, `search_hotels`, `search_travel_guide`, `list_my_trips`, `get_trip_plan`. The tools reuse the app's code (SerpApi, Tavily, the hybrid knowledge-base search, the trips table)
+  - Login for trip tools: `python -m scripts.mcp_token --email ...` makes a 90-day JWT, passed as `ROAMER_TOKEN`; the trip tools only see that account
+  - Starts from any folder (Claude Desktop starts it with an absolute path), never prints to stdout (the MCP channel)
+  - Tested with the official MCP client over stdio: all 5 tools listed and called; a past date and a missing token give clear tool errors; another account's trip id returns "No trip with that id"
+- [x] Demo inside Claude Desktop and record a GIF for the README (config snippet in the README; needs your Claude Desktop)
+- [x] **MCP client**: the `map_agent` node (runs last, after the critic) starts the official Mapbox MCP server (`npx @mapbox/mcp-server@0.14.0`) through `langchain-mcp-adapters` and keeps one session for the run
+  - An LLM call lists each day's places with their local-language names; Mapbox's `search_and_geocode_tool` finds them near the destination; `matrix_tool` gives walking (under 2 km) or driving times between a day's stops
+  - The plan gets a "Getting around" section; the page shows a Leaflet map (OpenStreetMap tiles) with numbered pins per day, saved with the trip
+  - If Mapbox fails or there's no token, the plan is finished without a map
+  - Swapped from the planned weather server to maps at the user's request
+
+Measured and fixed while building the map:
+
+- Mapbox's English place search barely works for Japan ("Tokyo Tower" → the centre of Tokyo Prefecture, "Meiji Jingu" → a street 315 km away) but is fine for Paris and Sydney (9 of 9 landmarks). Searching the Japanese name with `language: ja` finds them (浅草寺, 明治神宮, 東京タワー within ~100 m), so the LLM also returns each place's local name
+- A plain "Tokyo" search returned a restaurant called Tokyo in Melbourne (results lean towards the server's location), which put every real place "too far away"; the destination is now looked up as a place, region or country only
+- Wrong matches with the same name (Bali: a "Tegallalang" 30 km from the rice terraces, a "Ketut Warung" on the mainland for an island day) are dropped when a stop is more than 20 km from the rest of its day; legs over 2 hours are shown as "far apart, check this" and not added to the day's travel time
+- Results: saved Tokyo plan 5 of 8 places (misses: Hakone, outside Tokyo; a generic "onsen"; a wrong Japanese name from the model), Bali 13–14 of 15–16; browser run (Tokyo) 6 of 6, map restored when the trip is reopened. The map step adds about 40–75 s, mostly the place-listing LLM call
+- Mapbox has no public-transport routing, so travel times are walking or driving and the plan says so
+
+Deploy: the Dockerfile now copies Node 22 from `node:22-slim` and installs the Mapbox server at build time. Not built yet (Docker wasn't running locally).
 
 Why it matters: building both sides shows you understand the protocol, not just one SDK.
 

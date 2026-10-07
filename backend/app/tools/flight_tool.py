@@ -280,7 +280,9 @@ def resolve_location_to_iata(location: str):
         if location_clean in name:
             score += 50
 
-        if "international" in name:
+        # Only a tie-breaker between real matches; on its own it matched every
+        # international airport, so unknown places like "Shibuya" became ZZE.
+        if score > 0 and "international" in name:
             score += 10
 
         if score > 0:
@@ -289,6 +291,14 @@ def resolve_location_to_iata(location: str):
     if city_matches:
         city_matches.sort(reverse=True)
         return city_matches[0][1]
+
+    # "Shibuya, Tokyo": a neighbourhood has no airport, so try the city part.
+    parts = [part for part in raw_location.split(",") if part.strip()]
+    if len(parts) > 1:
+        for part in reversed(parts):
+            code = resolve_location_to_iata(part)
+            if code:
+                return code
 
     return None
 

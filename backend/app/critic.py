@@ -51,8 +51,27 @@ PROMPT_MARKERS = [
 MAX_PLAN_CHARS = 20000
 
 
+SECTION_WORDS = [word for words in REQUIRED_SECTIONS.values() for word in words]
+# A heading the model wrote without "#": "**2. Flight Information**" or "Flight Information:".
+BARE_HEADING = re.compile(r"^(\*\*)?\s*(\d+[.)]\s*)?([A-Za-z][A-Za-z -]{2,40}?)\s*:?\s*(\*\*)?\s*:?$")
+
+
+def heading(line: str) -> tuple[int, str] | None:
+    """(depth, lowercase text) if the line is a heading, else None."""
+    if line.startswith("#"):
+        return len(line) - len(line.lstrip("#")), line.lstrip("#").strip().lower()
+    match = BARE_HEADING.match(line.strip())
+    if not match:
+        return None
+    text = match.group(3).strip().lower()
+    if any(word in text for word in SECTION_WORDS):
+        return 2, text
+    # Other bold lines ("**Day 1**") are sub-headings inside a section.
+    return (3, text) if match.group(1) else None
+
+
 def headings(plan: str) -> list[str]:
-    return [line.lstrip("#").strip().lower() for line in plan.splitlines() if line.startswith("#")]
+    return [found[1] for found in map(heading, plan.splitlines()) if found]
 
 
 def missing_sections(plan: str) -> list[str]:
@@ -90,13 +109,13 @@ def section_lines(plan: str, words: list[str]) -> tuple[int, int]:
     lines = plan.splitlines()
     start, level = None, 0
     for index, line in enumerate(lines):
-        if line.startswith("#"):
-            depth = len(line) - len(line.lstrip("#"))
+        found = heading(line)
+        if found:
+            depth, text = found
             # A sub-heading ("### Day 1" under "## 4. Itinerary") stays in the section.
             if start is not None and depth <= level:
                 return start, index
-            heading = line.lstrip("#").strip().lower()
-            if start is None and any(word in heading for word in words):
+            if start is None and any(word in text for word in words):
                 start, level = index + 1, depth
     return (start, len(lines)) if start is not None else (0, 0)
 

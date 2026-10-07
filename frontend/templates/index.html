@@ -12,6 +12,10 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
+    />
     <link rel="stylesheet" href="/static/style.css" />
   </head>
 
@@ -171,6 +175,14 @@
             <h1 class="pdf-title">Travel Plan</h1>
             <div id="resultBox" class="result-box"></div>
           </div>
+
+          <!-- Each day's stops from the Mapbox MCP server (filled by script.js) -->
+          <div id="tripMapBox" class="trip-map-box hidden">
+            <h3>Map</h3>
+            <div id="tripMap" class="trip-map" role="img" aria-label="Map of the itinerary's stops by day"></div>
+            <div id="mapLegend" class="map-legend"></div>
+            <p class="muted map-note">Lines show the order of each day's stops, not the route.</p>
+          </div>
         </section>
       </main>
     </div>
@@ -207,6 +219,9 @@
 
     <!-- PDF Download Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <!-- Map of the itinerary -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 
     <script src="/static/script.js"></script>
   </body>

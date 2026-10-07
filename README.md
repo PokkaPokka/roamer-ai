@@ -91,6 +91,7 @@ OLLAMA_NUM_CTX=16384   # context window; guide excerpts need about 8K tokens
 OLLAMA_NUM_PREDICT=3000 # max tokens per response; stops a runaway answer
 FLEX_MAX_SEARCHES=7       # max Google Flights searches for one flexible-date trip
 GUIDE_MODE=react          # "react": the guide agent picks its own searches; "fixed": 4 set searches
+MAPBOX_ACCESS_TOKEN=pk... # Mapbox public token for the itinerary map (optional; the plan works without it)
 ```
 
 For local development, install [Ollama](https://ollama.com), then run `ollama pull qwen3:8b` and `ollama pull bge-m3` (the embedding model for the travel guide search).
@@ -162,6 +163,32 @@ curl -X POST http://127.0.0.1:8000/api/travel \
   -d '{"message":"Plan a 3-day trip to Tokyo from Melbourne leaving 2026-11-20"}'
 ```
 
+## MCP: Roamer in Claude Desktop, and Mapbox in Roamer
+
+Roamer speaks the Model Context Protocol in both directions.
+
+**As a server**, `backend/app/mcp_server.py` gives any MCP client these tools: `search_flights` (Google Flights fares), `search_hotels`, `search_travel_guide` (the Wikivoyage knowledge base, with source links), `list_my_trips` and `get_trip_plan`. To use it in Claude Desktop:
+
+1. Make a token for your Roamer account (trip tools only see that account's trips), from the `backend` folder:
+   `python -m scripts.mcp_token --email you@example.com` (valid 90 days; treat it like a password)
+2. Add Roamer to `~/Library/Application Support/Claude/claude_desktop_config.json` with absolute paths:
+
+```json
+{
+  "mcpServers": {
+    "roamer": {
+      "command": "/path/to/repo/.venv/bin/python",
+      "args": ["/path/to/repo/backend/app/mcp_server.py"],
+      "env": { "ROAMER_TOKEN": "<token from step 1>" }
+    }
+  }
+}
+```
+
+3. Restart Claude Desktop and ask, e.g. "Find flights from Melbourne to Tokyo for 20–23 November and what the guide says about Asakusa". Ollama must be running for the guide search (it embeds the question).
+
+**As a client**, the map agent starts the official [Mapbox MCP server](https://docs.mapbox.com/api/guides/mcp-server) (`npx @mapbox/mcp-server`, needs Node 22+ and `MAPBOX_ACCESS_TOKEN`) through `langchain-mcp-adapters`, geocodes each day's places and gets travel times between them. The plan gets a "Getting around" section and the web page shows a map of each day's stops.
+
 ## How the Workflow Works
 
 1. The user submits a travel request (or feedback on an existing plan, which the router sends to a revise step or a new search).
@@ -170,7 +197,8 @@ curl -X POST http://127.0.0.1:8000/api/travel \
 4. The graph pauses (LangGraph `interrupt()`) so the user can pick a flight; the paused state is saved in Postgres.
 5. The final agent writes the plan around the chosen flight in one LLM call and cites the excerpts it used, like `[2]`.
 6. A critic checks the plan with code: it fixes the budget total, the flight cost and mismatched citations itself, and sends missing sections or wrong dates back for one rewrite.
-7. The code appends a Sources list with links for the cited excerpts.
+7. The map agent puts each day's stops on a map through the Mapbox MCP server and adds travel times.
+8. The code appends a Sources list with links for the cited excerpts.
 
 Run the critic's tests from the `backend` folder: `python -m unittest tests.test_critic`.
 

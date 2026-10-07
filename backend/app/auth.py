@@ -33,12 +33,12 @@ bearer_scheme = HTTPBearer(auto_error=False)
 # Tokens
 # =========================
 
-def create_access_token(user_id: int) -> str:
+def create_access_token(user_id: int, lifetime: timedelta = TOKEN_LIFETIME) -> str:
     now = datetime.now(timezone.utc)
     payload = {
         "sub": str(user_id),
         "iat": now,
-        "exp": now + TOKEN_LIFETIME,
+        "exp": now + lifetime,
     }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
