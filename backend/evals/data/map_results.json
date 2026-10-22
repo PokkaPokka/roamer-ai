@@ -1,0 +1,322 @@
+{
+  "summary": {
+    "plain": {
+      "placed": 21,
+      "total": 40,
+      "not_found": 0,
+      "median_km": 0.28,
+      "by_city": {
+        "Tokyo": 1,
+        "Paris": 7,
+        "Bangkok": 6,
+        "Rome": 7
+      }
+    },
+    "destination": {
+      "placed": 28,
+      "total": 40,
+      "not_found": 11,
+      "median_km": 0.06,
+      "by_city": {
+        "Tokyo": 0,
+        "Paris": 10,
+        "Bangkok": 9,
+        "Rome": 9
+      }
+    },
+    "roamer": {
+      "placed": 36,
+      "total": 40,
+      "not_found": 1,
+      "median_km": 0.09,
+      "by_city": {
+        "Tokyo": 9,
+        "Paris": 8,
+        "Bangkok": 9,
+        "Rome": 10
+      }
+    }
+  },
+  "rows": [
+    {
+      "city": "Tokyo",
+      "name": "Meiji Shrine",
+      "plain": 913.62,
+      "destination": null,
+      "roamer": 0.09
+    },
+    {
+      "city": "Tokyo",
+      "name": "Roppongi Hills",
+      "plain": 0.42,
+      "destination": null,
+      "roamer": 0.05
+    },
+    {
+      "city": "Tokyo",
+      "name": "Sensō-ji",
+      "plain": 9481.7,
+      "destination": null,
+      "roamer": 0.0
+    },
+    {
+      "city": "Tokyo",
+      "name": "Shibuya Crossing",
+      "plain": 6657.67,
+      "destination": null,
+      "roamer": 0.0
+    },
+    {
+      "city": "Tokyo",
+      "name": "Tokyo Imperial Palace",
+      "plain": 8860.06,
+      "destination": null,
+      "roamer": 0.33
+    },
+    {
+      "city": "Tokyo",
+      "name": "Tokyo Skytree",
+      "plain": 10.93,
+      "destination": null,
+      "roamer": 0.0
+    },
+    {
+      "city": "Tokyo",
+      "name": "Tokyo Tower",
+      "plain": 8812.23,
+      "destination": null,
+      "roamer": 0.01
+    },
+    {
+      "city": "Tokyo",
+      "name": "Tsukiji fish market",
+      "plain": 10134.37,
+      "destination": null,
+      "roamer": 0.38
+    },
+    {
+      "city": "Tokyo",
+      "name": "Ueno Park",
+      "plain": 9954.03,
+      "destination": null,
+      "roamer": 0.34
+    },
+    {
+      "city": "Tokyo",
+      "name": "Shinjuku Gyo-en",
+      "plain": 1245.26,
+      "destination": null,
+      "roamer": null
+    },
+    {
+      "city": "Paris",
+      "name": "Arc de Triomphe",
+      "plain": 0.0,
+      "destination": 0.0,
+      "roamer": 0.0
+    },
+    {
+      "city": "Paris",
+      "name": "Centre Pompidou",
+      "plain": 0.02,
+      "destination": 0.02,
+      "roamer": 0.09
+    },
+    {
+      "city": "Paris",
+      "name": "Eiffel Tower",
+      "plain": 16781.75,
+      "destination": 0.01,
+      "roamer": 0.01
+    },
+    {
+      "city": "Paris",
+      "name": "Jardin du Luxembourg",
+      "plain": 0.1,
+      "destination": 0.1,
+      "roamer": 0.23
+    },
+    {
+      "city": "Paris",
+      "name": "Louvre",
+      "plain": 16827.21,
+      "destination": 0.75,
+      "roamer": 0.12
+    },
+    {
+      "city": "Paris",
+      "name": "Musée d'Orsay",
+      "plain": 0.0,
+      "destination": 0.0,
+      "roamer": 0.0
+    },
+    {
+      "city": "Paris",
+      "name": "Notre-Dame de Paris",
+      "plain": 0.02,
+      "destination": 0.02,
+      "roamer": 1.08
+    },
+    {
+      "city": "Paris",
+      "name": "Palais Garnier",
+      "plain": 0.01,
+      "destination": 0.01,
+      "roamer": 0.53
+    },
+    {
+      "city": "Paris",
+      "name": "Place de la Concorde",
+      "plain": 0.02,
+      "destination": 0.02,
+      "roamer": 8.17
+    },
+    {
+      "city": "Paris",
+      "name": "Panthéon",
+      "plain": 16787.7,
+      "destination": 0.02,
+      "roamer": 0.28
+    },
+    {
+      "city": "Bangkok",
+      "name": "Chatuchak Weekend Market",
+      "plain": 18.88,
+      "destination": 18.88,
+      "roamer": 0.09
+    },
+    {
+      "city": "Bangkok",
+      "name": "Grand Palace",
+      "plain": 0.06,
+      "destination": 0.06,
+      "roamer": 0.05
+    },
+    {
+      "city": "Bangkok",
+      "name": "Jim Thompson House",
+      "plain": 0.01,
+      "destination": 0.01,
+      "roamer": 0.01
+    },
+    {
+      "city": "Bangkok",
+      "name": "Khaosan Road",
+      "plain": 9512.32,
+      "destination": 0.21,
+      "roamer": 0.16
+    },
+    {
+      "city": "Bangkok",
+      "name": "Lumphini Park",
+      "plain": 0.1,
+      "destination": 0.1,
+      "roamer": 4.52
+    },
+    {
+      "city": "Bangkok",
+      "name": "MBK Center",
+      "plain": 0.12,
+      "destination": 0.12,
+      "roamer": 0.09
+    },
+    {
+      "city": "Bangkok",
+      "name": "Siam Paragon",
+      "plain": 0.06,
+      "destination": 0.12,
+      "roamer": 0.11
+    },
+    {
+      "city": "Bangkok",
+      "name": "Wat Arun",
+      "plain": 0.15,
+      "destination": 0.15,
+      "roamer": 0.02
+    },
+    {
+      "city": "Bangkok",
+      "name": "Wat Pho",
+      "plain": 7350.26,
+      "destination": 0.33,
+      "roamer": 0.08
+    },
+    {
+      "city": "Bangkok",
+      "name": "Wat Saket",
+      "plain": 104.86,
+      "destination": 0.14,
+      "roamer": 0.01
+    },
+    {
+      "city": "Rome",
+      "name": "Campo de' Fiori",
+      "plain": 2008.12,
+      "destination": 0.09,
+      "roamer": 0.09
+    },
+    {
+      "city": "Rome",
+      "name": "Castel Sant'Angelo",
+      "plain": 0.01,
+      "destination": 0.01,
+      "roamer": 0.01
+    },
+    {
+      "city": "Rome",
+      "name": "Circus Maximus",
+      "plain": 0.02,
+      "destination": 0.02,
+      "roamer": 0.27
+    },
+    {
+      "city": "Rome",
+      "name": "Colosseum",
+      "plain": 0.01,
+      "destination": 0.01,
+      "roamer": 0.14
+    },
+    {
+      "city": "Rome",
+      "name": "Pantheon, Rome",
+      "plain": 0.0,
+      "destination": 0.38,
+      "roamer": 0.96
+    },
+    {
+      "city": "Rome",
+      "name": "Piazza Navona",
+      "plain": 920.72,
+      "destination": 0.07,
+      "roamer": 0.07
+    },
+    {
+      "city": "Rome",
+      "name": "Roman Forum",
+      "plain": 0.13,
+      "destination": 0.13,
+      "roamer": 0.13
+    },
+    {
+      "city": "Rome",
+      "name": "Spanish Steps",
+      "plain": 0.01,
+      "destination": 0.01,
+      "roamer": 0.47
+    },
+    {
+      "city": "Rome",
+      "name": "Trevi Fountain",
+      "plain": 0.02,
+      "destination": 0.02,
+      "roamer": 0.13
+    },
+    {
+      "city": "Rome",
+      "name": "Villa Borghese gardens",
+      "plain": 7412.52,
+      "destination": null,
+      "roamer": 0.57
+    }
+  ]
+}

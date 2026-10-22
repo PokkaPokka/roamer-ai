@@ -86,6 +86,10 @@ JWT_SECRET=your_long_random_secret
 
 # LLM provider: "ollama" (local, free) or "groq" (hosted, needs GROQ_API_KEY)
 LLM_PROVIDER=ollama
+GROQ_MODEL=openai/gpt-oss-120b   # optional; the Groq model when LLM_PROVIDER=groq
+LANGSMITH_API_KEY=lsv2_...         # optional: traces every graph run in LangSmith
+LANGSMITH_ENDPOINT=https://api.smith.langchain.com   # use your region's endpoint (eu./apac.)
+LANGSMITH_PROJECT=roamer-ai
 OLLAMA_MODEL=qwen3:8b
 OLLAMA_NUM_CTX=16384   # context window; guide excerpts need about 8K tokens
 OLLAMA_NUM_PREDICT=3000 # max tokens per response; stops a runaway answer

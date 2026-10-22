@@ -1,0 +1,64 @@
+{
+  "by_error": {
+    "flight counted twice": {
+      "caught": 3,
+      "cases": 3
+    },
+    "wrong flight cost": {
+      "caught": 3,
+      "cases": 3
+    },
+    "wrong budget total": {
+      "caught": 1,
+      "cases": 1
+    },
+    "citation to the wrong excerpt": {
+      "caught": 3,
+      "cases": 3
+    },
+    "citation to a missing excerpt": {
+      "caught": 3,
+      "cases": 3
+    },
+    "missing section": {
+      "caught": 3,
+      "cases": 3
+    },
+    "travel dates missing": {
+      "caught": 3,
+      "cases": 3
+    },
+    "plans before landing": {
+      "caught": 3,
+      "cases": 3
+    },
+    "copied prompt text": {
+      "caught": 3,
+      "cases": 3
+    }
+  },
+  "caught": 25,
+  "cases": 25,
+  "false_alarms_on_clean": 0,
+  "raw_flags": [
+    {
+      "destination": "Barcelona",
+      "fixes": [
+        "Corrected the budget total from 1,389 to 1,289 (the sum of the rows)"
+      ],
+      "problems": []
+    },
+    {
+      "destination": "Seoul",
+      "fixes": [
+        "Removed 1 citation that didn't match the guide excerpt"
+      ],
+      "problems": []
+    },
+    {
+      "destination": "Istanbul",
+      "fixes": [],
+      "problems": []
+    }
+  ]
+}

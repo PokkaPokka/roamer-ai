@@ -1,0 +1,236 @@
+{
+  "summary": {
+    "hybrid": {
+      "hit@1": 0.43333333333333335,
+      "hit@5": 0.8333333333333334,
+      "mrr@10": 0.6172619047619048
+    },
+    "hybrid_all_words": {
+      "hit@1": 0.6333333333333333,
+      "hit@5": 1.0,
+      "mrr@10": 0.7716666666666666
+    },
+    "meaning": {
+      "hit@1": 0.6333333333333333,
+      "hit@5": 1.0,
+      "mrr@10": 0.7716666666666666
+    },
+    "keyword": {
+      "hit@1": 0.1,
+      "hit@5": 0.23333333333333334,
+      "mrr@10": 0.16470899470899472
+    }
+  },
+  "rows": [
+    {
+      "question": "Which neighborhoods in Hamilton, Ontario are best for finding affordable antique shops and fabric stores?",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "What are the fare and departure times for the ferry that runs between Old San Juan and Cataño?",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 1
+    },
+    {
+      "question": "Which banks have ATMs at Hong Kong MTR stations, and what cash denominations should I carry to avoid dealing with small change?",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 9
+    },
+    {
+      "question": "What’s the cost to enter the State Apartments at Dublin Castle in Dublin if I skip the guided tour?",
+      "hybrid": 2,
+      "hybrid_all_words": 2,
+      "meaning": 2,
+      "keyword": 9
+    },
+    {
+      "question": "What is the typical price for a vegetarian meal at a restaurant in Digha?",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "Where can I have tea near the Leeds Art Gallery and Library?",
+      "hybrid": 3,
+      "hybrid_all_words": 5,
+      "meaning": 5,
+      "keyword": null
+    },
+    {
+      "question": "What is the address and phone number for Sleepy Hollow Sports Park in Des Moines?",
+      "hybrid": 3,
+      "hybrid_all_words": 3,
+      "meaning": 3,
+      "keyword": null
+    },
+    {
+      "question": "How should I read street numbers and directions when navigating South Portland, Oregon?",
+      "hybrid": 2,
+      "hybrid_all_words": 2,
+      "meaning": 2,
+      "keyword": 7
+    },
+    {
+      "question": "What are the opening hours for the organic vegetarian restaurant by the quiet square next to the old Adelhausen monastery in Freiburg?",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "Which water theme parks are near Coimbatore and what are the adult and child entry fees?",
+      "hybrid": 7,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "What is the usual fee and maximum amount I can withdraw when using a foreign ATM card in Cebu City?",
+      "hybrid": 3,
+      "hybrid_all_words": 3,
+      "meaning": 3,
+      "keyword": null
+    },
+    {
+      "question": "What ATM fee do foreign cards incur in Bangkok, and where near Phaya Thai station can I find the cheapest currency exchange rates?",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 3
+    },
+    {
+      "question": "What are the admission fees and parking cost for the Louwman Museum in The Hague?",
+      "hybrid": 2,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "Where can I find affordable fresh fruit ice cream in Dumaguete and what price range should I expect?",
+      "hybrid": 1,
+      "hybrid_all_words": 4,
+      "meaning": 4,
+      "keyword": 10
+    },
+    {
+      "question": "In Hua Hin, where can I find inexpensive, air‑conditioned Thai food and what price range should I expect?",
+      "hybrid": 2,
+      "hybrid_all_words": 3,
+      "meaning": 3,
+      "keyword": 2
+    },
+    {
+      "question": "What is the nightly rate for a room at the Hotel Palace in Tallinn?",
+      "hybrid": 4,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "What are the opening hours and admission fee for the Gottlieb Daimler Memorial exhibition in Stuttgart’s Bad Cannstatt?",
+      "hybrid": 2,
+      "hybrid_all_words": 2,
+      "meaning": 2,
+      "keyword": null
+    },
+    {
+      "question": "Which Cincinnati neighborhood now offers the busiest weekend bar scene, especially around Fountain Square and the surrounding restaurant district?",
+      "hybrid": 2,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "What are the current prices and age categories for the Halloween ghost tours in York, and can I use a York Pass to get a discount?",
+      "hybrid": 8,
+      "hybrid_all_words": 2,
+      "meaning": 2,
+      "keyword": null
+    },
+    {
+      "question": "Which Casablanca restaurant with a formal dress code and a late opening serves sushi and costs about 800 dirhams for a dinner for two?",
+      "hybrid": 6,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "Which grocery store in Rovaniemi’s city centre stays open 24 hours a day?",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 1
+    },
+    {
+      "question": "Where can I catch a cheap ride back from Pattaya when a driver is heading home empty?",
+      "hybrid": null,
+      "hybrid_all_words": 5,
+      "meaning": 5,
+      "keyword": null
+    },
+    {
+      "question": "Which downtown Reno hotel that isn’t part of a casino has a 3 PM check‑in and an 11 AM check‑out?",
+      "hybrid": 3,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "What is the admission fee for foreign tourists to visit the Catacombs of Kom el‑Shoqafa in Alexandria?",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 4
+    },
+    {
+      "question": "What is the nightly rate for a room at Riad Arabesque in Fez?",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "Which mall in Medan sells Mont Blanc pens and what price range should I expect for each one?",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 1
+    },
+    {
+      "question": "What’s the best way to prevent being overcharged for a taxi from the street to the Egyptian Museum in Cairo?",
+      "hybrid": 3,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "What is the nightly cost for staying at the Maeholjae hanok guesthouse in Suwon?",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 4
+    },
+    {
+      "question": "Can I purchase wine at the German pavilion in Epcot’s World Showcase and have it delivered to my Disney resort rather than trying to take it out of the park at Walt Disney World?",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 7
+    },
+    {
+      "question": "What is the starting fare and the per‑kilometre rate for taxis in Belgrade?",
+      "hybrid": 6,
+      "hybrid_all_words": 2,
+      "meaning": 2,
+      "keyword": null
+    }
+  ]
+}

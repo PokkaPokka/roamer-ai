@@ -7,6 +7,12 @@ load_dotenv()
 os.environ["SSL_CERT_FILE"] = certifi.where()
 os.environ["REQUESTS_CA_BUNDLE"] = certifi.where()
 
+# LangSmith tracing: every graph run (nodes, LLM and tool calls) becomes a trace
+# when a LANGSMITH_API_KEY is set. LANGSMITH_TRACING=false in .env turns it off.
+if os.getenv("LANGSMITH_API_KEY"):
+    os.environ.setdefault("LANGSMITH_TRACING", "true")
+    os.environ.setdefault("LANGSMITH_PROJECT", "roamer-ai")
+
 from typing import TypedDict, Annotated, Literal
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date, timedelta
@@ -69,9 +75,11 @@ def get_llm():
         if not groq_api_key:
             raise ValueError("GROQ_API_KEY is missing. Please add it to your .env file.")
 
+        # Groq retired llama-3.3-70b-versatile in 2026; GROQ_MODEL overrides the default.
         return ChatGroq(
-            model="llama-3.3-70b-versatile",
-            api_key=groq_api_key
+            model=os.getenv("GROQ_MODEL", "openai/gpt-oss-120b"),
+            api_key=groq_api_key,
+            max_retries=6,  # the free tier rate-limits by tokens per minute
         )
 
     raise ValueError(f"Unknown LLM_PROVIDER '{LLM_PROVIDER}'. Use 'ollama' or 'groq'.")

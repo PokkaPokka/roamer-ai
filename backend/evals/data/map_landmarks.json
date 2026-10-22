@@ -1,0 +1,322 @@
+[
+  {
+    "city": "Tokyo",
+    "language": "ja",
+    "name": "Meiji Shrine",
+    "local_name": "明治神宮",
+    "lat": 35.67611111,
+    "lon": 139.69916667
+  },
+  {
+    "city": "Tokyo",
+    "language": "ja",
+    "name": "Roppongi Hills",
+    "local_name": "六本木ヒルズ",
+    "lat": 35.66,
+    "lon": 139.73
+  },
+  {
+    "city": "Tokyo",
+    "language": "ja",
+    "name": "Sensō-ji",
+    "local_name": "浅草寺",
+    "lat": 35.71472222,
+    "lon": 139.79675
+  },
+  {
+    "city": "Tokyo",
+    "language": "ja",
+    "name": "Shibuya Crossing",
+    "local_name": "渋谷スクランブル交差点",
+    "lat": 35.6595,
+    "lon": 139.70056
+  },
+  {
+    "city": "Tokyo",
+    "language": "ja",
+    "name": "Tokyo Imperial Palace",
+    "local_name": "皇居",
+    "lat": 35.6824,
+    "lon": 139.7527
+  },
+  {
+    "city": "Tokyo",
+    "language": "ja",
+    "name": "Tokyo Skytree",
+    "local_name": "東京スカイツリー",
+    "lat": 35.7101,
+    "lon": 139.8107
+  },
+  {
+    "city": "Tokyo",
+    "language": "ja",
+    "name": "Tokyo Tower",
+    "local_name": "東京タワー",
+    "lat": 35.65861111,
+    "lon": 139.74555556
+  },
+  {
+    "city": "Tokyo",
+    "language": "ja",
+    "name": "Tsukiji fish market",
+    "local_name": "築地市場",
+    "lat": 35.66138889,
+    "lon": 139.76972222
+  },
+  {
+    "city": "Tokyo",
+    "language": "ja",
+    "name": "Ueno Park",
+    "local_name": "上野恩賜公園",
+    "lat": 35.71222222,
+    "lon": 139.77111111
+  },
+  {
+    "city": "Tokyo",
+    "language": "ja",
+    "name": "Shinjuku Gyo-en",
+    "local_name": "新宿御苑",
+    "lat": 35.685,
+    "lon": 139.71
+  },
+  {
+    "city": "Paris",
+    "language": "fr",
+    "name": "Arc de Triomphe",
+    "local_name": "Arc de triomphe de l'Étoile",
+    "lat": 48.87377778,
+    "lon": 2.29502778
+  },
+  {
+    "city": "Paris",
+    "language": "fr",
+    "name": "Centre Pompidou",
+    "local_name": "Centre national d'art et de culture Georges-Pompidou",
+    "lat": 48.86064194,
+    "lon": 2.352245
+  },
+  {
+    "city": "Paris",
+    "language": "fr",
+    "name": "Eiffel Tower",
+    "local_name": "Tour Eiffel",
+    "lat": 48.85822222,
+    "lon": 2.2945
+  },
+  {
+    "city": "Paris",
+    "language": "fr",
+    "name": "Jardin du Luxembourg",
+    "local_name": "Jardin du Luxembourg",
+    "lat": 48.84694444,
+    "lon": 2.33722222
+  },
+  {
+    "city": "Paris",
+    "language": "fr",
+    "name": "Louvre",
+    "local_name": "Musée du Louvre",
+    "lat": 48.8611,
+    "lon": 2.3358
+  },
+  {
+    "city": "Paris",
+    "language": "fr",
+    "name": "Musée d'Orsay",
+    "local_name": "Musée d'Orsay",
+    "lat": 48.859972,
+    "lon": 2.326527
+  },
+  {
+    "city": "Paris",
+    "language": "fr",
+    "name": "Notre-Dame de Paris",
+    "local_name": "Cathédrale Notre-Dame de Paris",
+    "lat": 48.85305556,
+    "lon": 2.35
+  },
+  {
+    "city": "Paris",
+    "language": "fr",
+    "name": "Palais Garnier",
+    "local_name": "Opéra Garnier",
+    "lat": 48.87194444,
+    "lon": 2.33166667
+  },
+  {
+    "city": "Paris",
+    "language": "fr",
+    "name": "Place de la Concorde",
+    "local_name": "Place de la Concorde",
+    "lat": 48.8656331,
+    "lon": 2.3212357
+  },
+  {
+    "city": "Paris",
+    "language": "fr",
+    "name": "Panthéon",
+    "local_name": "Panthéon (Paris)",
+    "lat": 48.84611111,
+    "lon": 2.34583333
+  },
+  {
+    "city": "Bangkok",
+    "language": "th",
+    "name": "Chatuchak Weekend Market",
+    "local_name": "ตลาดนัดจตุจักร",
+    "lat": 13.80083333,
+    "lon": 100.55138889
+  },
+  {
+    "city": "Bangkok",
+    "language": "th",
+    "name": "Grand Palace",
+    "local_name": "พระบรมมหาราชวัง",
+    "lat": 13.7501,
+    "lon": 100.492
+  },
+  {
+    "city": "Bangkok",
+    "language": "th",
+    "name": "Jim Thompson House",
+    "local_name": "พิพิธภัณฑ์บ้านจิม ทอมป์สัน",
+    "lat": 13.74916667,
+    "lon": 100.52833333
+  },
+  {
+    "city": "Bangkok",
+    "language": "th",
+    "name": "Khaosan Road",
+    "local_name": "ถนนข้าวสาร",
+    "lat": 13.75888889,
+    "lon": 100.49722222
+  },
+  {
+    "city": "Bangkok",
+    "language": "th",
+    "name": "Lumphini Park",
+    "local_name": "สวนลุมพินี",
+    "lat": 13.73055556,
+    "lon": 100.54166667
+  },
+  {
+    "city": "Bangkok",
+    "language": "th",
+    "name": "MBK Center",
+    "local_name": "เอ็มบีเคเซ็นเตอร์",
+    "lat": 13.74555556,
+    "lon": 100.53
+  },
+  {
+    "city": "Bangkok",
+    "language": "th",
+    "name": "Siam Paragon",
+    "local_name": "สยามพารากอน",
+    "lat": 13.74638889,
+    "lon": 100.535
+  },
+  {
+    "city": "Bangkok",
+    "language": "th",
+    "name": "Wat Arun",
+    "local_name": "วัดอรุณราชวรารามราชวรมหาวิหาร",
+    "lat": 13.74361111,
+    "lon": 100.48888889
+  },
+  {
+    "city": "Bangkok",
+    "language": "th",
+    "name": "Wat Pho",
+    "local_name": "วัดพระเชตุพนวิมลมังคลารามราชวรมหาวิหาร",
+    "lat": 13.74638889,
+    "lon": 100.49361111
+  },
+  {
+    "city": "Bangkok",
+    "language": "th",
+    "name": "Wat Saket",
+    "local_name": "วัดสระเกศราชวรมหาวิหาร",
+    "lat": 13.75388889,
+    "lon": 100.50833333
+  },
+  {
+    "city": "Rome",
+    "language": "it",
+    "name": "Campo de' Fiori",
+    "local_name": "Campo de' Fiori",
+    "lat": 41.8957,
+    "lon": 12.472
+  },
+  {
+    "city": "Rome",
+    "language": "it",
+    "name": "Castel Sant'Angelo",
+    "local_name": "Castel Sant'Angelo",
+    "lat": 41.9031,
+    "lon": 12.4663
+  },
+  {
+    "city": "Rome",
+    "language": "it",
+    "name": "Circus Maximus",
+    "local_name": "Circo Massimo",
+    "lat": 41.8859,
+    "lon": 12.4857
+  },
+  {
+    "city": "Rome",
+    "language": "it",
+    "name": "Colosseum",
+    "local_name": "Colosseo",
+    "lat": 41.8903,
+    "lon": 12.4922
+  },
+  {
+    "city": "Rome",
+    "language": "it",
+    "name": "Pantheon, Rome",
+    "local_name": "Pantheon (Roma)",
+    "lat": 41.8986,
+    "lon": 12.4768
+  },
+  {
+    "city": "Rome",
+    "language": "it",
+    "name": "Piazza Navona",
+    "local_name": "Piazza Navona",
+    "lat": 41.899,
+    "lon": 12.4731
+  },
+  {
+    "city": "Rome",
+    "language": "it",
+    "name": "Roman Forum",
+    "local_name": "Foro Romano",
+    "lat": 41.8922,
+    "lon": 12.4852
+  },
+  {
+    "city": "Rome",
+    "language": "it",
+    "name": "Spanish Steps",
+    "local_name": "Scalinata di Trinità dei Monti",
+    "lat": 41.9061,
+    "lon": 12.4828
+  },
+  {
+    "city": "Rome",
+    "language": "it",
+    "name": "Trevi Fountain",
+    "local_name": "Fontana di Trevi",
+    "lat": 41.90083333,
+    "lon": 12.48305556
+  },
+  {
+    "city": "Rome",
+    "language": "it",
+    "name": "Villa Borghese gardens",
+    "local_name": "Villa Borghese",
+    "lat": 41.91416667,
+    "lon": 12.49222222
+  }
+]

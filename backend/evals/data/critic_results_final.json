@@ -1,0 +1,60 @@
+{
+  "by_error": {
+    "flight counted twice": {
+      "caught": 3,
+      "cases": 3
+    },
+    "wrong flight cost": {
+      "caught": 3,
+      "cases": 3
+    },
+    "wrong budget total": {
+      "caught": 0,
+      "cases": 0
+    },
+    "citation to the wrong excerpt": {
+      "caught": 2,
+      "cases": 2
+    },
+    "citation to a missing excerpt": {
+      "caught": 2,
+      "cases": 2
+    },
+    "missing section": {
+      "caught": 3,
+      "cases": 3
+    },
+    "travel dates missing": {
+      "caught": 3,
+      "cases": 3
+    },
+    "plans before landing": {
+      "caught": 3,
+      "cases": 3
+    },
+    "copied prompt text": {
+      "caught": 3,
+      "cases": 3
+    }
+  },
+  "caught": 22,
+  "cases": 22,
+  "false_alarms_on_clean": 0,
+  "raw_flags": [
+    {
+      "destination": "Lisbon",
+      "fixes": [],
+      "problems": []
+    },
+    {
+      "destination": "Hanoi",
+      "fixes": [],
+      "problems": []
+    },
+    {
+      "destination": "Mexico City",
+      "fixes": [],
+      "problems": []
+    }
+  ]
+}

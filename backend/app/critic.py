@@ -16,6 +16,18 @@ import re
 import unicodedata
 
 
+# Some models write non-breaking hyphens ("Day‑by‑Day") and narrow spaces ("Day 1",
+# "1 354"). They look the same but break every pattern, so they become plain ones.
+UNICODE_FIXES = str.maketrans({
+    "\u2010": "-", "\u2011": "-",
+    "\u00a0": " ", "\u2007": " ", "\u2009": " ", "\u200a": " ", "\u202f": " ",
+})
+
+
+def normalize(plan: str) -> str:
+    return plan.translate(UNICODE_FIXES)
+
+
 @dataclass
 class Review:
     plan: str                                           # the plan with code fixes applied
@@ -52,8 +64,12 @@ MAX_PLAN_CHARS = 20000
 
 
 SECTION_WORDS = [word for words in REQUIRED_SECTIONS.values() for word in words]
-# A heading the model wrote without "#": "**2. Flight Information**" or "Flight Information:".
-BARE_HEADING = re.compile(r"^(\*\*)?\s*(\d+[.)]\s*)?([A-Za-z][A-Za-z -]{2,40}?)\s*:?\s*(\*\*)?\s*:?$")
+# A heading the model wrote without "#": "**2. Flight Information**", "Flight Information:",
+# or "**5. Estimated Budget** *(per person)*".
+BARE_HEADING = re.compile(
+    r"^(\*\*)?\s*(\d+[.)]\s*)?([A-Za-z][^*|:\n]{2,60}?)\s*:?\s*(\*\*)?\s*:?"
+    r"(?:\s*\*?\([^)]*\)\*?)?\s*$"
+)
 
 
 def heading(line: str) -> tuple[int, str] | None:
@@ -90,12 +106,17 @@ def copied_prompt(plan: str) -> list[str]:
 # Budget
 # =========================
 
-# A money amount: "1,354", "360–540", "2,114 - 3,444", "600 to 800".
-AMOUNT = re.compile(r"(\d[\d,]*(?:\.\d+)?)(?:\s*(?:–|—|-|to)\s*(\d[\d,]*(?:\.\d+)?))?")
+# A money amount: "1,354", "1 354", "360–540", "2,114 - 3,444", "600 to 800".
+NUMBER = r"\d{1,3}(?:[, ]\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?"
+AMOUNT = re.compile(rf"({NUMBER})(?:\s*(?:–|—|-|to)\s*({NUMBER}))?")
+
+# A cell the critic can't read safely: alternatives ("hotel: 540 <br> hostel: 180") or
+# several sums. The budget check then says nothing rather than "fixing" the wrong number.
+AMBIGUOUS = "ambiguous"
 
 
 def to_number(text: str) -> float:
-    return float(text.replace(",", ""))
+    return float(text.replace(",", "").replace(" ", ""))
 
 
 def format_amount(low: float, high: float) -> str:
@@ -120,8 +141,11 @@ def section_lines(plan: str, words: list[str]) -> tuple[int, int]:
     return (start, len(lines)) if start is not None else (0, 0)
 
 
-def first_amount(text: str, offset: int) -> tuple[int, int, float, float] | None:
-    """The first amount in text that isn't inside brackets: (start, end, low, high)."""
+def first_amount(text: str, offset: int) -> tuple[int, int, float, float] | str | None:
+    """
+    The amount in a cell, outside brackets: (start, end, low, high). For a sum like
+    "3 × 180 = 540" it's the number after "=". AMBIGUOUS for alternatives or several sums.
+    """
     depth = 0
     brackets = []
     for index, char in enumerate(text):
@@ -131,11 +155,17 @@ def first_amount(text: str, offset: int) -> tuple[int, int, float, float] | None
             depth = max(depth - 1, 0)
         brackets.append(depth)
 
-    for match in AMOUNT.finditer(text):
-        if brackets[match.start()] == 0:
-            low = to_number(match.group(1))
-            high = to_number(match.group(2)) if match.group(2) else low
-            return offset + match.start(), offset + match.end(), low, high
+    equals = [index for index, char in enumerate(text) if char == "=" and brackets[index] == 0]
+    matches = [match for match in AMOUNT.finditer(text) if brackets[match.start()] == 0]
+    if len(equals) > 1 or ("<br" in text.lower() and len(matches) > 1):
+        return AMBIGUOUS
+    if equals:
+        matches = [match for match in matches if match.start() > equals[0]]
+
+    for match in matches:
+        low = to_number(match.group(1))
+        high = to_number(match.group(2)) if match.group(2) else low
+        return offset + match.start(), offset + match.end(), low, high
     return None
 
 
@@ -163,6 +193,9 @@ def budget_rows(plan: str) -> list[dict]:
             label = cells[0][0].replace("*", "").strip()
             for cell, cell_start in cells[1:]:
                 found = first_amount(cell, cell_start)
+                if found == AMBIGUOUS:
+                    rows.append({"line": index, "label": label, "ambiguous": True})
+                    break
                 if found:
                     rows.append({"line": index, "label": label, "start": found[0], "end": found[1],
                                  "low": found[2], "high": found[3]})
@@ -172,7 +205,9 @@ def budget_rows(plan: str) -> list[dict]:
             colon = line.index(":")
             label = line[:colon].replace("*", "").strip(" -")
             found = first_amount(line[colon + 1:], colon + 1)
-            if found:
+            if found == AMBIGUOUS:
+                rows.append({"line": index, "label": label, "ambiguous": True})
+            elif found:
                 rows.append({"line": index, "label": label, "start": found[0], "end": found[1],
                              "low": found[2], "high": found[3]})
 
@@ -198,7 +233,7 @@ def check_budget(plan: str, flight_price: float | None) -> tuple[str, list[str]]
 
     # The chosen fare is the whole round trip, counted once.
     if flight_price:
-        flight_rows = [row for row in rows if is_flight(row) and not is_total(row)]
+        flight_rows = [row for row in rows if is_flight(row) and not is_total(row) and not row.get("ambiguous")]
         for row in flight_rows[:1]:
             if abs(row["low"] - flight_price) > 1 or abs(row["high"] - flight_price) > 1:
                 twice = abs(row["low"] - 2 * flight_price) <= 1
@@ -211,8 +246,11 @@ def check_budget(plan: str, flight_price: float | None) -> tuple[str, list[str]]
 
     totals = [row for row in rows if is_total(row)]
     items = [row for row in rows if not is_total(row)]
-    if totals and items:
-        total = totals[-1]
+    # Several totals (one per hotel option) or a row with alternatives: the rows don't
+    # add up to one total, so don't check it.
+    readable = len(totals) == 1 and not any(row.get("ambiguous") for row in rows)
+    if readable and items:
+        total = totals[0]
         low = sum(row["low"] for row in items)
         high = sum(row["high"] for row in items)
         # The rows are whole numbers, so the total must match them (1 unit for rounding).
@@ -286,14 +324,22 @@ def check_arrival_day(plan: str, arrival_time: str | None) -> list[str]:
     except ValueError:
         return []
 
-    # Each day part's text runs to the next day part. A part that's only about
-    # arriving (airport, transfer, check-in) doesn't count as plans.
-    block = day_one(plan)
-    found = list(DAY_PART.finditer(block))
+    # A day part's text is its own line plus the lines indented under it, so timed
+    # bullets after it ("**18:30** - Land at Narita") don't count as its plans.
+    # A part that's only about arriving (airport, transfer, check-in) isn't plans.
+    lines = day_one(plan).splitlines()
     parts = set()
-    for index, match in enumerate(found):
-        text = block[match.end():found[index + 1].start() if index + 1 < len(found) else len(block)]
-        if not LOGISTICS.search(text):
+    for index, line in enumerate(lines):
+        match = DAY_PART.match(line)
+        if not match:
+            continue
+        indent = len(line) - len(line.lstrip())
+        text = [line[match.end():]]
+        for below in lines[index + 1:]:
+            if below.strip() and len(below) - len(below.lstrip()) <= indent:
+                break
+            text.append(below)
+        if not LOGISTICS.search("\n".join(text)):
             parts.add(match.group(1).lower())
 
     too_early = [part for part, limit in (("morning", 12), ("afternoon", 17)) if part in parts and hour >= limit]
@@ -323,6 +369,10 @@ NOT_NAMES = {
     # Labels the model puts before a citation, e.g. "**Excerpt Reference:** [4]".
     "excerpt", "excerpts", "reference", "references", "source", "sources", "guide", "wikivoyage",
     "citation", "cited", "based",
+    # Dates are capitalised but aren't places.
+    "january", "february", "march", "april", "may", "june", "july", "august", "september",
+    "october", "november", "december", "monday", "tuesday", "wednesday", "thursday", "friday",
+    "saturday", "sunday",
 }
 
 WORD = re.compile(r"\b[A-Z][\w'’-]{2,}")
@@ -332,6 +382,15 @@ CITATION = re.compile(r"\[(\d{1,2})\]")
 def plain(text: str) -> str:
     """Lowercase without accents, so "Sensō-ji" matches "Senso-ji"."""
     return unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().lower()
+
+
+def excerpt_places(guide_context: str) -> set[str]:
+    """
+    Words from the excerpts' headings ("Istanbul, Turkey — Eat"). The body leaves out
+    the city's name, so "iconic Istanbul street food [7]" says nothing about excerpt 7.
+    """
+    headings = re.findall(r"^\[\d+\] ([^\n]*)", guide_context or "", re.M)
+    return {plain(word) for heading in headings for word in re.findall(r"[\w'’-]+", heading)}
 
 
 def parse_excerpts(guide_context: str) -> dict[int, str]:
@@ -344,7 +403,41 @@ def parse_excerpts(guide_context: str) -> dict[int, str]:
     return excerpts
 
 
-def check_citations(plan: str, excerpts: dict[int, str]) -> tuple[str, list[str]]:
+# Where a clause ends: sentence, comma, colon, dash, an earlier citation or a table cell.
+CLAUSE_END = re.compile(r"[.;:!?,]\s|\]|\s[–—-]\s|\|")
+
+
+def claim_names(text_before: str, ignore: set[str] = frozenset()) -> list[str]:
+    """
+    The place names in the clause right before a citation. Judging only this clause
+    keeps the check stable when it runs again after removing a citation.
+    """
+    claim = CLAUSE_END.split(text_before)[-1]
+    names = [
+        re.sub(r"['’]s$", "", word)  # "Gaudí’s" -> "Gaudí"
+        for word in WORD.findall(claim)
+        # Acronyms like NYC or BTS are usually written out in the guide.
+        if plain(word) not in NOT_NAMES and not (word.isupper() and len(word) <= 5)
+        and plain(re.sub(r"['’]s$", "", word)) not in ignore
+    ]
+
+    # A capitalised first word is usually just the start of a sentence ("Carry a
+    # water bottle"), unless it looks like a name: "Senso-ji", "Central Park".
+    start = re.match(r"[\s*_>#•\-\d.)]*([A-Z][\w'’-]*)\s*(\S*)", claim)
+    if start and names and names[0] == re.sub(r"['’]s$", "", start.group(1)):
+        first, following = start.group(1), start.group(2).lstrip("*_")
+        if "-" not in first and first.isascii() and not following[:1].isupper():
+            names = names[1:]
+    return names
+
+
+def mentions(body: str, name: str) -> bool:
+    """Whether an excerpt names this place, ignoring accents, case and hyphens."""
+    spaced = lambda text: plain(text).replace("-", " ")
+    return spaced(name).strip("'’ ") in spaced(body)
+
+
+def check_citations(plan: str, excerpts: dict[int, str], ignore: set[str] = frozenset()) -> tuple[str, list[str]]:
     """
     Removes a citation [n] when n doesn't exist, or when the words just before it
     name a place and none of those names appear in excerpt n.
@@ -356,11 +449,9 @@ def check_citations(plan: str, excerpts: dict[int, str]) -> tuple[str, list[str]
         result, last = "", 0
         for match in CITATION.finditer(line):
             number = int(match.group(1))
-            # Judge only the words since the previous citation or sentence end.
-            claim = re.split(r"[.;!?]\s|\]", line[last:match.start()])[-1]
-            names = [word for word in WORD.findall(claim) if plain(word) not in NOT_NAMES]
-            body = plain(excerpts.get(number, ""))
-            matches = any(plain(name).strip("'’-") in body for name in names)
+            names = claim_names(line[last:match.start()], ignore)
+            body = excerpts.get(number, "")
+            matches = any(mentions(body, name) for name in names)
 
             keep = number in excerpts and (not names or matches)
             result += line[last:match.start()] + (match.group(0) if keep else "")
@@ -385,6 +476,7 @@ def review_plan(
     travel_dates: list[str] | None = None,
     arrival_time: str | None = None,
 ) -> Review:
+    plan = normalize(plan)
     review = Review(plan=plan)
 
     copied = copied_prompt(plan)
@@ -408,7 +500,7 @@ def review_plan(
     review.fixes += fixes
 
     if guide_context:
-        review.plan, fixes = check_citations(review.plan, parse_excerpts(guide_context))
+        review.plan, fixes = check_citations(review.plan, parse_excerpts(guide_context), excerpt_places(guide_context))
         review.fixes += fixes
 
     return review

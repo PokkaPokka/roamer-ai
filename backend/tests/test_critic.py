@@ -208,5 +208,69 @@ class ArrivalDayTests(unittest.TestCase):
         self.assertEqual(check_arrival_day(plan, "2026-11-20 20:35"), [])
 
 
+# Plans written by gpt-oss-120b for the critic eval used styles the critic missed.
+OTHER_STYLE = """**1. Trip Summary**
+Leave 20\u202fNov.
+
+**2. Flight Information**
+X.
+
+**3. Hotel Suggestions**
+Y.
+
+**4. Day\u2011by\u2011Day Itinerary**
+
+### **Day\u202f1 – 20\u202fNov\u202f2026 (Arrival)**
+- **Morning:** Visit the museum.
+- **18:30** – Land at Narita.
+
+**5. Estimated Budget** *(per person)*
+
+| Item | Cost (AUD) |
+|------|------------|
+| **Flight (round-trip)** | **1\u202f354** |
+| **Accommodation** | Hotel: 3 × 180 = 540 <br> Hostel: 3 × 60 = 180 |
+| **Total (hotel)** | **≈ 2\u202f226** |
+| **Total (hostel)** | **≈ 1\u202f866** |
+
+**6. Final Recommendations**
+Go.
+"""
+
+
+class OtherStyleTests(unittest.TestCase):
+    def test_bold_headings_and_unicode_spaces(self):
+        review = review_plan(OTHER_STYLE, "", 1354, ["2026-11-20"], "2026-11-20 18:30")
+        self.assertNotIn("Missing sections", " ".join(review.problems))
+        # "Morning: visit the museum" before an 18:30 landing; the timed bullet below isn't its text.
+        self.assertTrue(any("flight lands" in problem for problem in review.problems))
+
+    def test_budget_with_alternatives_is_not_checked(self):
+        plan, fixes = check_budget(review_plan(OTHER_STYLE).plan, flight_price=1354)
+        self.assertEqual(fixes, [])  # "1 354" is read as one number, two totals are skipped
+
+    def test_sum_in_a_cell_uses_the_result(self):
+        # "3 × 180 = 540" counts as 540, not 3: 1,354 + 540 + 200–300 + 100–150 + 100–150 = 2,294–2,494.
+        plan = WRONG_TOTAL.replace("360–540 (3 nights)", "3 × 180 = 540").replace("**2114–3444**", "**2,294–2,494**")
+        fixed, fixes = check_budget(plan, flight_price=1354)
+        self.assertEqual(fixes, [])
+
+
+class NameTests(unittest.TestCase):
+    def setUp(self):
+        self.excerpts = parse_excerpts(EXCERPTS)
+
+    def test_words_that_are_not_places(self):
+        for line in [
+            "Carry a water bottle, the tap water is fine [1].",       # sentence-start verb
+            "A chilly November day in Asakusa [1].",                   # month
+            "Iconic Tokyo temples in Asakusa [1].",                    # the city from the excerpt heading
+            "Gaudí’s style is nothing like Asakusa [1].",              # possessive of a word in no excerpt
+            "Take the JR line to Asakusa [1].",                        # acronym
+        ]:
+            plan, _ = check_citations(line, self.excerpts, {"tokyo", "japan", "see", "eat"})
+            self.assertIn("[1]", plan, line)
+
+
 if __name__ == "__main__":
     unittest.main()

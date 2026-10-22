@@ -1,0 +1,79 @@
+{
+  "by_error": {
+    "flight counted twice": {
+      "caught": 6,
+      "cases": 6
+    },
+    "wrong flight cost": {
+      "caught": 6,
+      "cases": 6
+    },
+    "wrong budget total": {
+      "caught": 1,
+      "cases": 1
+    },
+    "citation to the wrong excerpt": {
+      "caught": 5,
+      "cases": 6
+    },
+    "citation to a missing excerpt": {
+      "caught": 6,
+      "cases": 6
+    },
+    "missing section": {
+      "caught": 6,
+      "cases": 6
+    },
+    "travel dates missing": {
+      "caught": 6,
+      "cases": 6
+    },
+    "plans before landing": {
+      "caught": 3,
+      "cases": 3
+    },
+    "copied prompt text": {
+      "caught": 6,
+      "cases": 6
+    }
+  },
+  "caught": 45,
+  "cases": 46,
+  "false_alarms_on_clean": 0,
+  "raw_flags": [
+    {
+      "destination": "Tokyo",
+      "fixes": [
+        "Removed 1 citation that didn't match the guide excerpt"
+      ],
+      "problems": []
+    },
+    {
+      "destination": "Paris",
+      "fixes": [],
+      "problems": []
+    },
+    {
+      "destination": "Rome",
+      "fixes": [],
+      "problems": []
+    },
+    {
+      "destination": "Bangkok",
+      "fixes": [],
+      "problems": []
+    },
+    {
+      "destination": "Sydney",
+      "fixes": [],
+      "problems": []
+    },
+    {
+      "destination": "New York City",
+      "fixes": [
+        "Corrected the budget total from 1,999 to 1,909 (the sum of the rows)"
+      ],
+      "problems": []
+    }
+  ]
+}

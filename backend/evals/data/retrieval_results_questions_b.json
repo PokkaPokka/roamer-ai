@@ -1,0 +1,236 @@
+{
+  "summary": {
+    "hybrid": {
+      "hit@1": 0.4,
+      "hit@5": 0.7666666666666667,
+      "mrr@10": 0.5771031746031745
+    },
+    "hybrid_all_words": {
+      "hit@1": 0.6,
+      "hit@5": 1.0,
+      "mrr@10": 0.7688888888888888
+    },
+    "meaning": {
+      "hit@1": 0.6333333333333333,
+      "hit@5": 1.0,
+      "mrr@10": 0.7855555555555556
+    },
+    "keyword": {
+      "hit@1": 0.13333333333333333,
+      "hit@5": 0.26666666666666666,
+      "mrr@10": 0.18333333333333332
+    }
+  },
+  "rows": [
+    {
+      "question": "What are the opening hours and admission fee for the historic Central Post Office in Sarajevo?",
+      "hybrid": 3,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "Which shopping centre in Tirana includes a cinema and stays open until 9 p.m.?",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "Which neighborhoods in Beirut offer the liveliest nightlife scene, and around what times do bars and clubs usually shut down?",
+      "hybrid": 7,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "Where in Kochi can I find a full meal for under ₹50, and which street‑food stalls or budget chains are recommended?",
+      "hybrid": 1,
+      "hybrid_all_words": 2,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "What are the opening hours and admission cost for Wolong Temple in Xi'an?",
+      "hybrid": 3,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "In Tunis, what's the most reliable way to get to Carthage on the TGM—should I purchase a return ticket and how much does it cost?",
+      "hybrid": 2,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "Can I view the coastal rocks linked to King Munmu’s legendary underwater tomb in Gyeongju, and where is the best nearby spot to do so?",
+      "hybrid": 2,
+      "hybrid_all_words": 2,
+      "meaning": 2,
+      "keyword": 2
+    },
+    {
+      "question": "What’s the best way to get to the summit of Lycabettus Hill in Athens, and how much does the cable car ride cost?",
+      "hybrid": 7,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "In San Juan, how much does the B21 bus cost and is it a practical way to get around Old San Juan?",
+      "hybrid": null,
+      "hybrid_all_words": 2,
+      "meaning": 2,
+      "keyword": null
+    },
+    {
+      "question": "What hotels in Chișinău are priced around €50 per night and include breakfast and Wi‑Fi?",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 1
+    },
+    {
+      "question": "In Orlando, what are the typical speed limits on major roads and how can I access real‑time traffic information?",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 3
+    },
+    {
+      "question": "Which area in Manchester is known for pricey drinks but draws a fashionable crowd of locals and students?",
+      "hybrid": null,
+      "hybrid_all_words": 5,
+      "meaning": 5,
+      "keyword": null
+    },
+    {
+      "question": "What are the nightly rates for the Union Tourist Hotel near Daegu Station, and is there a discount if I reserve by phone?",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "What is the fare for a trip from Huangtudian to Kangzhuang on Beijing’s S2 suburban railway?",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 1
+    },
+    {
+      "question": "Where in Zurich can I grab an affordable vegetarian meal at a historic restaurant?",
+      "hybrid": 5,
+      "hybrid_all_words": 2,
+      "meaning": 2,
+      "keyword": null
+    },
+    {
+      "question": "What does a boat trip from Trpejca to a secluded Lake Ohrid beach cost?",
+      "hybrid": 2,
+      "hybrid_all_words": 2,
+      "meaning": 2,
+      "keyword": null
+    },
+    {
+      "question": "Which hotel in Addis Ababa’s Bole area provides a complimentary airport shuttle and is priced at about $95 per night?",
+      "hybrid": 7,
+      "hybrid_all_words": 2,
+      "meaning": 2,
+      "keyword": null
+    },
+    {
+      "question": "How much do the Guadalajara Zoo combo tickets that include the panoramic train and safari cost?",
+      "hybrid": 8,
+      "hybrid_all_words": 3,
+      "meaning": 3,
+      "keyword": null
+    },
+    {
+      "question": "Which family‑run ice‑cream shop on Imam Avenue in Tabriz is known for its secret‑recipe desserts?",
+      "hybrid": 2,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "What are the opening hours and phone number for Barcos bar in Hiroshima?",
+      "hybrid": 2,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "What is the adult admission fee for Nagoya Castle, and are volunteer‑run English tours offered?",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "What are the opening hours and admission price for the Bunker Museum in Kaliningrad?",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "In Frankfurt, how do I get from Hauptwache to the Römer using public transport, what ticket options are available, and how much extra time should I allow for possible S‑Bahn delays?",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 3
+    },
+    {
+      "question": "In Alexandria, which affordable Spanish restaurant should I visit and what dish is the top recommendation?",
+      "hybrid": 7,
+      "hybrid_all_words": 3,
+      "meaning": 3,
+      "keyword": null
+    },
+    {
+      "question": "What budget hostels are available in Sofia that offer free Wi‑Fi and kitchen facilities, and what are their nightly rates?",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 3
+    },
+    {
+      "question": "Which day of the week are most museums in Milan typically closed?",
+      "hybrid": 1,
+      "hybrid_all_words": 2,
+      "meaning": 2,
+      "keyword": null
+    },
+    {
+      "question": "Which restaurant in Johor Bahru provides a Harry Potter‑themed dining experience?",
+      "hybrid": 2,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": null
+    },
+    {
+      "question": "What is the cost of attending the November samba show on Sammonkatu 2 in Tampere?",
+      "hybrid": 2,
+      "hybrid_all_words": 5,
+      "meaning": 5,
+      "keyword": 1
+    },
+    {
+      "question": "Where can I find discounted tickets for Ba Na Hills and its cable car while staying in Da Nang?",
+      "hybrid": 4,
+      "hybrid_all_words": 2,
+      "meaning": 2,
+      "keyword": null
+    },
+    {
+      "question": "Do I have to pay to go inside Chongqing’s Great Hall of the People, and what is the entrance fee if there is one?",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 1
+    }
+  ]
+}

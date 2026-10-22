@@ -1,0 +1,236 @@
+{
+  "summary": {
+    "hybrid": {
+      "hit@1": 0.7333333333333333,
+      "hit@5": 1.0,
+      "mrr@10": 0.8555555555555556
+    },
+    "hybrid_all_words": {
+      "hit@1": 0.7333333333333333,
+      "hit@5": 1.0,
+      "mrr@10": 0.84
+    },
+    "meaning": {
+      "hit@1": 0.7666666666666667,
+      "hit@5": 1.0,
+      "mrr@10": 0.865
+    },
+    "keyword": {
+      "hit@1": 0.7333333333333333,
+      "hit@5": 0.9666666666666667,
+      "mrr@10": 0.8455555555555556
+    }
+  },
+  "rows": [
+    {
+      "question": "Pettah market bargaining guide",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 1
+    },
+    {
+      "question": "fine dining Khmer cuisine",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 1
+    },
+    {
+      "question": "metro and train connections",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 1
+    },
+    {
+      "question": "molecular cuisine restaurants",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 2,
+      "keyword": 1
+    },
+    {
+      "question": "budget hotels with amenities",
+      "hybrid": 3,
+      "hybrid_all_words": 4,
+      "meaning": 4,
+      "keyword": 2
+    },
+    {
+      "question": "urban murals and sculptures",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 1
+    },
+    {
+      "question": "restaurants with set menus",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 2
+    },
+    {
+      "question": "beach deck chairs hire cost",
+      "hybrid": 2,
+      "hybrid_all_words": 5,
+      "meaning": 5,
+      "keyword": 1
+    },
+    {
+      "question": "rum museum guided tour",
+      "hybrid": 1,
+      "hybrid_all_words": 2,
+      "meaning": 1,
+      "keyword": 2
+    },
+    {
+      "question": "bike rentals and ski hills",
+      "hybrid": 2,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 2
+    },
+    {
+      "question": "aquapark and sauna",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 1
+    },
+    {
+      "question": "Rocinha favela tours",
+      "hybrid": 2,
+      "hybrid_all_words": 2,
+      "meaning": 1,
+      "keyword": 2
+    },
+    {
+      "question": "night market food guide",
+      "hybrid": 2,
+      "hybrid_all_words": 2,
+      "meaning": 2,
+      "keyword": 1
+    },
+    {
+      "question": "music schools near Ram Jhula",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 1
+    },
+    {
+      "question": "Samneunggol valley Buddha statues",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 2,
+      "keyword": 1
+    },
+    {
+      "question": "Tiger Hill Pagoda tickets",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 1
+    },
+    {
+      "question": "nightlife clubs dangerous area",
+      "hybrid": 2,
+      "hybrid_all_words": 2,
+      "meaning": 2,
+      "keyword": 2
+    },
+    {
+      "question": "shopping malls and jewellery",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 1
+    },
+    {
+      "question": "cathedral ticket prices",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 1
+    },
+    {
+      "question": "Buda Castle funicular price",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 1
+    },
+    {
+      "question": "design week and bike routes",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 1
+    },
+    {
+      "question": "festivals and youth venues",
+      "hybrid": 1,
+      "hybrid_all_words": 2,
+      "meaning": 2,
+      "keyword": 1
+    },
+    {
+      "question": "budget bazaars and jewellery markets",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 1
+    },
+    {
+      "question": "Crown Hill Cemetery tours",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 1
+    },
+    {
+      "question": "summer festivals and fairs",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 1
+    },
+    {
+      "question": "budget bars with cheap beer",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 1
+    },
+    {
+      "question": "Museo Egizio opening hours",
+      "hybrid": 3,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 6
+    },
+    {
+      "question": "luxury shopping teahouses massages",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 1
+    },
+    {
+      "question": "how to ride matatu",
+      "hybrid": 2,
+      "hybrid_all_words": 4,
+      "meaning": 1,
+      "keyword": 5
+    },
+    {
+      "question": "live music clubs and bars",
+      "hybrid": 1,
+      "hybrid_all_words": 1,
+      "meaning": 1,
+      "keyword": 1
+    }
+  ]
+}

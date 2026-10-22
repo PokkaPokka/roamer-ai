@@ -10,7 +10,7 @@ Goal: extend Roamer AI to include user auth, plan revision, RAG, MCP, and more f
 | Area         | Before                                                                   | Now                                                          | Why                                                      |
 | ------------ | ------------------------------------------------------------------------ | ------------------------------------------------------------ | -------------------------------------------------------- |
 | Database     | Render Postgres                                                          | Render Postgres (kept), pgvector 0.8.1 enabled               | Supabase free project limit reached                      |
-| LLM          | Groq `llama-3.3-70b-versatile`                                           | Local Ollama `qwen3:8b` by default with Groq still swappable | Zero cost during development                             |
+| LLM          | Groq `llama-3.3-70b-versatile`                                           | Local Ollama `qwen3:8b` by default; Groq `openai/gpt-oss-120b` swappable (the old model was retired) | Zero cost during development                             |
 | Flights      | AviationStack (live status only, no fares, no future dates on free plan) | SerpApi Google Flights                                       | AviationStack can't price a future trip                  |
 | Trip parsing | Regex only                                                               | LLM structured output (`TripRequest`) with regex fallback    | Extracts dates and traveller count; better agentic story |
 | Hotels       | Tavily                                                                   | Tavily                                                       | —                                                        |
@@ -204,9 +204,18 @@ Why it matters: building both sides shows you understand the protocol, not just 
 
 ## Phase 5 — Evals and observability
 
-- [ ] LangSmith tracing on every graph run
-- [ ] Golden set of about 30 trip queries
-- [ ] Ragas metrics: faithfulness and context precision
-- [ ] Put the before/after numbers in the README (e.g. "faithfulness 0.71 → 0.89 after hybrid search")
+Full results and every setback: [METRICS.md](METRICS.md).
 
-Why it matters: a measured improvement is the kind of result hiring managers look for.
+Changed from the original plan: model-quality scores (faithfulness, citation accuracy of
+generated plans) were dropped because they mostly measure the model, and the development
+model runs on a laptop. Each eval below measures a design decision with the model held
+fixed or not used.
+
+- [x] **Retrieval** (`evals/retrieval.py`): 90 reviewed queries in 3 sets. The first run showed hybrid search losing to meaning-only search (MRR 0.65 vs 0.77); the keyword half now needs every query word, which brought hybrid to 0.77 on both question sets, including one written after the change
+- [x] **Critic** (`evals/critic_detection.py`): injected errors in plans from tuning, held-out and final sets; final, untouched set 22/22 caught with 0 false alarms. Reviewing raw-plan flags found and fixed several precision problems along the way
+- [x] **Map lookup** (`evals/map_lookup.py`): 40 landmarks with Wikipedia coordinates; Roamer's strategy places 36/40 vs 21/40 for a plain Mapbox tool call
+- [x] **LangSmith tracing:** on whenever `LANGSMITH_API_KEY` is set; every graph run (nodes, LLM and tool calls) is traced. The account is in the APAC region, so `LANGSMITH_ENDPOINT` must point there (the US/EU endpoints answered 403)
+- [ ] Put the headline numbers in the README
+
+Why it matters: a measured improvement is the kind of result hiring managers look for, and a
+measured setback that was then fixed is a good interview story.
